@@ -12,9 +12,12 @@
 // External includes
 #include <cmath> // pow(), M_PI
 // My includes
+#include "math_helpers.hpp"
 #include "math_constants.hpp"
 #include "atmosphere.hpp"
+#include "math_variables.hpp"
 
+/* Conversion Functions */
 /**
  * Converts Fahrenheit to Celsius.
  *
@@ -45,13 +48,29 @@ float convertFarenheitToKelvin(float fahrenheit) {
     return ((fahrenheit - 32) * 5 / 9) + 273.15;
 }
 
+/* Calculating Intermediate Values */
+
+void calcRhoMetric(struct variables *vars, struct atmosphericData *atmos) {
+    float kelvinTemp = convertFarenheitToKelvin(atmos->temp);
+    float pressureFactor = atmos->pressure * std::exp(-vars->beta * vars->elevationM);
+    float humidityFactor = 0.3783 * atmos->relHumidity * vars->SVP / 100;
+    vars->rhoMetric = 1.2929 * (273 / kelvinTemp) * (pressureFactor - humidityFactor) / 760;
+}
+
 /**
  * Calculates the Reynolds Number for a golf ball with velocity=100mph.
  * Used for determining which coefficient of drag to use.
  *
  * @param atmos Struct containing current atmospheric information.
- * @return The calculated Re-100 value.
 */
-float calculateReynoldsNumber(struct atmosphericData *atmos) {
+void calcRe100(struct variables *vars, struct atmosphericData *atmos) {
 
+}
+
+// move this eventually
+void initVarsStruct(struct variables *vars, struct atmosphericData *atmos) {
+    size_t numCalcFuncs = sizeof(calcFuncs) / sizeof(CalcFuncPtr);
+    for (size_t i = 0; i < numCalcFuncs; ++i) {
+        calcFuncs[i](vars, atmos);
+    }
 }

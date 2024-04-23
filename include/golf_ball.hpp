@@ -5,6 +5,9 @@ constexpr float circumference = 5.277; // circumference (in) of a standard golf 
 constexpr float mass = 1.62; // mass (oz) of a standard golf ball
 
 struct golfBall {
+    float x0; // yards; points to the right of the golfer (this needs to be set to dist of ball -> sensor)
+    float y0;
+    float z0;
     float exitSpeed;
     float launchAngle;
     float direction;
@@ -13,9 +16,9 @@ struct golfBall {
 };
 
 struct golfBallLanding {
-    float xFinal; // yards
-    float yFinal; // yards
-    float zFinal; // yards
+    float xF; // yards
+    float yF;
+    float zF;
     float timeOfFlight;
     float bearing;
     float distance; // yards

@@ -25,9 +25,6 @@ namespace MATH_CONSTANTS {
     constexpr float Cl_default = 0.305;
     constexpr float coeff1 = 1.990;
     constexpr float coeff2 = -3.250;
-
-    // some const for testing
-    constexpr float someconst = 5.682E-03;
 }
 
 #endif // MATH_CONSTANTS_HPP
