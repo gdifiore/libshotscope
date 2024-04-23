@@ -20,7 +20,7 @@ struct variables {
     float vxw;
     float vyw;
     float SVP;
-    float pressuremmHG;
+    float barometricPressure;
     float Re100;
 };
 
