@@ -28,7 +28,7 @@ float convertFahrenheitToCelsius (float fahrenheit) {
  * @return The temperature in Kelvin.
  */
 float convertCelsiusToKelvin (float celsius) {
-    return celsius + 273.15;
+    return celsius + 273.16;
 }
 
 /**
@@ -38,7 +38,7 @@ float convertCelsiusToKelvin (float celsius) {
  * @return The temperature in Kelvin.
  */
 float convertFarenheitToKelvin (float fahrenheit) {
-    return ((fahrenheit - 32) * 5 / 9) + 273.15;
+    return ((fahrenheit - 32) * 5 / 9) + 273.16;
 }
 
 /**

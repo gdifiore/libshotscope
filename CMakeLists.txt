@@ -49,11 +49,15 @@ FetchContent_MakeAvailable(googletest)
 # Enable testing
 enable_testing()
 
-# Locate test files
-file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
+set(TEST_SOURCES
+    ${PROJECT_SOURCE_DIR}/test/test_math_helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/math_helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
+    # Add other test source files here
+)
 
 # Add test executable and link with gtest_main
-add_executable(my_test_executable ${TEST_SOURCES})
+add_executable(my_test_executable ${TEST_SOURCES} ${HEADERS})
 target_link_libraries(my_test_executable GTest::gtest_main)
 
 # Discover tests

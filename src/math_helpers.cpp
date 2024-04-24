@@ -19,6 +19,9 @@
 #include "math_utils.hpp"
 #include "math_variables.hpp"
 
+// I want all of these to have the same signature to be used as function pointers, so this is fine.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 /**
  * Calculates the air density value (in metric) for a golf ball.
  *
@@ -28,10 +31,7 @@
  */
 void calcRhoMetric(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    float kelvinTemp = convertFarenheitToKelvin(atmos->temp);
-    float pressureFactor = atmos->pressure * std::exp(-vars->beta * vars->elevationM);
-    float humidityFactor = 0.3783 * atmos->relHumidity * vars->SVP / 100;
-    vars->rhoMetric = 1.2929 * (273 / kelvinTemp) * (pressureFactor - humidityFactor) / 760;
+    vars->rhoMetric = 1.2929 * (273.0 / (convertCelsiusToKelvin(vars->tempC)) * (vars->barometricPressure * exp(-vars->beta * vars->elevationM) - 0.3783 * atmos->relHumidity * vars->SVP / 100.0) / 760.0);
 }
 
 /**
@@ -79,7 +79,7 @@ void calcv0(struct golfBall *ball, struct variables *vars, struct atmosphericDat
  */
 void calcv0x(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->v0x = 1.467 * vars->v0 * std::cos(ball->launchAngle * M_PI / 180) * std::sin(ball->direction * M_PI / 180);
+    vars->v0x = 1.467 * vars->v0 * std::cos(ball->launchAngle * M_PI / 180.0) * std::sin(ball->direction * M_PI / 180.0);
 }
 
 /**
@@ -91,7 +91,7 @@ void calcv0x(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcv0y(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->v0y = 1.467 * vars->v0 * std::cos(ball->launchAngle * M_PI / 180) * std::cos(ball->direction * M_PI / 180);
+    vars->v0y = 1.467 * vars->v0 * std::cos(ball->launchAngle * M_PI / 180.0) * std::cos(ball->direction * M_PI / 180.0);
 }
 
 /**
@@ -103,7 +103,7 @@ void calcv0y(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcv0z(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->v0z = 1.467 * vars->v0 * std::sin(ball->launchAngle * M_PI / 180);
+    vars->v0z = 1.467 * vars->v0 * std::sin(ball->launchAngle * M_PI / 180.0);
 }
 
 /**
@@ -115,7 +115,7 @@ void calcv0z(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcwx(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->wx = (ball->backspin * std::cos(ball->direction * M_PI / 180) - ball->sidespin * std::sin(ball->launchAngle * M_PI / 180) * std::sin(ball->direction * M_PI / 180)) * M_PI / 30;
+    vars->wx = (ball->backspin * std::cos(ball->direction * M_PI / 180.0) - ball->sidespin * std::sin(ball->launchAngle * M_PI / 180.0) * std::sin(ball->direction * M_PI / 180.0)) * M_PI / 30.0;
 }
 
 /**
@@ -127,7 +127,7 @@ void calcwx(struct golfBall *ball, struct variables *vars, struct atmosphericDat
  */
 void calcwy(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->wy = (-ball->backspin * std::sin(ball->launchAngle * M_PI / 180) - ball->sidespin * std::sin(ball->launchAngle * M_PI / 180) * std::cos(ball->direction * M_PI / 180)) * M_PI / 30;
+    vars->wy = (-ball->backspin * std::sin(ball->launchAngle * M_PI / 180.0) - ball->sidespin * std::sin(ball->launchAngle * M_PI / 180.0) * std::cos(ball->direction * M_PI / 180.0)) * M_PI / 30.0;
 }
 
 /**
@@ -139,7 +139,7 @@ void calcwy(struct golfBall *ball, struct variables *vars, struct atmosphericDat
  */
 void calcwz(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->wz = (ball->backspin * std::cos(ball->launchAngle * M_PI / 180)) * M_PI / 30;
+    vars->wz = (ball->sidespin * std::cos(ball->launchAngle * M_PI / 180.0)) * M_PI / 30.0;
 }
 
 /**
@@ -151,7 +151,7 @@ void calcwz(struct golfBall *ball, struct variables *vars, struct atmosphericDat
  */
 void calcOmega(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->omega = std::sqrt(std::pow(ball->backspin, 2) + std::pow(ball->sidespin, 2)) * M_PI / 30;
+    vars->omega = std::sqrt(std::pow(ball->backspin, 2) + std::pow(ball->sidespin, 2)) * M_PI / 30.0;
 }
 
 /**
@@ -163,7 +163,7 @@ void calcOmega(struct golfBall *ball, struct variables *vars, struct atmospheric
  */
 void calcROmega(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->rOmega = (std_golf_ball_circumference / (2 * M_PI)) * vars->omega / 12;
+    vars->rOmega = (std_golf_ball_circumference / (2 * M_PI)) * (vars->omega / 12.0);
 }
 
 /**
@@ -175,7 +175,7 @@ void calcROmega(struct golfBall *ball, struct variables *vars, struct atmospheri
  */
 void calcvxw(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->vxw = atmos->vWind * 1.467 * std::sin(atmos->phiWind * M_PI / 180);
+    vars->vxw = atmos->vWind * 1.467 * std::sin(atmos->phiWind * M_PI / 180.0);
 }
 
 /**
@@ -187,7 +187,7 @@ void calcvxw(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcvyw(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->vyw = atmos->vWind * 1.467 * std::cos(atmos->phiWind * M_PI / 180);
+    vars->vyw = atmos->vWind * 1.467 * std::cos(atmos->phiWind * M_PI / 180.0);
 }
 
 /**
@@ -211,7 +211,7 @@ void calcSVP(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcBarometricPressure(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->barometricPressure = atmos->pressure * 1000 / 39.37;
+    vars->barometricPressure = atmos->pressure * 1000.0 / 39.37;
 }
 
 /**
@@ -224,9 +224,10 @@ void calcBarometricPressure(struct golfBall *ball, struct variables *vars, struc
  */
 void calcRe100(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->Re100 = vars->rhoImperial * 44.7 * (std_golf_ball_circumference / (M_PI * 39.37)) * (convertCelsiusToKelvin(vars->tempC) + 120)
+    vars->Re100 = vars->rhoMetric * 44.7 * (std_golf_ball_circumference / (M_PI * 39.37)) * (convertCelsiusToKelvin(vars->tempC) + 120)
                     / (0.000001512 * std::pow(convertCelsiusToKelvin(vars->tempC), 1.5));
 }
+#pragma GCC diagnostic pop
 
 /**
  * Initialize all intermediate variables needed for physics calculations.
@@ -234,15 +235,36 @@ void calcRe100(struct golfBall *ball, struct variables *vars, struct atmospheric
  * @param ball Struct containing current ball information.
  * @param vars Struct containing current variables for calculations.
  * @param atmos Struct containing current atmospheric information.
- */void initVars(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
+ */
+void initVars(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
+    CalcFuncPtr calcFuncs[] = {
+        calcBarometricPressure,
+        calcSVP,
+        calcOmega,
+        calcROmega,
+        calcRhoMetric,
+        calcRhoImperial,
+        calcc0,
+        calcv0,
+        calcv0x,
+        calcv0y,
+        calcv0z,
+        calcwx,
+        calcwy,
+        calcwz,
+        calcvxw,
+        calcvyw,
+        calcRe100
+    };
+
+    // these don't depend on any crazy physics calculations
+    vars->tempC = convertFahrenheitToCelsius(atmos->temp);
+    vars->elevationM = convertFeetToMeters(atmos->elevation);
+
     uint8_t numCalcFuncs = sizeof(calcFuncs) / sizeof(CalcFuncPtr);
     for (uint8_t i = 0; i < numCalcFuncs; ++i)
     {
         calcFuncs[i](ball, vars, atmos);
     }
-
-    // these don't depend on any crazy physics calculations
-    vars->tempC = convertFahrenheitToCelsius(atmos->temp);
-    vars->elevationM = convertFeetToMeters(atmos->elevation);
 }

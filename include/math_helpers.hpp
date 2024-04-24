@@ -21,26 +21,6 @@ void calcRe100(struct golfBall *ball, struct variables *vars, struct atmospheric
 
 
 typedef void (*CalcFuncPtr)(struct golfBall *ball, struct variables*, struct atmosphericData*);
-// needs to be in a specific order, some variables depend on others
-static CalcFuncPtr calcFuncs[] = {
-    calcRhoMetric,
-    calcRhoImperial,
-    calcc0,
-    calcv0,
-    calcv0x,
-    calcv0y,
-    calcv0z,
-    calcwx,
-    calcwy,
-    calcwz,
-    calcOmega,
-    calcROmega,
-    calcvxw,
-    calcvyw,
-    calcSVP,
-    calcBarometricPressure,
-    calcRe100
-};
 
 void initVars (struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos);
 
