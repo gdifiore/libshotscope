@@ -80,7 +80,7 @@ void calcv0(struct golfBall *ball, struct variables *vars, struct atmosphericDat
  */
 void calcv0x(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->v0x = 1.467 * vars->v0 * std::cos(ball->launchAngle * M_PI / 180.0) * std::sin(ball->direction * M_PI / 180.0);
+    vars->v0x = 1.467 * ball->exitSpeed * std::cos(ball->launchAngle * M_PI / 180.0) * std::sin(ball->direction * M_PI / 180.0);
 }
 
 /**
@@ -92,7 +92,7 @@ void calcv0x(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcv0y(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->v0y = 1.467 * vars->v0 * std::cos(ball->launchAngle * M_PI / 180.0) * std::cos(ball->direction * M_PI / 180.0);
+    vars->v0y = 1.467 * ball->exitSpeed * std::cos(ball->launchAngle * M_PI / 180.0) * std::cos(ball->direction * M_PI / 180.0);
 }
 
 /**
@@ -104,7 +104,7 @@ void calcv0y(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcv0z(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->v0z = 1.467 * vars->v0 * std::sin(ball->launchAngle * M_PI / 180.0);
+    vars->v0z = 1.467 * ball->exitSpeed * std::sin(ball->launchAngle * M_PI / 180.0);
 }
 
 /**
@@ -128,7 +128,7 @@ void calcwx(struct golfBall *ball, struct variables *vars, struct atmosphericDat
  */
 void calcwy(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->wy = (-ball->backspin * std::sin(ball->launchAngle * M_PI / 180.0) - ball->sidespin * std::sin(ball->launchAngle * M_PI / 180.0) * std::cos(ball->direction * M_PI / 180.0)) * M_PI / 30.0;
+    vars->wy = (-ball->backspin * std::sin(ball->direction * M_PI / 180.0) - ball->sidespin * std::sin(ball->launchAngle * M_PI / 180.0) * std::cos(ball->direction * M_PI / 180.0)) * M_PI / 30.0;
 }
 
 /**

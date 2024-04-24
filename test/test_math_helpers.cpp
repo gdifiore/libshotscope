@@ -78,4 +78,8 @@ TEST(ShotScopeTest, initVars) {
     EXPECT_NEAR(vars->SVP, 18.79, 0.01);
     EXPECT_NEAR(vars->barometricPressure, 759.97, 0.1);
     EXPECT_NEAR(vars->Re100, 123600, 100);
+
+    free(ball);
+    free(atmos);
+    free(vars);
 }
