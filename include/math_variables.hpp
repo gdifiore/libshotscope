@@ -5,7 +5,7 @@ struct variables {
     float rhoImperial;
     float rhoMetric;
     float c0;
-    float beta = 0.0001217;
+    float beta;
     float v0;
     float v0x;
     float v0y;

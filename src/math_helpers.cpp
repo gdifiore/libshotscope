@@ -11,6 +11,7 @@
 
 // External includes
 #include <cmath> // pow(), M_PI
+#include <stdio.h>
 // My includes
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
@@ -31,7 +32,7 @@
  */
 void calcRhoMetric(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->rhoMetric = 1.2929 * (273.0 / (convertCelsiusToKelvin(vars->tempC)) * (vars->barometricPressure * exp(-vars->beta * vars->elevationM) - 0.3783 * atmos->relHumidity * vars->SVP / 100.0) / 760.0);
+    vars->rhoMetric = 1.2929 * ((273.0 / (vars->tempC + 273)) * ((vars->barometricPressure * exp(-vars->beta * vars->elevationM) - 0.3783 * atmos->relHumidity * (vars->SVP / 100.0)) / 760.0));
 }
 
 /**
@@ -199,7 +200,7 @@ void calcvyw(struct golfBall *ball, struct variables *vars, struct atmosphericDa
  */
 void calcSVP(struct golfBall *ball, struct variables *vars, struct atmosphericData *atmos)
 {
-    vars->SVP = 4.5841 * std::exp((18.687 - atmos->temp / 234.5) * atmos->temp / (257.14 + atmos->temp));
+    vars->SVP = 4.5841 * exp((18.687 - vars->tempC / 234.5) * vars->tempC / (257.14 + vars->tempC));
 }
 
 /**
@@ -259,6 +260,7 @@ void initVars(struct golfBall *ball, struct variables *vars, struct atmosphericD
     };
 
     // these don't depend on any crazy physics calculations
+    vars->beta = 0.0001217;
     vars->tempC = convertFahrenheitToCelsius(atmos->temp);
     vars->elevationM = convertFeetToMeters(atmos->elevation);
 
