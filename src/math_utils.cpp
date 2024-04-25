@@ -17,7 +17,7 @@
  * @param fahrenheit The temperature in Fahrenheit.
  * @return The temperature in Celsius.
  */
-float convertFahrenheitToCelsius (float fahrenheit) {
+float math_utils::convertFahrenheitToCelsius (float fahrenheit) {
     return (fahrenheit - 32) * 5 / 9;
 }
 
@@ -27,7 +27,7 @@ float convertFahrenheitToCelsius (float fahrenheit) {
  * @param celsius The temperature in Celsius.
  * @return The temperature in Kelvin.
  */
-float convertCelsiusToKelvin (float celsius) {
+float math_utils::convertCelsiusToKelvin (float celsius) {
     return celsius + 273.16;
 }
 
@@ -37,7 +37,7 @@ float convertCelsiusToKelvin (float celsius) {
  * @param fahrenheit The temperature in Fahrenheit.
  * @return The temperature in Kelvin.
  */
-float convertFarenheitToKelvin (float fahrenheit) {
+float math_utils::convertFahrenheitToKelvin (float fahrenheit) {
     return ((fahrenheit - 32) * 5 / 9) + 273.16;
 }
 
@@ -47,6 +47,6 @@ float convertFarenheitToKelvin (float fahrenheit) {
  * @param feet The length in feet.
  * @return The length in meters.
  */
-float convertFeetToMeters(float feet) {
+float math_utils::convertFeetToMeters(float feet) {
     return feet * 0.3048;
 }

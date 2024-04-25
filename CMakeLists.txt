@@ -10,7 +10,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # Specify the source files
 set(SOURCES
    ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
-   ${PROJECT_SOURCE_DIR}/src/math_helpers.cpp
+   ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
    ${PROJECT_SOURCE_DIR}/src/main.cpp
 )
 
@@ -19,8 +19,7 @@ set(HEADERS
    ${PROJECT_SOURCE_DIR}/include/math_constants.hpp
    ${PROJECT_SOURCE_DIR}/include/golf_ball.hpp
    ${PROJECT_SOURCE_DIR}/include/math_utils.hpp
-   ${PROJECT_SOURCE_DIR}/include/math_helpers.hpp
-   ${PROJECT_SOURCE_DIR}/include/math_variables.hpp
+   ${PROJECT_SOURCE_DIR}/include/GolfBallPhysicsVariables.hpp
    ${PROJECT_SOURCE_DIR}/include/atmosphere.hpp
 )
 
@@ -31,7 +30,7 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 
 # Include Google Test
 include(FetchContent)
@@ -51,7 +50,7 @@ enable_testing()
 
 set(TEST_SOURCES
     ${PROJECT_SOURCE_DIR}/test/test_math_helpers.cpp
-    ${PROJECT_SOURCE_DIR}/src/math_helpers.cpp
+    ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
     ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
     # Add other test source files here
 )

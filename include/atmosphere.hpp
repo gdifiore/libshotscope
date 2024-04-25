@@ -1,8 +1,6 @@
 #ifndef ATMOSPHERE_HPP
 #define ATMOSPHERE_HPP
 
-#include <cstdint>
-
 struct atmosphericData {
     float temp; // decimals better, but limited memory
     float elevation;
