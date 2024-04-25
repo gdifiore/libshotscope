@@ -1,2 +1,2 @@
-# ShotScope
- ShotScope - golf ball tracking for the masses
+# libshotscope
+ libshotscope - golf ball tracking for the masses
