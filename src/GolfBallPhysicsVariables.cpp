@@ -26,6 +26,23 @@ GolfBallPhysicsVariables::GolfBallPhysicsVariables(const golfBall& ball, const a
 {
     tempC = math_utils::convertFahrenheitToCelsius(atmos.temp);
     elevationM = math_utils::convertFeetToMeters(atmos.elevation);
+    rhoMetric = 0.0;
+    rhoImperial = 0.0;
+    c0 = 0.0;
+    v0 = 0.0;
+    v0x = 0.0;
+    v0y = 0.0;
+    v0z = 0.0;
+    wx = 0.0;
+    wy = 0.0;
+    wz = 0.0;
+    omega = 0.0;
+    rOmega = 0.0;
+    vxw = 0.0;
+    vyw = 0.0;
+    SVP = 0.0;
+    barometricPressure = 0.0;
+    Re100 = 0.0;
 }
 
 /**
