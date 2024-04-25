@@ -33,3 +33,4 @@
 
 # Custom
 build/
+.vscode/
