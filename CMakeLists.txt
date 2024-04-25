@@ -50,6 +50,7 @@ enable_testing()
 
 set(TEST_SOURCES
     ${PROJECT_SOURCE_DIR}/test/test_math_helpers.cpp
+    ${PROJECT_SOURCE_DIR}/test/test_math_utils.cpp
     ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
     ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
     # Add other test source files here
