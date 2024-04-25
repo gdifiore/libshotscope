@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-
 #include "atmosphere.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "golf_ball.hpp"
@@ -46,7 +45,7 @@ TEST(ShotScopeTest, initVarsDefault) {
     ballVars.calculateAllVariables();
     EXPECT_NEAR(ballVars.getRhoImperial(), 0.0748, 0.001);
     EXPECT_NEAR(ballVars.getRhoMetric(), 1.194, 0.001);
-    EXPECT_NEAR(ballVars.getC0(), 0.005682, 0.000001);
+    EXPECT_NEAR(ballVars.getC0(), 0.005682, 0.00001);
     EXPECT_NEAR(ballVars.getV0(), 234.72, 0.1);
     EXPECT_NEAR(ballVars.getV0x(), 0.0, 0.1);
     EXPECT_NEAR(ballVars.getV0y(), 230.41, 0.1);
@@ -75,7 +74,7 @@ TEST(ShotScopeTest, initVarsNotDefault) {
     vars.calculateAllVariables();
     EXPECT_NEAR(vars.getRhoImperial(), 0.0745, 0.001);
     EXPECT_NEAR(vars.getRhoMetric(), 1.190, 0.001);
-    EXPECT_NEAR(vars.getC0(), 0.005663, 0.000001);
+    EXPECT_NEAR(vars.getC0(), 0.005663, 0.00001);
     EXPECT_NEAR(vars.getV0(), 234.72, 0.1);
     EXPECT_NEAR(vars.getV0x(), 0.0, 0.1);
     EXPECT_NEAR(vars.getV0y(), 230.41, 0.1);

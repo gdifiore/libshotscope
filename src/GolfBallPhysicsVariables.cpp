@@ -1,13 +1,31 @@
+/**
+ * @file GolfBallPhysicsVariables.cpp
+ * @author Gabriel DiFiore
+ * @brief Contains the implementation of the GolfBallPhysicsVariables class.
+ *
+ * This file defines the GolfBallPhysicsVariables class, which is responsible for calculating
+ * various intermediate physics variables related to a golf ball. It includes functions for
+ * calculating air density, barometric pressure, spin rates, launch angles, wind effects, and
+ * other variables used in golf ball physics calculations.
+ *
+ * The GolfBallPhysicsVariables class takes a golf ball object and atmospheric data as input,
+ * and provides methods to calculate all the required variables.
+ *
+ * @copyright Copyright (c) 2024, Gabriel DiFiore
+ */
+
 #include <cmath>
 
+#include "math_utils.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "golf_ball.hpp"
 #include "atmosphere.hpp"
-#include "math_utils.hpp"
 
 GolfBallPhysicsVariables::GolfBallPhysicsVariables(const golfBall& ball, const atmosphericData& atmos)
-    : ball(ball), atmos(atmos), beta(0.0001217), tempC(convertFahrenheitToCelsius(atmos.temp)), elevationM(convertFeetToMeters(atmos.elevation))
+    : ball(ball), atmos(atmos), beta(0.0001217)
 {
+    tempC = math_utils::convertFahrenheitToCelsius(atmos.temp);
+    elevationM = math_utils::convertFeetToMeters(atmos.elevation);
 }
 
 void GolfBallPhysicsVariables::calculateAllVariables() {
@@ -34,7 +52,7 @@ void GolfBallPhysicsVariables::calculateAllVariables() {
  * Calculates the air density value (in metric) for a golf ball.
  */
 void GolfBallPhysicsVariables::calculateRhoMetric() {
-    rhoMetric = 1.2929 * ((273.0 / (tempC + 273)) * ((barometricPressure * exp(-beta * elevationM) - 0.3783 * atmos.relHumidity * (this->SVP / 100.0)) / 760.0));
+    rhoMetric = 1.2929 * ((273.0 / (math_utils::convertCelsiusToKelvin(tempC)) * ((barometricPressure * exp(-beta * elevationM) - 0.3783 * atmos.relHumidity * (this->SVP / 100.0)) / 760.0)));
 }
 
 void GolfBallPhysicsVariables::calculateRhoImperial() {
@@ -98,6 +116,6 @@ void GolfBallPhysicsVariables::calculateBarometricPressure() {
 }
 
 void GolfBallPhysicsVariables::calculateRe100() {
-    Re100 = rhoMetric * 44.7 * (ball.std_golf_ball_circumference / (M_PI * 39.37)) * (convertCelsiusToKelvin(tempC) + 120)
-            / (0.000001512 * std::pow(convertCelsiusToKelvin(tempC), 1.5));
+    Re100 = rhoMetric * 44.7 * (ball.std_golf_ball_circumference / (M_PI * 39.37)) * (math_utils::convertCelsiusToKelvin(tempC) + 120)
+            / (0.000001512 * std::pow(math_utils::convertCelsiusToKelvin(tempC), 1.5));
 }
