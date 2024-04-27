@@ -9,22 +9,21 @@ class TrajectoryRenderer {
 
         void init(GLFWwindow* window) {
             glfwSetMouseButtonCallback(window, mouse_callback);
-            // ... (initialize GLEW, set up vertex data, etc.)
+            // init GLEW, set up vertex data, etc.
         }
 
         void render() {
-            // Clear color buffer
             glClear(GL_COLOR_BUFFER_BIT);
 
-            // Set up projection and modelview matrices
+            // set up projection and modelview matrices
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
             glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
-            glTranslatef(panX, panY, 0.0f); // Apply panning transformation
+            glTranslatef(panX, panY, 0.0f); // apply panning transformation
 
-            // Render vertices as a line loop
+            // render vertices as a line loop
             glBegin(GL_LINE_LOOP);
             for (int i = 0; i < static_cast<int>(vertices.size()); i += 3) {
                 glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
