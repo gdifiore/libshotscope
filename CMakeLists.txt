@@ -11,6 +11,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(SOURCES
    ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
    ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
+   ${PROJECT_SOURCE_DIR}/src/TrajectoryRenderer.cpp
 )
 
 # Specify the header files
@@ -19,17 +20,20 @@ set(HEADERS
    ${PROJECT_SOURCE_DIR}/include/golf_ball.hpp
    ${PROJECT_SOURCE_DIR}/include/math_utils.hpp
    ${PROJECT_SOURCE_DIR}/include/GolfBallPhysicsVariables.hpp
+   ${PROJECT_SOURCE_DIR}/include/TrajectoryRenderer.hpp
    ${PROJECT_SOURCE_DIR}/include/atmosphere.hpp
 )
 
+# Find OpenGL
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
+
 # Create the static library
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
 
 # Additional configuration (if needed)
-# set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-# set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 # Include Google Test
 include(FetchContent)
@@ -57,7 +61,7 @@ set(TEST_SOURCES
 
 # Add test executable and link with gtest_main and the static library
 add_executable(libshotscope_tests ${TEST_SOURCES})
-target_link_libraries(libshotscope_tests ${PROJECT_NAME} GTest::gtest_main)
+target_link_libraries(libshotscope_tests ${PROJECT_NAME} GTest::gtest_main ${OPENGL_LIBRARIES})
 
 # Discover tests
 include(GoogleTest)
