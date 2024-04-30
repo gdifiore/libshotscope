@@ -7,9 +7,8 @@ CoefficientModel::CoefficientModel(AuxiliaryCalculations auxCalc) {
     auxCalc = auxCalc;
 }
 
-CoefficientModel::~CoefficientModel() {
-    // Destructor implementation
-}
+CoefficientModel::~CoefficientModel() = default;
+
 
 float CoefficientModel::determineCoefficientOfDrag() {
     if (auxCalc.Re <= math_constants::CdL) {
