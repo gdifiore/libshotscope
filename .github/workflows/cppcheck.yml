@@ -52,4 +52,4 @@ jobs:
         clang_tidy_args: -checks='*,fuchsia-*,google-*,zircon-*,abseil-*,modernize-use-trailing-return-type'
 
         # (Optional) cppcheck args
-        cppcheck_args: --enable=all --suppress=missingInclude
+        cppcheck_args: --enable=all --suppress=missingInclude -itest/
