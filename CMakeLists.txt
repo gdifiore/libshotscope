@@ -11,6 +11,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 set(SOURCES
    ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
    ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
+   ${PROJECT_SOURCE_DIR}/src/GolfBallKinematics.cpp
+   ${PROJECT_SOURCE_DIR}/src/CoefficientModel.cpp
+   ${PROJECT_SOURCE_DIR}/src/AuxiliaryCalculations.cpp
 )
 
 # Specify the header files
@@ -20,6 +23,9 @@ set(HEADERS
    ${PROJECT_SOURCE_DIR}/include/math_utils.hpp
    ${PROJECT_SOURCE_DIR}/include/GolfBallPhysicsVariables.hpp
    ${PROJECT_SOURCE_DIR}/include/atmosphere.hpp
+   ${PROJECT_SOURCE_DIR}/include/AuxiliaryCalculations.hpp
+   ${PROJECT_SOURCE_DIR}/include/CoefficientModel.hpp
+   ${PROJECT_SOURCE_DIR}/include/GolfBallKinematics.hpp
 )
 
 # Create the static library
