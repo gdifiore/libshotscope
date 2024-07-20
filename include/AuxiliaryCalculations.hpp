@@ -2,13 +2,14 @@
 #define AUXILIARYCALCULATIONS_HPP
 
 #include "GolfBallPhysicsVariables.hpp"
+#include "atmosphere.hpp"
 
 class CoefficientModel;
 
 class AuxiliaryCalculations
 {
 public:
-    AuxiliaryCalculations(GolfBallPhysicsVariables vars, CoefficientModel& coeffModel);
+    AuxiliaryCalculations(atmosphericData& atmos, GolfBallPhysicsVariables& vars, CoefficientModel& coeffModel);
 
     float getX() const { return m_x; };
     void calcX();
@@ -25,6 +26,12 @@ public:
     float getAMagX() const { return m_adragx; };
     void calcAMagX();
 
+    float getVW() const { return m_vw; };
+    void calcVW();
+
+    float getVxW() const { return m_vxw; };
+    void calcVxW();
+
     float getRe() const { return m_Re; };
     void calcRe();
 
@@ -32,13 +39,16 @@ public:
     void calcS();
 
 private:
-    GolfBallPhysicsVariables vars;
+    atmosphericData& atmos;
+    GolfBallPhysicsVariables& vars;
     CoefficientModel& coeffModel;
     float m_x;
     float m_vx;
     float m_ax;
     float m_adragx;
     float m_aMagx;
+    float m_vw;
+    float m_vxw;
 
     float m_Re; // Reynolds Number (x10^-5)
 

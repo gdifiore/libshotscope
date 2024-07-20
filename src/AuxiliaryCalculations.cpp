@@ -1,8 +1,11 @@
+#include <math.h>
+
 #include "AuxiliaryCalculations.hpp"
 #include "GolfBallKinematics.hpp"
 #include "CoefficientModel.hpp"
+#include "atmosphere.hpp"
 
-AuxiliaryCalculations::AuxiliaryCalculations(GolfBallPhysicsVariables vars, CoefficientModel& coeffModel) : vars(vars), coeffModel(coeffModel)
+AuxiliaryCalculations::AuxiliaryCalculations(atmosphericData& atmos, GolfBallPhysicsVariables& vars, CoefficientModel& coeffModel) : atmos(atmos), vars(vars), coeffModel(coeffModel)
 {
 }
 
@@ -24,6 +27,22 @@ void AuxiliaryCalculations::calcAX()
 void AuxiliaryCalculations::calcADragX()
 {
     m_adragx = -vars.getC0() * coeffModel.determineCoefficientOfDrag() * m_vw * (m_vx - m_vxw);
+}
+
+void AuxiliaryCalculations::calcVW()
+{
+    double z = vars.getZ();
+
+    if (vars. >= atmos.hWind) {
+        m_vw = sqrt(pow((m_vx - m_vxw), 2) + pow((m_vy - m_vyw), 2) + pow(m_vz, 2));
+    } else {
+        m_vw = m_v;
+    }
+}
+
+void AuxiliaryCalculations::calcVxW()
+{
+    m_vxw = 0.0;
 }
 
 void AuxiliaryCalculations::calcRe()
