@@ -2,50 +2,90 @@
 
 #include "AuxiliaryCalculations.hpp"
 #include "GolfBallKinematics.hpp"
-#include "CoefficientModel.hpp"
+#include "math_constants.hpp"
 #include "atmosphere.hpp"
 
-AuxiliaryCalculations::AuxiliaryCalculations(atmosphericData& atmos, GolfBallPhysicsVariables& vars, CoefficientModel& coeffModel) : atmos(atmos), vars(vars), coeffModel(coeffModel)
+void AuxiliaryCalculations::calculatePosition()
+{
+    // calculate balls 3d position
+}
+
+void AuxiliaryCalculations::calculateV()
+{
+    float vx = velocity3D[0] + acceleration3D[0] * GolfBallKinematics::dt;
+}
+
+void AuxiliaryCalculations::calculateVelocityw()
 {
 }
 
-void AuxiliaryCalculations::calcX()
+void AuxiliaryCalculations::calculateAccel()
 {
-    m_x = m_x + m_vx * GolfBallKinematics::dt + 0.5 * m_ax * GolfBallKinematics::dt * GolfBallKinematics::dt;
+    acceleration3D[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
+    acceleration3D[1] = accelerationDrag3D[1] + accelertaionMagnitude3D[1];
+    acceleration3D[2] = accelerationDrag3D[2] + accelertaionMagnitude3D[2] - 32.174;
 }
 
-void AuxiliaryCalculations::calcVX()
+void AuxiliaryCalculations::calculateAccelD()
 {
-    m_vx = m_vx + m_ax * GolfBallKinematics::dt;
+    accelerationDrag3D[0] = -physicsVars.getC0() * determineCoefficientOfDrag() * velocity3D_w[0] * (velocity3D[0] - velocity3D_w[0]);
+    accelerationDrag3D[1] = -physicsVars.getC0() * determineCoefficientOfDrag() * velocity3D_w[1] * (velocity3D[1] - velocity3D_w[1]);
+    accelerationDrag3D[2] = -physicsVars.getC0() * determineCoefficientOfDrag() * velocity3D_w[2] * velocity3D[2];
 }
 
-void AuxiliaryCalculations::calcAX()
+void AuxiliaryCalculations::calculateAccelM()
 {
-    m_ax = m_adragx + m_aMagx;
+    accelertaionMagnitude3D[0] = physicsVars.getC0() * (determineCoefficientOfLift() / physicsVars.getOmega()) * vw * (physicsVars.getW()[1] * velocity3D[2] - physicsVars.getW()[2] * (velocity3D[1] - velocity3D_w[1])) / w_perp_div_w;
+    accelertaionMagnitude3D[1] = physicsVars.getC0() * (determineCoefficientOfLift() / physicsVars.getOmega()) * vw * (physicsVars.getW()[2] * (velocity3D[1] - physicsVars.getVw()[1]) - physicsVars.getW()[0] * velocity3D[2]) / w_perp_div_w;
+    accelertaionMagnitude3D[2] = physicsVars.getC0() * (determineCoefficientOfLift() / physicsVars.getOmega()) * vw * (physicsVars.getW()[0] * (velocity3D[1] - physicsVars.getVw()[1]) - physicsVars.getW()[1] * (velocity3D[0] - velocity3D_w[0]) ) / w_perp_div_w;
 }
 
-void AuxiliaryCalculations::calcADragX()
+void AuxiliaryCalculations::calculateTau()
 {
-    m_adragx = -vars.getC0() * coeffModel.determineCoefficientOfDrag() * m_vw * (m_vx - m_vxw);
 }
 
-void AuxiliaryCalculations::calcVW()
+void AuxiliaryCalculations::calculateRw()
 {
-    double z = vars.getZ();
+}
 
-    if (vars. >= atmos.hWind) {
-        m_vw = sqrt(pow((m_vx - m_vxw), 2) + pow((m_vy - m_vyw), 2) + pow(m_vz, 2));
-    } else {
-        m_vw = m_v;
+void AuxiliaryCalculations::calculateVw()
+{
+}
+
+void AuxiliaryCalculations::calculateRe_x_e5()
+{
+    // calculate Re x e^5
+}
+
+float AuxiliaryCalculations::determineCoefficientOfDrag()
+{
+    if (getRe_x_e5() <= math_constants::CdL)
+    {
+        return math_constants::CdL;
+    }
+    else if (getRe_x_e5() < 1)
+    {
+        return math_constants::CdL - (math_constants::CdL - math_constants::CdH) * (getRe_x_e5() - 0.5) / 0.5 + math_constants::CdS * getSpinFactor();
+    }
+    else
+    {
+        return math_constants::CdH + math_constants::CdS * getSpinFactor();
     }
 }
 
-void AuxiliaryCalculations::calcVxW()
+float AuxiliaryCalculations::determineCoefficientOfLift()
 {
-    m_vxw = 0.0;
+    if (getSpinFactor() <= 0.3)
+    {
+        return math_constants::coeff1 * getSpinFactor() + math_constants::coeff2 * pow(getSpinFactor(), 2);
+    }
+    else
+    {
+        return 0.305;
+    }
 }
 
-void AuxiliaryCalculations::calcRe()
+void AuxiliaryCalculations::calculateAllVariables()
 {
-
+    // call all calculate function
 }
