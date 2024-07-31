@@ -2,12 +2,13 @@
 #define GOLFBALLFLIGHTINTERMEDIARY_HPP
 
 #include <array>
+#include <cmath>
 #include <optional>
 #include <stdexcept>
 
 #include "GolfBallPhysicsVariables.hpp"
-#include "golf_ball.hpp"
 #include "atmosphere.hpp"
+#include "golf_ball.hpp"
 
 class GolfBallFlightIntermediary {
  public:
@@ -21,6 +22,7 @@ class GolfBallFlightIntermediary {
   float getV() const { return v; }
   float getVMph() const { return vMph; }
   const Vector3D &getVelocity3D() const { return velocity3D; }
+  float getPhi() const { return phi; }
   float getTau() const { return tau; }
   float getRw() const { return rw; }
   float getWPerp() const { return w_perp; }
@@ -53,17 +55,18 @@ class GolfBallFlightIntermediary {
   // CoefficientModel &coeffModel;
 
   // kinematics class
-  Vector3D position = {ball.x0, ball.y0, ball.z0};
+  Vector3D position;
 
   // want this refactored out
   float d_t = 0.01f;  // dt
   float t_sec = 0.0f;  // t_sec
 
   // Member variables               // column title in excel sheet
-  float v;                                            // v
-  float vMph;                                         // vmph
-  Vector3D velocity3D = {physicsVars.getV0Vector()};  // vx/vy/vz
+  Vector3D velocity3D;  // vx/vy/vz
+  float v;  // v
+  float vMph;                                    // vmph
 
+  float phi;                         // phi
   float tau;                         // tau
   float rw;                          // rw
   float w_perp = 0.0f;               // w_perp
@@ -85,11 +88,14 @@ class GolfBallFlightIntermediary {
   void calculateAccelD();
   void calculateAccelM();
 
+  void calculatePhi();
   void calculateTau();
   void calculateRw();
   void calculateVw();
   void calculateRe_x_e5();
+  void calculateSpinFactor();
 
+  void initialize();
   // Want below to be in its own Kinematics Class
   void calculatePosition();
 };

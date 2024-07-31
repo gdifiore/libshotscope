@@ -7,36 +7,7 @@
 #include "math_constants.hpp"
 #include "math_utils.hpp"
 
-struct golfBall initBall(float a, float b, float c, float d, float e, float f,
-                         float g, float h) {
-  struct golfBall testBall;
-
-  testBall.x0 = a;
-  testBall.y0 = b;
-  testBall.z0 = c;
-  testBall.exitSpeed = d;
-  testBall.launchAngle = e;
-  testBall.direction = f;
-  testBall.backspin = g;
-  testBall.sidespin = h;
-
-  return testBall;
-}
-
-struct atmosphericData initAtmos(float a, float b, float c, float d, float e,
-                                 float f, float g) {
-  struct atmosphericData atmosData;
-
-  atmosData.temp = a;
-  atmosData.elevation = b;
-  atmosData.vWind = c;
-  atmosData.phiWind = d;
-  atmosData.hWind = e;
-  atmosData.relHumidity = f;
-  atmosData.pressure = g;
-
-  return atmosData;
-}
+#include "test_helpers.hpp"
 
 // Test default initial values from a spreadsheet created by Alan M. Nathan at
 // U. of Illinois
@@ -98,20 +69,4 @@ TEST(ShotScopeTest, initVarsNotDefault) {
   EXPECT_NEAR(vars.getSVP(), 18.79, 0.01);
   EXPECT_NEAR(vars.getBarometricPressure(), 759.97, 0.1);
   EXPECT_NEAR(vars.getRe100(), 123200, 100);
-}
-
-TEST(ShotScopeTest, intermediaryCalc) {
-  const struct golfBall ball =
-      initBall(0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 500.0);
-  const struct atmosphericData atmos =
-      initAtmos(70.0, 90.0, 2.0, 30.0, 50.0, 50.0, 29.92);
-
-  auto vars = GolfBallPhysicsVariables(ball, atmos);
-  auto intermediary = GolfBallFlightIntermediary(vars, ball, atmos);
-
-  vars.calculateAllVariables();
-  intermediary.calculateAllVariables();
-  EXPECT_NEAR(intermediary.getPosition()[0], 0.000, 0.1);
-  EXPECT_NEAR(intermediary.getPosition()[1], 2.300, 0.1);
-  EXPECT_NEAR(intermediary.getPosition()[2], 0.448, 0.1);
 }

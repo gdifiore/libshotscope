@@ -6,24 +6,34 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "math_constants.hpp"
+#include <iostream>
 
 GolfBallFlightIntermediary::GolfBallFlightIntermediary(
-    GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-    const struct atmosphericData &atmos): physicsVars(physicsVars), ball(ball), atmos(atmos) {
-  // Initialize position, velocity, and acceleration
-  position = {0.0, 0.0, 0.0};
-  velocity3D = {0.0, 0.0, 0.0};
-  acceleration3D = {0.0, 0.0, 0.0};
-  accelerationDrag3D = {0.0, 0.0, 0.0};
-  accelertaionMagnitude3D = {0.0, 0.0, 0.0};
+  GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
+  const struct atmosphericData &atmos): physicsVars(physicsVars), ball(ball), atmos(atmos) {
 
-  // Set default values for other variables
-  v = 0.0;
-  vMph = 0.0;
-  vw = 0.0;
-  rw = 0.0;
-  tau = 0.0;
-  Re_x_e5 = 0.0;
+  initialize();
+}
+
+// Initialize all variables
+// Equivalent to the 
+void GolfBallFlightIntermediary::initialize() {
+  position = {ball.x0, ball.y0, ball.z0};
+  velocity3D = physicsVars.getV0Vector();
+
+  v = sqrt(velocity3D[0] * velocity3D[0] + velocity3D[1] * velocity3D[1] +
+           velocity3D[2] * velocity3D[2]);
+  vMph = v / 1.467;
+  calculateVelocityw();
+
+  calculateTau();
+  calculateRw();
+  calculateRe_x_e5();
+  calculateSpinFactor();
+
+  calculateAccelD();
+  calculateAccelM();
+  calculateAccel();
 }
 
 void GolfBallFlightIntermediary::calculatePosition() {
@@ -46,7 +56,20 @@ void GolfBallFlightIntermediary::calculateV() {
   vMph = v / 1.467;
 }
 
-void GolfBallFlightIntermediary::calculateVelocityw() {}
+void GolfBallFlightIntermediary::calculateVelocityw() {
+  if (position[2] >= atmos.hWind) {
+    vw = sqrt(pow(velocity3D[0] - velocity3D_w[0], 2) +
+              pow(velocity3D[1] - velocity3D_w[1], 2) + pow(velocity3D[2], 2));
+    velocity3D_w[0] = physicsVars.getVw()[0];
+    velocity3D_w[1] = physicsVars.getVw()[1];
+  } else {
+    vw = v;
+    velocity3D_w[0] = 0;
+    velocity3D_w[1] = 0;
+  }
+
+  vwMph = v / 1.467;
+}
 
 void GolfBallFlightIntermediary::calculateAccel() {
   acceleration3D[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
@@ -57,11 +80,11 @@ void GolfBallFlightIntermediary::calculateAccel() {
 
 void GolfBallFlightIntermediary::calculateAccelD() {
   accelerationDrag3D[0] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-                          velocity3D_w[0] * (velocity3D[0] - velocity3D_w[0]);
+                          vw * (velocity3D[0] - velocity3D_w[0]);
   accelerationDrag3D[1] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-                          velocity3D_w[1] * (velocity3D[1] - velocity3D_w[1]);
+                          vw * (velocity3D[1] - velocity3D_w[1]);
   accelerationDrag3D[2] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-                          velocity3D_w[2] * velocity3D[2];
+                          vw * velocity3D[2];
 }
 
 void GolfBallFlightIntermediary::calculateAccelM() {
@@ -74,15 +97,19 @@ void GolfBallFlightIntermediary::calculateAccelM() {
   accelertaionMagnitude3D[1] =
       physicsVars.getC0() *
       (determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-      (physicsVars.getW()[2] * (velocity3D[1] - physicsVars.getVw()[1]) -
+      (physicsVars.getW()[2] * (velocity3D[0] - velocity3D_w[0]) -
        physicsVars.getW()[0] * velocity3D[2]) /
       w_perp_div_w;
   accelertaionMagnitude3D[2] =
       physicsVars.getC0() *
       (determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-      (physicsVars.getW()[0] * (velocity3D[1] - physicsVars.getVw()[1]) -
+      (physicsVars.getW()[0] * (velocity3D[1] - velocity3D_w[1]) -
        physicsVars.getW()[1] * (velocity3D[0] - velocity3D_w[0])) /
       w_perp_div_w;
+}
+
+void GolfBallFlightIntermediary::calculatePhi() {
+  phi = atan2(position[1], position[2]) * 180 / M_PI;
 }
 
 void GolfBallFlightIntermediary::calculateTau() {
@@ -129,15 +156,21 @@ float GolfBallFlightIntermediary::determineCoefficientOfLift() {
   }
 }
 
+void GolfBallFlightIntermediary::calculateSpinFactor() {
+  spinFactor = rw / vw;
+}
+
 void GolfBallFlightIntermediary::calculateAllVariables() {
-	calculateV();
-	calculateVelocityw();
-	calculateAccel();
-	calculateAccelD();
-	calculateAccelM();
+  calculateV();
+  calculateVelocityw();
+  calculateAccel();
+  calculateAccelD();
+  calculateAccelM();
+  calculatePhi();
 	calculateTau();
 	calculateRw();
 	calculateVw();
 	calculateRe_x_e5();
-    calculatePosition();
+  calculateSpinFactor();
+  calculatePosition();
 }

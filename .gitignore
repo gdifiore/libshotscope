@@ -33,5 +33,6 @@
 
 # Custom
 build/
+Bld/*
 .vscode/
 CMakeFiles/*
