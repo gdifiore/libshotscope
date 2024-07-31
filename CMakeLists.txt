@@ -1,34 +1,42 @@
 cmake_minimum_required(VERSION 3.14)
 project(libshotscope)
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Define project source and include directories
+set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(PROJECT_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
+set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
+
 # Configure the include directories
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_INCLUDE_DIR})
 
 # Specify the source files
 set(SOURCES
-   ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
-   ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
+   ${PROJECT_SRC_DIR}/math_utils.cpp
+   ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
+   #${PROJECT_SRC_DIR}/GolfBallKinematics.cpp
+   ${PROJECT_SRC_DIR}/GolfBallFlightIntermediary.cpp
 )
 
 # Specify the header files
 set(HEADERS
-   ${PROJECT_SOURCE_DIR}/include/math_constants.hpp
-   ${PROJECT_SOURCE_DIR}/include/golf_ball.hpp
-   ${PROJECT_SOURCE_DIR}/include/math_utils.hpp
-   ${PROJECT_SOURCE_DIR}/include/GolfBallPhysicsVariables.hpp
-   ${PROJECT_SOURCE_DIR}/include/atmosphere.hpp
+   ${PROJECT_INCLUDE_DIR}/math_constants.hpp
+   ${PROJECT_INCLUDE_DIR}/golf_ball.hpp
+   ${PROJECT_INCLUDE_DIR}/math_utils.hpp
+   ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
+   ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
+   ${PROJECT_INCLUDE_DIR}/GolfBallFlightIntermediary.hpp
+   #${PROJECT_INCLUDE_DIR}/GolfBallKinematics.hpp
 )
 
 # Create the static library
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
-# Additional configuration (if needed)
-# set(CMAKE_BUILD_TYPE Debug)
+# Set compilation flags
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-# set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 
 # Include Google Test
@@ -37,21 +45,20 @@ FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Add googletest directly to our build. This adds the following targets: gtest, gtest_main, gmock
 FetchContent_MakeAvailable(googletest)
 
 # Enable testing
 enable_testing()
 
+# Specify the test source files
 set(TEST_SOURCES
-    ${PROJECT_SOURCE_DIR}/test/test_math_helpers.cpp
-    ${PROJECT_SOURCE_DIR}/test/test_math_utils.cpp
-    ${PROJECT_SOURCE_DIR}/src/GolfBallPhysicsVariables.cpp
-    ${PROJECT_SOURCE_DIR}/src/math_utils.cpp
+    ${PROJECT_TEST_DIR}/test_helpers.cpp
+    ${PROJECT_TEST_DIR}/test_ball_physics_vars.cpp
+    ${PROJECT_TEST_DIR}/test_math_utils.cpp
+    ${PROJECT_TEST_DIR}/test_flight_intermediary.cpp
+    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
+    ${PROJECT_SRC_DIR}/math_utils.cpp
     # Add other test source files here
 )
 
