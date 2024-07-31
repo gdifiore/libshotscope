@@ -17,8 +17,8 @@ include_directories(${PROJECT_INCLUDE_DIR})
 set(SOURCES
    ${PROJECT_SRC_DIR}/math_utils.cpp
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
-   ${PROJECT_SRC_DIR}/GolfBallKinematics.cpp
-   ${PROJECT_SRC_DIR}/AuxiliaryCalculations.cpp
+   #${PROJECT_SRC_DIR}/GolfBallKinematics.cpp
+   ${PROJECT_SRC_DIR}/GolfBallFlightIntermediary.cpp
 )
 
 # Specify the header files
@@ -28,8 +28,8 @@ set(HEADERS
    ${PROJECT_INCLUDE_DIR}/math_utils.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
    ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
-   ${PROJECT_INCLUDE_DIR}/AuxiliaryCalculations.hpp
-   ${PROJECT_INCLUDE_DIR}/GolfBallKinematics.hpp
+   ${PROJECT_INCLUDE_DIR}/GolfBallFlightIntermediary.hpp
+   #${PROJECT_INCLUDE_DIR}/GolfBallKinematics.hpp
 )
 
 # Create the static library
@@ -53,7 +53,7 @@ enable_testing()
 
 # Specify the test source files
 set(TEST_SOURCES
-    ${PROJECT_TEST_DIR}/test_math_helpers.cpp
+    ${PROJECT_TEST_DIR}/test_ball_physics_vars.cpp
     ${PROJECT_TEST_DIR}/test_math_utils.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp

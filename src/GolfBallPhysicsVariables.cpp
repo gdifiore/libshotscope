@@ -15,10 +15,12 @@
  */
 
 #include "GolfBallPhysicsVariables.hpp"
+#include "golf_ball.hpp"
+#include "atmosphere.hpp"
 #include "math_utils.hpp"
 #include <cmath>
 
-GolfBallPhysicsVariables::GolfBallPhysicsVariables(const golfBall &ball, const atmosphericData &atmos)
+GolfBallPhysicsVariables::GolfBallPhysicsVariables(const struct golfBall &ball, const struct atmosphericData &atmos)
     : ball(ball), atmos(atmos), beta(0.0001217f)
 {
     tempC = math_utils::convertFahrenheitToCelsius(atmos.temp);
@@ -43,7 +45,7 @@ void GolfBallPhysicsVariables::calculateAllVariables()
 void GolfBallPhysicsVariables::calculateRhoMetric()
 {
     rhoMetric = 1.2929 * ((273.0 / (math_utils::convertCelsiusToKelvin(tempC)) *
-                           ((barometricPressure.value() * std::exp(-beta * elevationM) - 0.3783 * atmos.relHumidity * (SVP.value() / 100.0)) / 760.0)));
+                           ((barometricPressure * std::exp(-beta * elevationM) - 0.3783 * atmos.relHumidity * (SVP / 100.0)) / 760.0)));
 }
 
 void GolfBallPhysicsVariables::calculateRhoImperial()
@@ -85,7 +87,7 @@ void GolfBallPhysicsVariables::calculateOmega()
 
 void GolfBallPhysicsVariables::calculateROmega()
 {
-    rOmega = (ball.std_golf_ball_circumference / (2 * M_PI)) * (omega.value() / 12.0);
+    rOmega = (ball.std_golf_ball_circumference / (2 * M_PI)) * (omega / 12.0);
 }
 
 void GolfBallPhysicsVariables::calculateVw()
