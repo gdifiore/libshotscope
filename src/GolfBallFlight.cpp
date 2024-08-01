@@ -29,6 +29,11 @@ GolfBallFlight::GolfBallFlight(
 	initialize();
 }
 
+/**
+ * Initializes the golf ball flight by setting the initial position, velocity, and other variables.
+ *
+ * Some of these have initial values from other classes, some need to be calculated for the first time.
+ */
 void GolfBallFlight::initialize()
 {
 	position = {ball.x0, ball.y0, ball.z0};
@@ -206,6 +211,10 @@ void GolfBallFlight::calculateSpinFactor()
 	spinFactor = rw / vw;
 }
 
+/**
+ * Calculates a single step in the golf ball's flight.
+ * Updates the current time and calculates various parameters such as position, velocity, spin, and acceleration.
+ */
 void GolfBallFlight::calculateFlightStep()
 {
 	currentTime += dt;

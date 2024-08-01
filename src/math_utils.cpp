@@ -1,7 +1,7 @@
 /**
  * @file math_utils.cpp
  * @author Gabriel DiFiore
- * @brief Contains functions for various mathematical utilities
+ * @brief Contains functions for various mathematical utilities.
  *
  * This file contains functions that perform mathematical
  * utilities, e.g. converting between units.

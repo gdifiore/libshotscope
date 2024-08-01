@@ -1,3 +1,18 @@
+/**
+ * @file Simulator.cpp
+ * @author Gabriel DiFiore
+ * @brief Contains the implementation of the Simulator class.
+ *
+ * This file defines the Simulator class, which is responsible encapsulating
+ * all the functionality of calculating the flight path of a golf ball,
+ * and returning it back in a specific format.
+ *
+ * The GolfBallPhysicsVariables class takes a GolfBallPhysicsVariables object, GolfBalFlight object, golf ball object, and atmospheric data as input,
+ * and provides methods to calculate all the required variables.
+ *
+ * @copyright Copyright (c) 2024, Gabriel DiFiore
+ */
+
 #include "Simulator.hpp"
 
 #include "GolfBallPhysicsVariables.hpp"

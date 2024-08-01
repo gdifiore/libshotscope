@@ -14,35 +14,6 @@ public:
 	GolfBallPhysicsVariables(const struct golfBall &ball,
 							 const struct atmosphericData &atmos);
 
-	// Assignment operator
-	GolfBallPhysicsVariables &operator=(const GolfBallPhysicsVariables &other)
-	{
-		if (this == &other)
-		{
-			return *this;
-		}
-
-		// Copy member variables
-		ball = other.ball;
-		atmos = other.atmos;
-		rhoImperial = other.rhoImperial;
-		rhoMetric = other.rhoMetric;
-		c0 = other.c0;
-		tempC = other.tempC;
-		elevationM = other.elevationM;
-		v0_magnitude = other.v0_magnitude;
-		v0 = other.v0;
-		w = other.w;
-		vw = other.vw;
-		omega = other.omega;
-		rOmega = other.rOmega;
-		SVP = other.SVP;
-		barometricPressure = other.barometricPressure;
-		Re100 = other.Re100;
-
-		return *this;
-	}
-
 	// Getters
 	float getRhoImperial() const { return rhoImperial; }
 	float getRhoMetric() const { return rhoMetric; }
@@ -60,7 +31,6 @@ public:
 	float getBarometricPressure() const { return barometricPressure; }
 	float getRe100() const { return Re100; }
 
-	// Calculate all variables
 	void calculateAllVariables();
 
 private:

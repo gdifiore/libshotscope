@@ -9,47 +9,14 @@
 #include "GolfBallPhysicsVariables.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
+#include "math_utils.hpp"
 
 class GolfBallFlight
 {
 public:
-	using Vector3D = std::array<float, 3>;
-
 	GolfBallFlight(GolfBallPhysicsVariables &physicsVars,
 				   const struct golfBall &ball,
 				   const struct atmosphericData &atmos);
-
-	GolfBallFlight &operator=(const GolfBallFlight &other)
-	{
-		if (this == &other)
-			return *this;
-
-		// Copy member variables
-		physicsVars = other.physicsVars;
-		ball = other.ball;
-		atmos = other.atmos;
-		dt = other.dt;
-		t_sec = other.t_sec;
-		position = other.position;
-		velocity3D = other.velocity3D;
-		v = other.v;
-		vMph = other.vMph;
-		phi = other.phi;
-		tau = other.tau;
-		rw = other.rw;
-		w_perp = other.w_perp;
-		w_perp_div_w = other.w_perp_div_w;
-		Re_x_e5 = other.Re_x_e5;
-		vw = other.vw;
-		vwMph = other.vwMph;
-		spinFactor = other.spinFactor;
-		velocity3D_w = other.velocity3D_w;
-		accelerationDrag3D = other.accelerationDrag3D;
-		accelertaionMagnitude3D = other.accelertaionMagnitude3D;
-		acceleration3D = other.acceleration3D;
-
-		return *this;
-	}
 
 	// Getters
 	float getV() const { return v; }
@@ -77,7 +44,6 @@ public:
 	float determineCoefficientOfDrag();
 	float determineCoefficientOfLift();
 
-	// Calculate all variables
 	void calculateFlightStep();
 
 private:
@@ -85,15 +51,14 @@ private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 
-	float dt = 0.01f;	// dt
-	float t_sec = 0.0f; // t_sec
+	const float dt = 0.01f;
+	float currentTime = 0.0f; // just needed for Rw
 
 	// Member variables               // column title in excel sheet
 	Vector3D position;
-	Vector3D velocity3D; // vx/vy/vz
-	float v;			 // v
-	float vMph;			 // vmph
-
+	Vector3D velocity3D;			  // vx/vy/vz
+	float v;						  // v
+	float vMph;						  // vmph
 	float phi;						  // phi
 	float tau;						  // tau
 	float rw;						  // rw
@@ -108,26 +73,23 @@ private:
 	Vector3D accelertaionMagnitude3D; // aMagx/y/z
 	Vector3D acceleration3D;		  // ax/y/z
 
-	// just needed for Rw
-	float currentTime = 0.0f;
-
-	// Private calculation methods
+	// Private calculation methods (the order they're in is the order they need to be called)
 	void initialize();
 
+	void calculatePosition();
 	void calculateV();
 	void calculateVelocityw();
-
-	void calculateAccel();
-	void calculateAccelD();
-	void calculateAccelM();
+	void calculateVw();
 
 	void calculatePhi();
 	void calculateTau();
 	void calculateRw();
-	void calculateVw();
 	void calculateRe_x_e5();
 	void calculateSpinFactor();
-	void calculatePosition();
+
+	void calculateAccelD();
+	void calculateAccelM();
+	void calculateAccel();
 };
 
 #endif // GOLFBALLFLIGHT_HPP
