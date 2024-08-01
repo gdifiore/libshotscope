@@ -53,7 +53,6 @@ enable_testing()
 
 # Specify the test source files
 set(TEST_SOURCES
-    ${PROJECT_TEST_DIR}/test_helpers.cpp
     ${PROJECT_TEST_DIR}/test_ball_physics_vars.cpp
     ${PROJECT_TEST_DIR}/test_math_utils.cpp
     ${PROJECT_TEST_DIR}/test_ball_flight.cpp
