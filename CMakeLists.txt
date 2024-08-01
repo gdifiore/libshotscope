@@ -19,6 +19,7 @@ set(SOURCES
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
    ${PROJECT_SRC_DIR}/Simulator.cpp
    ${PROJECT_SRC_DIR}/GolfBallFlight.cpp
+   ${PROJECT_SRC_DIR}/FlightVisualizer.cpp
 )
 
 # Specify the header files
@@ -30,6 +31,7 @@ set(HEADERS
    ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallFlight.hpp
    ${PROJECT_INCLUDE_DIR}/Simulator.hpp
+   ${PROJECT_INCLUDE_DIR}/FlightVisualizer.hpp
 )
 
 # Create the static library
@@ -37,7 +39,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
 # Set compilation flags
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+set(CMAKE_CXX_FLAGS_RELEASE "-O1")
 
 # Include Google Test
 include(FetchContent)
@@ -59,16 +61,36 @@ set(TEST_SOURCES
     ${PROJECT_TEST_DIR}/test_ball_flight.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
-    # Add other test source files here
 )
 
 # Add test executable and link with gtest_main and the static library
 add_executable(libshotscope_tests ${TEST_SOURCES})
 target_link_libraries(libshotscope_tests ${PROJECT_NAME} GTest::gtest_main)
 
-add_executable(main examples/main.cpp)
-target_link_libraries(main ${PROJECT_NAME})
+add_executable(flight examples/flight.cpp)
+target_link_libraries(flight ${PROJECT_NAME})
 
 # Discover tests
 include(GoogleTest)
 gtest_discover_tests(libshotscope_tests)
+
+# Add OpenGL, GLEW, and GLFW
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glfw3 REQUIRED)
+
+# Add the TrajectoryVisualizer executable
+add_executable(3dviz examples/3dviz.cpp)
+target_link_libraries(3dviz
+    ${PROJECT_NAME}
+    OpenGL::GL
+    GLEW::GLEW
+    glfw
+)
+
+# Include directories for TrajectoryVisualizer
+target_include_directories(3dviz PRIVATE 
+    ${PROJECT_INCLUDE_DIR}
+    ${OPENGL_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+)
