@@ -16,10 +16,10 @@ public:
 	using Vector3D = std::array<float, 3>;
 
 	GolfBallFlight(GolfBallPhysicsVariables &physicsVars,
-							   const struct golfBall &ball,
-							   const struct atmosphericData &atmos);
+				   const struct golfBall &ball,
+				   const struct atmosphericData &atmos);
 
-	GolfBallFlight& operator=(const GolfBallFlight& other)
+	GolfBallFlight &operator=(const GolfBallFlight &other)
 	{
 		if (this == &other)
 			return *this;

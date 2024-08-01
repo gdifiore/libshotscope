@@ -208,22 +208,22 @@ void GolfBallFlight::calculateSpinFactor()
 
 void GolfBallFlight::calculateFlightStep()
 {
-    currentTime += dt;
+	currentTime += dt;
 
-    calculatePosition();
-    calculateV();
+	calculatePosition();
+	calculateV();
 
-    calculateVelocityw();
-    calculateVw();
+	calculateVelocityw();
+	calculateVw();
 
-    calculatePhi();
-    calculateTau();
-    calculateRw();
+	calculatePhi();
+	calculateTau();
+	calculateRw();
 
-    calculateRe_x_e5();
-    calculateSpinFactor();
+	calculateRe_x_e5();
+	calculateSpinFactor();
 
-    calculateAccelD();
-    calculateAccelM();
-    calculateAccel();
+	calculateAccelD();
+	calculateAccelM();
+	calculateAccel();
 }
