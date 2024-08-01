@@ -17,8 +17,8 @@ include_directories(${PROJECT_INCLUDE_DIR})
 set(SOURCES
    ${PROJECT_SRC_DIR}/math_utils.cpp
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
-   #${PROJECT_SRC_DIR}/GolfBallKinematics.cpp
-   ${PROJECT_SRC_DIR}/GolfBallFlightIntermediary.cpp
+   ${PROJECT_SRC_DIR}/Simulator.cpp
+   ${PROJECT_SRC_DIR}/GolfBallFlight.cpp
 )
 
 # Specify the header files
@@ -28,8 +28,8 @@ set(HEADERS
    ${PROJECT_INCLUDE_DIR}/math_utils.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
    ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
-   ${PROJECT_INCLUDE_DIR}/GolfBallFlightIntermediary.hpp
-   #${PROJECT_INCLUDE_DIR}/GolfBallKinematics.hpp
+   ${PROJECT_INCLUDE_DIR}/GolfBallFlight.hpp
+   ${PROJECT_INCLUDE_DIR}/Simulator.hpp
 )
 
 # Create the static library
@@ -53,10 +53,10 @@ enable_testing()
 
 # Specify the test source files
 set(TEST_SOURCES
-    ${PROJECT_TEST_DIR}/test_helpers.cpp
     ${PROJECT_TEST_DIR}/test_ball_physics_vars.cpp
+    ${PROJECT_TEST_DIR}/test_simulation.cpp
     ${PROJECT_TEST_DIR}/test_math_utils.cpp
-    ${PROJECT_TEST_DIR}/test_flight_intermediary.cpp
+    ${PROJECT_TEST_DIR}/test_ball_flight.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
     # Add other test source files here
@@ -65,6 +65,9 @@ set(TEST_SOURCES
 # Add test executable and link with gtest_main and the static library
 add_executable(libshotscope_tests ${TEST_SOURCES})
 target_link_libraries(libshotscope_tests ${PROJECT_NAME} GTest::gtest_main)
+
+add_executable(main examples/main.cpp)
+target_link_libraries(main ${PROJECT_NAME})
 
 # Discover tests
 include(GoogleTest)

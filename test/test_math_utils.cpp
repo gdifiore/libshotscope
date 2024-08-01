@@ -25,3 +25,16 @@ TEST(ShotScopeTest, FTtoM) {
 
     EXPECT_NEAR(tempK, 1.524, 0.1);
 }
+
+TEST(ShotScopeTest, MtoFT) {
+    float lengthFT = math_utils::convertMetersToFeet(10.0);
+
+    EXPECT_NEAR(lengthFT, 32.8084, 0.01);
+}
+
+TEST(ShotScopeTest, DistanceInYards) {
+    Vector3D position {3.0, 4.0, 0.0};
+    float distanceYards = math_utils::getDistanceInYards(position);
+
+    EXPECT_NEAR(distanceYards, 1.66, 0.01);
+}

@@ -19,12 +19,15 @@
 #include "atmosphere.hpp"
 #include "math_utils.hpp"
 #include <cmath>
+#include <iostream>
 
 GolfBallPhysicsVariables::GolfBallPhysicsVariables(const struct golfBall &ball, const struct atmosphericData &atmos)
     : ball(ball), atmos(atmos), beta(0.0001217f)
 {
     tempC = math_utils::convertFahrenheitToCelsius(atmos.temp);
     elevationM = math_utils::convertFeetToMeters(atmos.elevation);
+
+    calculateAllVariables();
 }
 
 void GolfBallPhysicsVariables::calculateAllVariables()

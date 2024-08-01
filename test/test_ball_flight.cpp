@@ -1,23 +1,19 @@
 #include <gtest/gtest.h>
 
-#include "GolfBallFlightIntermediary.hpp"
+#include "GolfBallFlight.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "math_constants.hpp"
 #include "math_utils.hpp"
 
-#include "test_helpers.hpp"
-
 TEST(ShotScopeTest, intermediaryCalc) {
-  const struct golfBall ball =
-      initBall(0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 500.0);
-  const struct atmosphericData atmos =
-      initAtmos(70.0, 90.0, 2.0, 30.0, 50.0, 50.0, 29.92);
+  const golfBall ball {0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 500.0};
+  const atmosphericData atmos {70.0, 90.0, 2.0, 30.0, 50.0, 50.0, 29.92};
 
   auto vars = GolfBallPhysicsVariables(ball, atmos);
   vars.calculateAllVariables();
-  auto intermediary = GolfBallFlightIntermediary(vars, ball, atmos);
+  auto intermediary = GolfBallFlight(vars, ball, atmos);
   // just testing the initial line in the excel sheet w/ initialization
   //intermediary.calculateAllVariables();
 

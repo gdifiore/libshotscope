@@ -1,14 +1,16 @@
 #!/bin/bash
 
 # Check if Clang is installed
-#if ! command -v clang &> /dev/null; then
-#    echo "Clang is not installed. Installing Clang..."
-#    sudo apt-get update
-#    sudo apt-get install clang
-#fi
-# TODO: investigate gtest compiler errors
-#export CC=/usr/bin/clang
-#export CXX=/usr/bin/clang++
+if ! command -v clang &> /dev/null; then
+    echo "Clang is not installed. Installing Clang..."
+    sudo apt-get update
+    sudo apt-get install clang
+fi
+
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+
+echo "$CC"
 
 # Create build directory
 mkdir -p build
