@@ -2,6 +2,7 @@
 #define MATH_UTILS_HPP
 
 #include <array>
+#include <vector>
 
 using Vector3D = std::array<float, 3>;
 
@@ -19,6 +20,8 @@ namespace math_utils
     float convertMetersToFeet(float meters);
 
     float getDistanceInYards(Vector3D position);
+
+    Vector3D calcLandingPoint(const std::vector<Vector3D> &positions);
 }
 
 #endif // MATH_UTILS_HPP
