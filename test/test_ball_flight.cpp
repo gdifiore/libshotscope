@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "GolfBallFlightIntermediary.hpp"
+#include "GolfBallFlight.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
@@ -17,7 +17,7 @@ TEST(ShotScopeTest, intermediaryCalc) {
 
   auto vars = GolfBallPhysicsVariables(ball, atmos);
   vars.calculateAllVariables();
-  auto intermediary = GolfBallFlightIntermediary(vars, ball, atmos);
+  auto intermediary = GolfBallFlight(vars, ball, atmos);
   // just testing the initial line in the excel sheet w/ initialization
   //intermediary.calculateAllVariables();
 

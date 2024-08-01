@@ -9,6 +9,8 @@
  * @copyright Copyright (c) 2024, Gabriel DiFiore
  */
 
+#include <cmath>
+
 #include "math_utils.hpp"
 
 /**
@@ -52,5 +54,31 @@ float math_utils::convertFahrenheitToKelvin(float fahrenheit)
  */
 float math_utils::convertFeetToMeters(float feet)
 {
-    return feet * 0.3048;
+    return feet * FEET_TO_METERS;
+}
+
+/**
+ * Converts meters to feet.
+ *
+ * @param meters The length in meters.
+ * @return The length in feet.
+ */
+float math_utils::convertMetersToFeet(float meters)
+{
+    return meters * METERS_TO_FEET;
+}
+
+/**
+ * Calculates the distance in yards from the origin to the given position.
+ *
+ * @param position The position in 3D space.
+ * @return The distance in yards.
+ */
+float math_utils::getDistanceInYards(Vector3D position)
+{
+    float distance = std::sqrt(position[0] * position[0] + position[1] * position[1]);
+
+    float distanceInYards = distance / YARDS_TO_FEET;
+
+    return distanceInYards;
 }

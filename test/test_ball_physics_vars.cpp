@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include "GolfBallFlightIntermediary.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
