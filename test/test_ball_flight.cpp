@@ -7,15 +7,16 @@
 #include "math_constants.hpp"
 #include "math_utils.hpp"
 
-TEST(ShotScopeTest, intermediaryCalc) {
-  const golfBall ball {0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 500.0};
-  const atmosphericData atmos {70.0, 90.0, 2.0, 30.0, 50.0, 50.0, 29.92};
+TEST(ShotScopeTest, intermediaryCalc)
+{
+  const golfBall ball{0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 500.0};
+  const atmosphericData atmos{70.0, 90.0, 2.0, 30.0, 50.0, 50.0, 29.92};
 
   auto vars = GolfBallPhysicsVariables(ball, atmos);
   vars.calculateAllVariables();
   auto intermediary = GolfBallFlight(vars, ball, atmos);
   // just testing the initial line in the excel sheet w/ initialization
-  //intermediary.calculateAllVariables();
+  // intermediary.calculateAllVariables();
 
   EXPECT_NEAR(intermediary.getPhi(), 0.0, 0.1);
   EXPECT_NEAR(intermediary.getVelocity3D()[0], 0.0, 0.1);
