@@ -66,8 +66,12 @@ set(TEST_SOURCES
 add_executable(libshotscope_tests ${TEST_SOURCES})
 target_link_libraries(libshotscope_tests ${PROJECT_NAME} GTest::gtest_main)
 
-add_executable(main examples/main.cpp)
-target_link_libraries(main ${PROJECT_NAME})
+# Eamples
+add_executable(calculate_ball_landing examples/calculate_ball_landing.cpp)
+target_link_libraries(calculate_ball_landing ${PROJECT_NAME})
+
+add_executable(calculate_ball_trajectory examples/calculate_ball_trajectory.cpp)
+target_link_libraries(calculate_ball_trajectory ${PROJECT_NAME})
 
 # Discover tests
 include(GoogleTest)
