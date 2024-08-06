@@ -1,9 +1,6 @@
 #ifndef GOLFBALLPHYSICSVARIABLES_HPP
 #define GOLFBALLPHYSICSVARIABLES_HPP
 
-#include <array>
-#include <stdexcept>
-
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "math_utils.hpp"
@@ -15,35 +12,39 @@ public:
 							 const struct atmosphericData &atmos);
 
 	// Getters
-	float getRhoImperial() const { return rhoImperial; }
-	float getRhoMetric() const { return rhoMetric; }
-	float getC0() const { return c0; }
-	float getBeta() const { return beta; }
-	float getV0() const { return v0_magnitude; }
-	Vector3D getV0Vector() const { return v0; }
-	Vector3D getW() const { return w; }
-	float getOmega() const { return omega; }
-	float getROmega() const { return rOmega; }
-	float getTempC() const { return tempC; }
-	float getElevationM() const { return elevationM; }
-	Vector3D getVw() const { return vw; }
-	float getSVP() const { return SVP; }
-	float getBarometricPressure() const { return barometricPressure; }
-	float getRe100() const { return Re100; }
+        [[nodiscard]] auto getRhoImperial() const -> float {
+          return rhoImperial;
+        }
+        [[nodiscard]] auto getRhoMetric() const -> float { return rhoMetric; }
+        [[nodiscard]] auto getC0() const -> float { return c0; }
+        [[nodiscard]] auto getBeta() const -> float { return beta; }
+        [[nodiscard]] auto getV0() const -> float { return v0_magnitude; }
+        [[nodiscard]] auto getV0Vector() const -> Vector3D { return v0; }
+        [[nodiscard]] auto getW() const -> Vector3D { return w; }
+        [[nodiscard]] auto getOmega() const -> float { return omega; }
+        [[nodiscard]] auto getROmega() const -> float { return rOmega; }
+        [[nodiscard]] auto getTempC() const -> float { return tempC; }
+        [[nodiscard]] auto getElevationM() const -> float { return elevationM; }
+        [[nodiscard]] auto getVw() const -> Vector3D { return vw; }
+        [[nodiscard]] auto getSVP() const -> float { return SVP; }
+        [[nodiscard]] auto getBarometricPressure() const -> float {
+          return barometricPressure;
+        }
+        [[nodiscard]] auto getRe100() const -> float { return Re100; }
 
-	void calculateAllVariables();
+        void calculateAllVariables();
 
 private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 
 	// Member variables
-	float rhoImperial = 0.0f;
-	float rhoMetric = 0.0f;
-	float c0 = 0.0f;
-	const float beta = 0.0001217f;
-	float tempC = 0.0f;
-	float elevationM = 0.0f;
+	float rhoImperial = 0.0F;
+	float rhoMetric = 0.0F;
+	float c0 = 0.0F;
+	const float beta = 0.0001217F;
+	float tempC = 0.0F;
+	float elevationM = 0.0F;
 	float v0_magnitude;
 
 	Vector3D v0;

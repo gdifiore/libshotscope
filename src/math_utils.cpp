@@ -12,7 +12,6 @@
 #include <cmath>
 
 #include "math_utils.hpp"
-#include <vector>
 #include <stdexcept>
 
 /**
@@ -106,7 +105,7 @@ Vector3D math_utils::calcLandingPoint(const std::vector<Vector3D> &positions)
         Vector3D result;
         for (int i = 0; i < 3; ++i)
         {
-            result[i] = vec[i] / 3.0f;
+            result[i] = vec[i] / 3.0F; // yards to feet
         }
         return result;
     };

@@ -10,20 +10,19 @@
 class Simulator
 {
 public:
-    Simulator(GolfBallPhysicsVariables &physVars, GolfBallFlight &flight);
+    Simulator(GolfBallFlight &flight);
 
-    std::vector<Vector3D> runSimulation();
-    Vector3D runSimulationLanding();
+    auto runSimulation() -> std::vector<Vector3D>;
+    auto runSimulationLanding() -> Vector3D;
 
 private:
-    GolfBallPhysicsVariables &physVars;
     GolfBallFlight &flight;
 
-    const float dt = 0.01f;
-    float currentTime = 0.0f;
+    const float dt = 0.01F;
+    float currentTime = 0.0F;
 
-    bool isFlightOver() const;
+    [[nodiscard]] auto isFlightOver() const -> bool;
     void calculateNextStep();
-};
+};;
 
 #endif // SIMULATOR_HPP

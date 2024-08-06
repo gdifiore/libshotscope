@@ -1,10 +1,7 @@
 #ifndef GOLFBALLFLIGHT_HPP
 #define GOLFBALLFLIGHT_HPP
 
-#include <array>
 #include <cmath>
-#include <optional>
-#include <stdexcept>
 
 #include "GolfBallPhysicsVariables.hpp"
 #include "atmosphere.hpp"
@@ -19,40 +16,51 @@ public:
 				   const struct atmosphericData &atmos);
 
 	// Getters
-	float getV() const { return v; }
-	float getVMph() const { return vMph; }
-	const Vector3D &getVelocity3D() const { return velocity3D; }
-	float getPhi() const { return phi; }
-	float getTau() const { return tau; }
-	float getRw() const { return rw; }
-	float getWPerp() const { return w_perp; }
-	float getWPerpDivW() const { return w_perp_div_w; }
-	float getRe_x_e5() const { return Re_x_e5; }
-	float getVw() const { return vw; }
-	float getVwMph() const { return vwMph; }
-	float getSpinFactor() const { return spinFactor; }
-	const Vector3D &getVelocity3D_w() const { return velocity3D_w; }
-	const Vector3D &getAccelerationDrag3D() const { return accelerationDrag3D; }
-	const Vector3D &getAccelertaionMagnitude3D() const
-	{
-		return accelertaionMagnitude3D;
-	}
-	const Vector3D &getAcceleration3D() const { return acceleration3D; }
+        [[nodiscard]] auto getV() const -> float { return v; }
+        [[nodiscard]] auto getVMph() const -> float { return vMph; }
+        [[nodiscard]] auto getVelocity3D() const -> const Vector3D& {
+          return velocity3D;
+        }
+        [[nodiscard]] auto getPhi() const -> float { return phi; }
+        [[nodiscard]] auto getTau() const -> float { return tau; }
+        [[nodiscard]] auto getRw() const -> float { return rw; }
+        [[nodiscard]] auto getWPerp() const -> float { return w_perp; }
+        [[nodiscard]] auto getWPerpDivW() const -> float {
+          return w_perp_div_w;
+        }
+        [[nodiscard]] auto getRe_x_e5() const -> float { return Re_x_e5; }
+        [[nodiscard]] auto getVw() const -> float { return vw; }
+        [[nodiscard]] auto getVwMph() const -> float { return vwMph; }
+        [[nodiscard]] auto getSpinFactor() const -> float { return spinFactor; }
+        [[nodiscard]] auto getVelocity3D_w() const -> const Vector3D& {
+          return velocity3D_w;
+        }
+        [[nodiscard]] auto getAccelerationDrag3D() const -> const Vector3D& {
+          return accelerationDrag3D;
+        }
+        [[nodiscard]] auto getAccelertaionMagnitude3D() const
+            -> const Vector3D& {
+          return accelertaionMagnitude3D;
+        }
+        [[nodiscard]] auto getAcceleration3D() const -> const Vector3D& {
+          return acceleration3D;
+        }
+        [[nodiscard]] auto getPosition() const -> const Vector3D& {
+          return position;
+        }
 
-	const Vector3D &getPosition() const { return position; }
+        auto determineCoefficientOfDrag() -> float;
+        auto determineCoefficientOfLift() -> float;
 
-	float determineCoefficientOfDrag();
-	float determineCoefficientOfLift();
-
-	void calculateFlightStep();
+        void calculateFlightStep();
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
 
-	const float dt = 0.01f;
-	float currentTime = 0.0f; // just needed for Rw
+	const float dt = 0.01F;
+	float currentTime = 0.0F; // just needed for Rw
 
 	// Member variables               // column title in excel sheet
 	Vector3D position;
@@ -62,8 +70,8 @@ private:
 	float phi;						  // phi
 	float tau;						  // tau
 	float rw;						  // rw
-	float w_perp = 0.0f;			  // w_perp
-	float w_perp_div_w = 1.0f;		  // w_perp_div_w
+	float w_perp = 0.0F;			  // w_perp
+	float w_perp_div_w = 1.0F;		  // w_perp_div_w
 	float Re_x_e5;					  // Re x e-5
 	float vw;						  // vw
 	float vwMph;					  // vwmph

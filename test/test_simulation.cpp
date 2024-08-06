@@ -16,7 +16,7 @@ TEST(ShotScopeTest, flightLanding)
     GolfBallPhysicsVariables physVars(ball, atmos);
     GolfBallFlight flight(physVars, ball, atmos);
 
-    Simulator simulator(physVars, flight);
+    Simulator simulator(flight);
 
     Vector3D result = simulator.runSimulationLanding();
     EXPECT_NEAR(result[0], 0.0, 0.1);
@@ -32,7 +32,7 @@ TEST(ShotScopeTest, flightPath)
     GolfBallPhysicsVariables physVars(ball, atmos);
     GolfBallFlight flight(physVars, ball, atmos);
 
-    Simulator simulator(physVars, flight);
+    Simulator simulator(flight);
 
     std::vector<Vector3D> result = simulator.runSimulation();
 

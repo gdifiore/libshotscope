@@ -1,8 +1,6 @@
 #ifndef MATH_CONSTANTS_HPP
 #define MATH_CONSTANTS_HPP
 
-#include <cstdint>
-
 namespace math_constants
 {
     /*

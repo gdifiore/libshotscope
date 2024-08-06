@@ -14,15 +14,13 @@
  */
 
 #include "Simulator.hpp"
-
-#include "GolfBallPhysicsVariables.hpp"
 #include "GolfBallFlight.hpp"
+#include "GolfBallPhysicsVariables.hpp"
 #include "golf_ball.hpp"
 #include "math_utils.hpp"
-#include <vector>
 
-Simulator::Simulator(GolfBallPhysicsVariables &physVars, GolfBallFlight &flight)
-    : physVars(physVars), flight(flight)
+Simulator::Simulator(GolfBallFlight &flight)
+    : flight(flight)
 {
 }
 
