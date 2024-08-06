@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include <stdio.h>
+
 int main()
 {
     const golfBall ball{0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 0.0};
