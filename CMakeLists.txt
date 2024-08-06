@@ -23,6 +23,7 @@ set(SOURCES
 
 # Specify the header files
 set(HEADERS
+   ${PROJECT_INCLUDE_DIR}/libshotscope.hpp
    ${PROJECT_INCLUDE_DIR}/math_constants.hpp
    ${PROJECT_INCLUDE_DIR}/golf_ball.hpp
    ${PROJECT_INCLUDE_DIR}/math_utils.hpp

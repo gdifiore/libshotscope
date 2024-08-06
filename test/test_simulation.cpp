@@ -1,12 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "GolfBallFlight.hpp"
-#include "GolfBallPhysicsVariables.hpp"
-#include "Simulator.hpp"
-#include "atmosphere.hpp"
-#include "golf_ball.hpp"
-#include "math_constants.hpp"
-#include "math_utils.hpp"
+#include <libshotscope.hpp>
 
 TEST(ShotScopeTest, flightLanding)
 {
