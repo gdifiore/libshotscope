@@ -1,7 +1,4 @@
-#include "Simulator.hpp"
-#include "golf_ball.hpp"
-#include "atmosphere.hpp"
-#include "math_utils.hpp"
+#include <libshotscope.hpp>
 
 #include <stdio.h>
 

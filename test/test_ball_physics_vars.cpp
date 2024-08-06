@@ -1,10 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "GolfBallPhysicsVariables.hpp"
-#include "atmosphere.hpp"
-#include "golf_ball.hpp"
-#include "math_constants.hpp"
-#include "math_utils.hpp"
+#include <libshotscope.hpp>
 
 // Test default initial values from a spreadsheet created by Alan M. Nathan at
 // U. of Illinois

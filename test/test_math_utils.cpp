@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "math_utils.hpp"
+#include <libshotscope.hpp>
 
 TEST(ShotScopeTest, FtoC)
 {
