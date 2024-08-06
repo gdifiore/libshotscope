@@ -13,13 +13,12 @@
  * @copyright Copyright (c) 2024, Gabriel DiFiore
  */
 
-#include <math.h>
+#include <cmath>
 
 #include "GolfBallFlight.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "math_constants.hpp"
-#include <iostream>
 
 GolfBallFlight::GolfBallFlight(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,

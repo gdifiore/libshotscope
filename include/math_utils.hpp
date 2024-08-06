@@ -8,20 +8,20 @@ using Vector3D = std::array<float, 3>;
 
 namespace math_utils
 {
-    float convertFahrenheitToCelsius(float fahrenheit);
-    float convertCelsiusToKelvin(float celsius);
-    float convertFahrenheitToKelvin(float fahrenheit);
+    auto convertFahrenheitToCelsius(float fahrenheit) -> float;
+    auto convertCelsiusToKelvin(float celsius) -> float;
+    auto convertFahrenheitToKelvin(float fahrenheit) -> float;
 
-    constexpr float METERS_TO_FEET = 3.28084f;
-    constexpr float FEET_TO_METERS = 1.0f / METERS_TO_FEET;
-    constexpr float YARDS_TO_FEET = 3.0f;
+    constexpr float METERS_TO_FEET = 3.28084F;
+    constexpr float FEET_TO_METERS = 1.0F / METERS_TO_FEET;
+    constexpr float YARDS_TO_FEET = 3.0F;
 
-    float convertFeetToMeters(float feet);
-    float convertMetersToFeet(float meters);
+    auto convertFeetToMeters(float feet) -> float;
+    auto convertMetersToFeet(float meters) -> float;
 
-    float getDistanceInYards(Vector3D position);
+    auto getDistanceInYards(Vector3D position) -> float;
 
-    Vector3D calcLandingPoint(const std::vector<Vector3D> &positions);
+    auto calcLandingPoint(const std::vector<Vector3D> &positions) -> Vector3D;
 }
 
 #endif // MATH_UTILS_HPP

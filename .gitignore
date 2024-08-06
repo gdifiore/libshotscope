@@ -36,3 +36,5 @@ build/
 Bld/*
 .vscode/
 CMakeFiles/*
+clang-tidy.sh
+.clang-tidy
