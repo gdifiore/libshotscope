@@ -10,8 +10,6 @@ fi
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
 
-echo "$CC"
-
 # Create build directory
 mkdir -p build
 cd build
@@ -21,3 +19,5 @@ cmake ..
 
 # Build the project
 make
+
+sudo make install
