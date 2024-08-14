@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(libshotscope)
+project(shotscope)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -77,3 +77,6 @@ target_link_libraries(calculate_ball_trajectory ${PROJECT_NAME})
 # Discover tests
 include(GoogleTest)
 gtest_discover_tests(libshotscope_tests)
+
+install(TARGETS shotscope DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
