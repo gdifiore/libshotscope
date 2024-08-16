@@ -18,6 +18,8 @@ GolfBallFlight flight(physVars, ball, atmos);
 Simulator simulator(flight);
 ```
 
+See `include\golf_ball.hpp` and `include\atmosphere.hpp` to see what each field of the structs means.
+
 Typically, the ball and atmospheric data would be initialized dynamically by physical sensors or chosen through another program, such as simulating weather conditions at Cypress Point. The `libshotscope` library focuses on calculating the flight path of the ball based on these input values.
 
 Once you have an instance of the `Simulator` class, you can call one of two functions.
