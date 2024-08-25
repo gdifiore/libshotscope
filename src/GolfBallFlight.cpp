@@ -20,6 +20,24 @@
 #include "golf_ball.hpp"
 #include "math_constants.hpp"
 
+/**
+ * @brief Constructs a GolfBallFlight object.
+ *
+ * This constructor initializes a GolfBallFlight object with the given physics variables,
+ * golf ball data, and atmospheric data. It sets up the initial state for simulating
+ * the flight of a golf ball.
+ *
+ * @param physicsVars Reference to a GolfBallPhysicsVariables object containing pre-calculated physics variables.
+ * @param ball The golf ball structure containing relevant data such as initial position, velocity, and spin.
+ * @param atmos The atmospheric data structure containing relevant environmental data.
+ *
+ * @note The user is responsible for validating the physicsVars, ball, and atmos parameters before passing them to this constructor.
+ *       This class assumes that the input data is valid, consistent, and within physically reasonable ranges.
+ *       Passing invalid, inconsistent, or out-of-range data may lead to unexpected behavior or incorrect flight calculations.
+ *
+ * @note The physicsVars object should be initialized with the same ball and atmos data used in this constructor
+ *       to ensure consistency in calculations.
+ */
 GolfBallFlight::GolfBallFlight(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
 	const struct atmosphericData &atmos) : physicsVars(physicsVars), ball(ball), atmos(atmos)
@@ -155,19 +173,6 @@ void GolfBallFlight::calculateRw()
 	rw = physicsVars.getROmega() * exp(-currentTime / tau);
 }
 
-void GolfBallFlight::calculateVw()
-{
-	if (position[2] >= atmos.hWind)
-	{
-		vw = sqrt(pow(velocity3D[0] - velocity3D_w[0], 2) +
-				  pow(velocity3D[1] - velocity3D_w[1], 2) + pow(velocity3D[2], 2));
-	}
-	else
-	{
-		vw = v;
-	}
-}
-
 void GolfBallFlight::calculateRe_x_e5()
 {
 	Re_x_e5 = (vwMph / 100) * physicsVars.getRe100() * 0.00001;
@@ -182,22 +187,22 @@ float GolfBallFlight::determineCoefficientOfDrag()
 	else if (getRe_x_e5() < 1)
 	{
 		return math_constants::CdL -
-			   (math_constants::CdL - math_constants::CdH) * (getRe_x_e5() - 0.5) /
+			   (math_constants::CdL - math_constants::CdH) * (Re_x_e5 - 0.5) /
 				   0.5 +
-			   math_constants::CdS * getSpinFactor();
+			   math_constants::CdS * spinFactor;
 	}
 	else
 	{
-		return math_constants::CdH + math_constants::CdS * getSpinFactor();
+		return math_constants::CdH + math_constants::CdS * spinFactor;
 	}
 }
 
 float GolfBallFlight::determineCoefficientOfLift()
 {
-	if (getSpinFactor() <= 0.3)
+	if (spinFactor <= 0.3)
 	{
-		return math_constants::coeff1 * getSpinFactor() +
-			   math_constants::coeff2 * pow(getSpinFactor(), 2);
+		return math_constants::coeff1 * spinFactor +
+			   math_constants::coeff2 * pow(spinFactor, 2);
 	}
 	else
 	{
@@ -222,7 +227,6 @@ void GolfBallFlight::calculateFlightStep()
 	calculateV();
 
 	calculateVelocityw();
-	calculateVw();
 
 	calculatePhi();
 	calculateTau();

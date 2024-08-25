@@ -90,9 +90,9 @@ void Simulator::calculateNextStep()
 /**
  * Checks if the flight is over.
  *
- * @return true if the ball position.z < 0, false otherwise.
+ * @return true if the ball position.z < 0.0, false otherwise.
  */
 bool Simulator::isFlightOver() const
 {
-    return flight.getPosition()[2] < 0;
+    return flight.getPosition()[2] < 0.0;
 }

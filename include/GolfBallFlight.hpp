@@ -87,7 +87,6 @@ private:
 	void calculatePosition();
 	void calculateV();
 	void calculateVelocityw();
-	void calculateVw();
 
 	void calculatePhi();
 	void calculateTau();

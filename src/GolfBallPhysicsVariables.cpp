@@ -21,6 +21,18 @@
 #include <cmath>
 #include <iostream>
 
+/**
+ * @brief Constructs a GolfBallPhysicsVariables object.
+ *
+ * This constructor initializes a GolfBallPhysicsVariables object with the given golf ball and atmospheric data.
+ *
+ * @param ball The golf ball structure containing relevant data.
+ * @param atmos The atmospheric data structure containing relevant data.
+ *
+ * @note The user is responsible for validating the ball and atmos structures before passing them to this constructor.
+ *       This class assumes that the input data is valid and within physically reasonable ranges.
+ *       Passing invalid or out-of-range data may lead to unexpected behavior or incorrect calculations.
+ */
 GolfBallPhysicsVariables::GolfBallPhysicsVariables(const struct golfBall &ball, const struct atmosphericData &atmos)
     : ball(ball), atmos(atmos), beta(0.0001217f)
 {
