@@ -13,12 +13,12 @@
  * @copyright Copyright (c) 2024, Gabriel DiFiore
  */
 
-#include <cmath>
-
 #include "GolfBallFlight.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "math_constants.hpp"
+
+#include <cmath>
 
 /**
  * @brief Constructs a GolfBallFlight object.

@@ -1,19 +1,15 @@
 cmake_minimum_required(VERSION 3.14)
 project(shotscope)
 
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Define project source and include directories
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(PROJECT_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
 
-# Configure the include directories
 include_directories(${PROJECT_INCLUDE_DIR})
 
-# Specify the source files
 set(SOURCES
    ${PROJECT_SRC_DIR}/math_utils.cpp
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
@@ -21,7 +17,6 @@ set(SOURCES
    ${PROJECT_SRC_DIR}/GolfBallFlight.cpp
 )
 
-# Specify the header files
 set(HEADERS
    ${PROJECT_INCLUDE_DIR}/libshotscope.hpp
    ${PROJECT_INCLUDE_DIR}/math_constants.hpp
@@ -60,7 +55,6 @@ set(TEST_SOURCES
     ${PROJECT_TEST_DIR}/test_ball_flight.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
-    # Add other test source files here
 )
 
 # Add test executable and link with gtest_main and the static library

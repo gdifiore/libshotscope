@@ -1,11 +1,11 @@
 #ifndef SIMULATOR_HPP
 #define SIMULATOR_HPP
 
-#include <vector>
-
 #include "GolfBallFlight.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "math_utils.hpp"
+
+#include <vector>
 
 class Simulator
 {
@@ -23,6 +23,6 @@ private:
 
     [[nodiscard]] auto isFlightOver() const -> bool;
     void calculateNextStep();
-};;
+};
 
 #endif // SIMULATOR_HPP

@@ -9,9 +9,9 @@
  * @copyright Copyright (c) 2024, Gabriel DiFiore
  */
 
-#include <cmath>
-
 #include "math_utils.hpp"
+
+#include <cmath>
 #include <stdexcept>
 
 /**

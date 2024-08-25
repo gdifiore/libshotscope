@@ -18,6 +18,7 @@
 #include "golf_ball.hpp"
 #include "atmosphere.hpp"
 #include "math_utils.hpp"
+
 #include <cmath>
 #include <iostream>
 
