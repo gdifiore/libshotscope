@@ -70,7 +70,7 @@ float math_utils::convertMetersToFeet(float meters)
 }
 
 /**
- * Calculates the distance in yards from the origin to the given position.
+ * Calculates the distance in yards from the origin to the given landing position.
  *
  * @param position The position in 3D space.
  * @return The distance in yards.

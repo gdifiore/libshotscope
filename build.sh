@@ -20,4 +20,6 @@ cmake ..
 # Build the project
 make
 
+echo "password needed to sudo make install"
+
 sudo make install
