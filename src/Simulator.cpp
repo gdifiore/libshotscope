@@ -19,6 +19,15 @@
 #include "golf_ball.hpp"
 #include "math_utils.hpp"
 
+/**
+ * @brief Constructs a Simulator object.
+ *
+ * This constructor initializes a Simulator object with a reference to a GolfBallFlight object.
+ * The Simulator uses this GolfBallFlight object to perform step-by-step calculations of the golf ball's trajectory.
+ *
+ * @param flight A reference to a GolfBallFlight object that has been properly initialized with
+ *               valid physics variables, golf ball data, and atmospheric conditions.
+ */
 Simulator::Simulator(GolfBallFlight &flight)
     : flight(flight)
 {

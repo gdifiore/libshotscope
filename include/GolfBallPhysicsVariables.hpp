@@ -12,27 +12,29 @@ public:
 							 const struct atmosphericData &atmos);
 
 	// Getters
-        [[nodiscard]] auto getRhoImperial() const -> float {
-          return rhoImperial;
-        }
-        [[nodiscard]] auto getRhoMetric() const -> float { return rhoMetric; }
-        [[nodiscard]] auto getC0() const -> float { return c0; }
-        [[nodiscard]] auto getBeta() const -> float { return beta; }
-        [[nodiscard]] auto getV0() const -> float { return v0_magnitude; }
-        [[nodiscard]] auto getV0Vector() const -> Vector3D { return v0; }
-        [[nodiscard]] auto getW() const -> Vector3D { return w; }
-        [[nodiscard]] auto getOmega() const -> float { return omega; }
-        [[nodiscard]] auto getROmega() const -> float { return rOmega; }
-        [[nodiscard]] auto getTempC() const -> float { return tempC; }
-        [[nodiscard]] auto getElevationM() const -> float { return elevationM; }
-        [[nodiscard]] auto getVw() const -> Vector3D { return vw; }
-        [[nodiscard]] auto getSVP() const -> float { return SVP; }
-        [[nodiscard]] auto getBarometricPressure() const -> float {
-          return barometricPressure;
-        }
-        [[nodiscard]] auto getRe100() const -> float { return Re100; }
+	[[nodiscard]] auto getRhoImperial() const -> float
+	{
+		return rhoImperial;
+	}
+	[[nodiscard]] auto getRhoMetric() const -> float { return rhoMetric; }
+	[[nodiscard]] auto getC0() const -> float { return c0; }
+	[[nodiscard]] auto getBeta() const -> float { return beta; }
+	[[nodiscard]] auto getV0() const -> float { return v0_magnitude; }
+	[[nodiscard]] auto getV0Vector() const -> Vector3D { return v0; }
+	[[nodiscard]] auto getW() const -> Vector3D { return w; }
+	[[nodiscard]] auto getOmega() const -> float { return omega; }
+	[[nodiscard]] auto getROmega() const -> float { return rOmega; }
+	[[nodiscard]] auto getTempC() const -> float { return tempC; }
+	[[nodiscard]] auto getElevationM() const -> float { return elevationM; }
+	[[nodiscard]] auto getVw() const -> Vector3D { return vw; }
+	[[nodiscard]] auto getSVP() const -> float { return SVP; }
+	[[nodiscard]] auto getBarometricPressure() const -> float
+	{
+		return barometricPressure;
+	}
+	[[nodiscard]] auto getRe100() const -> float { return Re100; }
 
-        void calculateAllVariables();
+	void calculateAllVariables();
 
 private:
 	struct golfBall ball;

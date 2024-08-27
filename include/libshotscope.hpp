@@ -1,5 +1,3 @@
-// libshotscope.hpp
-
 #ifndef LIBSHOTSCOPE_HPP
 #define LIBSHOTSCOPE_HPP
 
