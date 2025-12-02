@@ -1,79 +1,75 @@
 #ifndef GOLFBALLPHYSICSVARIABLES_HPP
 #define GOLFBALLPHYSICSVARIABLES_HPP
 
-#include "golf_ball.hpp"
 #include "atmosphere.hpp"
+#include "golf_ball.hpp"
+#include "math_utils.hpp"
 
-class GolfBallPhysicsVariables {
-    public:
-        GolfBallPhysicsVariables(const golfBall& ball, const atmosphericData& atmos);
+class GolfBallPhysicsVariables
+{
+public:
+	GolfBallPhysicsVariables(const struct golfBall &ball,
+							 const struct atmosphericData &atmos);
 
-        void calculateAllVariables();
+	// Getters
+	[[nodiscard]] auto getRhoImperial() const -> float
+	{
+		return rhoImperial;
+	}
+	[[nodiscard]] auto getRhoMetric() const -> float { return rhoMetric; }
+	[[nodiscard]] auto getC0() const -> float { return c0; }
+	[[nodiscard]] auto getBeta() const -> float { return beta; }
+	[[nodiscard]] auto getV0() const -> float { return v0_magnitude; }
+	[[nodiscard]] auto getV0Vector() const -> Vector3D { return v0; }
+	[[nodiscard]] auto getW() const -> Vector3D { return w; }
+	[[nodiscard]] auto getOmega() const -> float { return omega; }
+	[[nodiscard]] auto getROmega() const -> float { return rOmega; }
+	[[nodiscard]] auto getTempC() const -> float { return tempC; }
+	[[nodiscard]] auto getElevationM() const -> float { return elevationM; }
+	[[nodiscard]] auto getVw() const -> Vector3D { return vw; }
+	[[nodiscard]] auto getSVP() const -> float { return SVP; }
+	[[nodiscard]] auto getBarometricPressure() const -> float
+	{
+		return barometricPressure;
+	}
+	[[nodiscard]] auto getRe100() const -> float { return Re100; }
 
-        // Getters for accessing the calculated variables
-        float getRhoImperial() const { return rhoImperial; }
-        float getRhoMetric() const { return rhoMetric; }
-        float getC0() const { return c0; }
-        float getBeta() const { return beta; }
-        float getV0() const { return v0; }
-        float getV0x() const { return v0x; }
-        float getV0y() const { return v0y; }
-        float getV0z() const { return v0z; }
-        float getWx() const { return wx; }
-        float getWy() const { return wy; }
-        float getWz() const { return wz; }
-        float getOmega() const { return omega; }
-        float getROmega() const { return rOmega; }
-        float getTempC() const { return tempC; }
-        float getElevationM() const { return elevationM; }
-        float getVxw() const { return vxw; }
-        float getVyw() const { return vyw; }
-        float getSVP() const { return SVP; }
-        float getBarometricPressure() const { return barometricPressure; }
-        float getRe100() const { return Re100; }
+	void calculateAllVariables();
 
-    private:
-        const golfBall& ball;
-        const atmosphericData& atmos;
+private:
+	struct golfBall ball;
+	struct atmosphericData atmos;
 
-        float rhoImperial;
-        float rhoMetric;
-        float c0;
-        float beta;
-        float v0;
-        float v0x;
-        float v0y;
-        float v0z;
-        float wx;
-        float wy;
-        float wz;
-        float omega;
-        float rOmega;
-        float tempC;
-        float elevationM;
-        float vxw;
-        float vyw;
-        float SVP;
-        float barometricPressure;
-        float Re100;
+	// Member variables
+	float rhoImperial = 0.0F;
+	float rhoMetric = 0.0F;
+	float c0 = 0.0F;
+	const float beta = 0.0001217F;
+	float tempC = 0.0F;
+	float elevationM = 0.0F;
+	float v0_magnitude;
 
-        void calculateRhoMetric();
-        void calculateRhoImperial();
-        void calculateC0();
-        void calculateV0();
-        void calculateV0x();
-        void calculateV0y();
-        void calculateV0z();
-        void calculateWx();
-        void calculateWy();
-        void calculateWz();
-        void calculateOmega();
-        void calculateROmega();
-        void calculateVxw();
-        void calculateVyw();
-        void calculateSVP();
-        void calculateBarometricPressure();
-        void calculateRe100();
+	Vector3D v0;
+	Vector3D w;
+	Vector3D vw;
+	float omega;
+	float rOmega;
+	float SVP;
+	float barometricPressure;
+	float Re100;
+
+	// Private calculation methods
+	void calculateRhoMetric();
+	void calculateRhoImperial();
+	void calculateC0();
+	void calculateV0();
+	void calculateW();
+	void calculateOmega();
+	void calculateROmega();
+	void calculateVw();
+	void calculateSVP();
+	void calculateBarometricPressure();
+	void calculateRe100();
 };
 
 #endif // GOLFBALLPHYSICSVARIABLES_HPP
