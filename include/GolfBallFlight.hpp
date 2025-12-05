@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include "BallState.hpp"
 #include "GolfBallPhysicsVariables.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
@@ -20,7 +21,7 @@ public:
 	[[nodiscard]] auto getVMph() const -> float { return vMph; }
 	[[nodiscard]] auto getVelocity3D() const -> const Vector3D &
 	{
-		return velocity3D;
+		return state.velocity;
 	}
 	[[nodiscard]] auto getPhi() const -> float { return phi; }
 	[[nodiscard]] auto getTau() const -> float { return tau; }
@@ -49,11 +50,15 @@ public:
 	}
 	[[nodiscard]] auto getAcceleration3D() const -> const Vector3D &
 	{
-		return acceleration3D;
+		return state.acceleration;
 	}
 	[[nodiscard]] auto getPosition() const -> const Vector3D &
 	{
-		return position;
+		return state.position;
+	}
+	[[nodiscard]] auto getState() const -> const BallState &
+	{
+		return state;
 	}
 
 	auto determineCoefficientOfDrag() -> float;
@@ -66,11 +71,10 @@ private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 
-	float currentTime = 0.0F; // just needed for Rw
+	// Physics state (position, velocity, acceleration, time)
+	BallState state;
 
-	// Member variables               // column title in excel sheet
-	Vector3D position;
-	Vector3D velocity3D;			  // vx/vy/vz
+	// Calculated variables (derived from state)
 	float v;						  // v
 	float vMph;						  // vmph
 	float phi;						  // phi
@@ -85,7 +89,6 @@ private:
 	Vector3D velocity3D_w;			  // vxw/vyw
 	Vector3D accelerationDrag3D;	  // adragx/y/z
 	Vector3D accelertaionMagnitude3D; // aMagx/y/z
-	Vector3D acceleration3D;		  // ax/y/z
 
 	// Private calculation methods (the order they're in is the order they need to be called)
 	void initialize();
