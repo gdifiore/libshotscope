@@ -124,3 +124,69 @@ Vector3D math_utils::calcLandingPoint(const std::vector<Vector3D> &positions)
 
     return result;
 }
+
+/**
+ * Reflects a velocity vector off a surface defined by its normal vector.
+ *
+ * @param velocity The incoming velocity vector.
+ * @param normal The surface normal vector (should be normalized).
+ * @return The reflected velocity vector.
+ */
+Vector3D math_utils::reflect(const Vector3D& velocity, const Vector3D& normal)
+{
+    float dot = dotProduct(velocity, normal);
+    Vector3D result;
+    for (int i = 0; i < 3; ++i)
+    {
+        result[i] = velocity[i] - 2.0f * dot * normal[i];
+    }
+    return result;
+}
+
+/**
+ * Projects a vector onto another vector.
+ *
+ * @param vector The vector to project.
+ * @param onto The vector to project onto.
+ * @return The projected vector.
+ */
+Vector3D math_utils::project(const Vector3D& vector, const Vector3D& onto)
+{
+    float dotVectorOnto = dotProduct(vector, onto);
+    float dotOntoOnto = dotProduct(onto, onto);
+
+    Vector3D result;
+    for (int i = 0; i < 3; ++i)
+    {
+        result[i] = (dotVectorOnto / dotOntoOnto) * onto[i];
+    }
+    return result;
+}
+
+/**
+ * Calculates the dot product of two vectors.
+ *
+ * @param a The first vector.
+ * @param b The second vector.
+ * @return The dot product.
+ */
+float math_utils::dotProduct(const Vector3D& a, const Vector3D& b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+/**
+ * Calculates the cross product of two vectors.
+ *
+ * @param a The first vector.
+ * @param b The second vector.
+ * @return The cross product vector.
+ */
+Vector3D math_utils::crossProduct(const Vector3D& a, const Vector3D& b)
+{
+    Vector3D result;
+    result[0] = a[1] * b[2] - a[2] * b[1];
+    result[1] = a[2] * b[0] - a[0] * b[2];
+    result[2] = a[0] * b[1] - a[1] * b[0];
+    return result;
+}
