@@ -53,11 +53,12 @@ GolfBallFlight::GolfBallFlight(
  */
 void GolfBallFlight::initialize()
 {
-	position = {ball.x0, ball.y0, ball.z0};
+	state.position = {ball.x0, ball.y0, ball.z0};
+	state.currentTime = 0.0F;
 
-	velocity3D = physicsVars.getV0Vector();
-	v = sqrt(velocity3D[0] * velocity3D[0] + velocity3D[1] * velocity3D[1] +
-			 velocity3D[2] * velocity3D[2]);
+	state.velocity = physicsVars.getV0Vector();
+	v = sqrt(state.velocity[0] * state.velocity[0] + state.velocity[1] * state.velocity[1] +
+			 state.velocity[2] * state.velocity[2]);
 	vMph = v / physics_constants::MPH_TO_FT_PER_S;
 	calculateVelocityw();
 	vw = v;
@@ -75,21 +76,21 @@ void GolfBallFlight::initialize()
 
 void GolfBallFlight::calculatePosition()
 {
-	position[0] =
-		position[0] + velocity3D[0] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * acceleration3D[0] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
-	position[1] =
-		position[1] + velocity3D[1] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * acceleration3D[1] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
-	position[2] =
-		position[2] + velocity3D[2] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * acceleration3D[2] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
+	state.position[0] =
+		state.position[0] + state.velocity[0] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * state.acceleration[0] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
+	state.position[1] =
+		state.position[1] + state.velocity[1] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * state.acceleration[1] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
+	state.position[2] =
+		state.position[2] + state.velocity[2] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * state.acceleration[2] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
 }
 
 void GolfBallFlight::calculateV()
 {
-	float vx = velocity3D[0] + acceleration3D[0] * physics_constants::SIMULATION_TIME_STEP;
-	float vy = velocity3D[1] + acceleration3D[1] * physics_constants::SIMULATION_TIME_STEP;
-	float vz = velocity3D[2] + acceleration3D[2] * physics_constants::SIMULATION_TIME_STEP;
+	float vx = state.velocity[0] + state.acceleration[0] * physics_constants::SIMULATION_TIME_STEP;
+	float vy = state.velocity[1] + state.acceleration[1] * physics_constants::SIMULATION_TIME_STEP;
+	float vz = state.velocity[2] + state.acceleration[2] * physics_constants::SIMULATION_TIME_STEP;
 
-	velocity3D = {vx, vy, vz};
+	state.velocity = {vx, vy, vz};
 
 	v = sqrt(vx * vx + vy * vy + vz * vz);
 	vMph = v / physics_constants::MPH_TO_FT_PER_S;
@@ -99,10 +100,10 @@ void GolfBallFlight::calculateV()
 // It represents the speed at which the object is moving horizontally, without considering any vertical motion.
 void GolfBallFlight::calculateVelocityw()
 {
-	if (position[2] >= atmos.hWind)
+	if (state.position[2] >= atmos.hWind)
 	{
-		vw = sqrt(pow(velocity3D[0] - velocity3D_w[0], 2) +
-				  pow(velocity3D[1] - velocity3D_w[1], 2) + pow(velocity3D[2], 2));
+		vw = sqrt(pow(state.velocity[0] - velocity3D_w[0], 2) +
+				  pow(state.velocity[1] - velocity3D_w[1], 2) + pow(state.velocity[2], 2));
 		velocity3D_w[0] = physicsVars.getVw()[0];
 		velocity3D_w[1] = physicsVars.getVw()[1];
 	}
@@ -118,20 +119,20 @@ void GolfBallFlight::calculateVelocityw()
 
 void GolfBallFlight::calculateAccel()
 {
-	acceleration3D[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
-	acceleration3D[1] = accelerationDrag3D[1] + accelertaionMagnitude3D[1];
-	acceleration3D[2] =
+	state.acceleration[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
+	state.acceleration[1] = accelerationDrag3D[1] + accelertaionMagnitude3D[1];
+	state.acceleration[2] =
 		accelerationDrag3D[2] + accelertaionMagnitude3D[2] - physics_constants::GRAVITY_FT_PER_S2;
 }
 
 void GolfBallFlight::calculateAccelD()
 {
 	accelerationDrag3D[0] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-							vw * (velocity3D[0] - velocity3D_w[0]);
+							vw * (state.velocity[0] - velocity3D_w[0]);
 	accelerationDrag3D[1] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-							vw * (velocity3D[1] - velocity3D_w[1]);
+							vw * (state.velocity[1] - velocity3D_w[1]);
 	accelerationDrag3D[2] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-							vw * velocity3D[2];
+							vw * state.velocity[2];
 }
 
 void GolfBallFlight::calculateAccelM()
@@ -139,26 +140,26 @@ void GolfBallFlight::calculateAccelM()
 	accelertaionMagnitude3D[0] =
 		physicsVars.getC0() *
 		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-		(physicsVars.getW()[1] * velocity3D[2] -
-		 physicsVars.getW()[2] * (velocity3D[1] - velocity3D_w[1])) /
+		(physicsVars.getW()[1] * state.velocity[2] -
+		 physicsVars.getW()[2] * (state.velocity[1] - velocity3D_w[1])) /
 		w_perp_div_w;
 	accelertaionMagnitude3D[1] =
 		physicsVars.getC0() *
 		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-		(physicsVars.getW()[2] * (velocity3D[0] - velocity3D_w[0]) -
-		 physicsVars.getW()[0] * velocity3D[2]) /
+		(physicsVars.getW()[2] * (state.velocity[0] - velocity3D_w[0]) -
+		 physicsVars.getW()[0] * state.velocity[2]) /
 		w_perp_div_w;
 	accelertaionMagnitude3D[2] =
 		physicsVars.getC0() *
 		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-		(physicsVars.getW()[0] * (velocity3D[1] - velocity3D_w[1]) -
-		 physicsVars.getW()[1] * (velocity3D[0] - velocity3D_w[0])) /
+		(physicsVars.getW()[0] * (state.velocity[1] - velocity3D_w[1]) -
+		 physicsVars.getW()[1] * (state.velocity[0] - velocity3D_w[0])) /
 		w_perp_div_w;
 }
 
 void GolfBallFlight::calculatePhi()
 {
-	phi = atan2(position[1], position[2]) * 180 / M_PI;
+	phi = atan2(state.position[1], state.position[2]) * 180 / M_PI;
 }
 
 void GolfBallFlight::calculateTau()
@@ -169,7 +170,7 @@ void GolfBallFlight::calculateTau()
 
 void GolfBallFlight::calculateRw()
 {
-	rw = physicsVars.getROmega() * exp(-currentTime / tau);
+	rw = physicsVars.getROmega() * exp(-state.currentTime / tau);
 }
 
 void GolfBallFlight::calculateRe_x_e5()
@@ -220,7 +221,7 @@ void GolfBallFlight::calculateSpinFactor()
  */
 void GolfBallFlight::calculateFlightStep()
 {
-	currentTime += physics_constants::SIMULATION_TIME_STEP;
+	state.currentTime += physics_constants::SIMULATION_TIME_STEP;
 
 	calculatePosition();
 	calculateV();
