@@ -52,7 +52,7 @@ Vector3D Simulator::runSimulationLanding()
         previousPosition = currentPosition;
         currentPosition = flight.getPosition();
 
-        currentTime += dt;
+        currentTime += physics_constants::SIMULATION_TIME_STEP;
         iteration++;
     }
 
@@ -80,7 +80,7 @@ std::vector<Vector3D> Simulator::runSimulation()
 
         positions.push_back(flight.getPosition());
 
-        currentTime += dt;
+        currentTime += physics_constants::SIMULATION_TIME_STEP;
         iteration++;
     }
 

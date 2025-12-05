@@ -66,7 +66,6 @@ private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 
-	const float dt = 0.01F;
 	float currentTime = 0.0F; // just needed for Rw
 
 	// Member variables               // column title in excel sheet

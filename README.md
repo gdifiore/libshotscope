@@ -17,5 +17,3 @@ chmod +x build.sh
 ## docs
 
 [How to use](/docs/how.md) `libshotscope`
-
-[Why/Where to use](/docs/why.md) `libshotscope`

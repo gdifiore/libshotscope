@@ -39,4 +39,3 @@ CMakeFiles/*
 clang-tidy.sh
 .clang-tidy
 points.txt
-*.py

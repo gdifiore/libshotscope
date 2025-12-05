@@ -19,13 +19,13 @@ set(SOURCES
 
 set(HEADERS
    ${PROJECT_INCLUDE_DIR}/libshotscope.hpp
-   ${PROJECT_INCLUDE_DIR}/math_constants.hpp
    ${PROJECT_INCLUDE_DIR}/golf_ball.hpp
    ${PROJECT_INCLUDE_DIR}/math_utils.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
    ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallFlight.hpp
    ${PROJECT_INCLUDE_DIR}/Simulator.hpp
+   ${PROJECT_INCLUDE_DIR}/physics_constants.hpp
 )
 
 # Create the static library

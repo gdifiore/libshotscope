@@ -10,6 +10,7 @@
  */
 
 #include "math_utils.hpp"
+#include "physics_constants.hpp"
 
 #include <cmath>
 #include <stdexcept>
@@ -22,7 +23,7 @@
  */
 float math_utils::convertFahrenheitToCelsius(float fahrenheit)
 {
-    return (fahrenheit - 32) * 5 / 9;
+    return (fahrenheit - physics_constants::FAHRENHEIT_OFFSET) * physics_constants::FAHRENHEIT_TO_CELSIUS_SCALE;
 }
 
 /**
@@ -33,7 +34,7 @@ float math_utils::convertFahrenheitToCelsius(float fahrenheit)
  */
 float math_utils::convertCelsiusToKelvin(float celsius)
 {
-    return celsius + 273.16;
+    return celsius + physics_constants::KELVIN_OFFSET;
 }
 
 /**
@@ -44,7 +45,7 @@ float math_utils::convertCelsiusToKelvin(float celsius)
  */
 float math_utils::convertFahrenheitToKelvin(float fahrenheit)
 {
-    return ((fahrenheit - 32) * 5 / 9) + 273.16;
+    return ((fahrenheit - physics_constants::FAHRENHEIT_OFFSET) * physics_constants::FAHRENHEIT_TO_CELSIUS_SCALE) + physics_constants::KELVIN_OFFSET;
 }
 
 /**
@@ -55,7 +56,7 @@ float math_utils::convertFahrenheitToKelvin(float fahrenheit)
  */
 float math_utils::convertFeetToMeters(float feet)
 {
-    return feet * FEET_TO_METERS;
+    return feet * physics_constants::FEET_TO_METERS;
 }
 
 /**
@@ -66,7 +67,7 @@ float math_utils::convertFeetToMeters(float feet)
  */
 float math_utils::convertMetersToFeet(float meters)
 {
-    return meters * METERS_TO_FEET;
+    return meters * physics_constants::METERS_TO_FEET;
 }
 
 /**
@@ -79,7 +80,7 @@ float math_utils::getDistanceInYards(Vector3D position)
 {
     float distance = std::sqrt(position[0] * position[0] + position[1] * position[1]);
 
-    float distanceInYards = distance / YARDS_TO_FEET;
+    float distanceInYards = distance / physics_constants::YARDS_TO_FEET;
 
     return distanceInYards;
 }
@@ -105,7 +106,7 @@ Vector3D math_utils::calcLandingPoint(const std::vector<Vector3D> &positions)
         Vector3D result;
         for (int i = 0; i < 3; ++i)
         {
-            result[i] = vec[i] / 3.0F; // yards to feet
+            result[i] = vec[i] / physics_constants::YARDS_TO_FEET;
         }
         return result;
     };
@@ -113,7 +114,7 @@ Vector3D math_utils::calcLandingPoint(const std::vector<Vector3D> &positions)
     Vector3D last = divideBy3(positions.back());
     Vector3D second_last = divideBy3(positions[positions.size() - 2]);
 
-    float heightDiff = last[2] / (last[2] - second_last[2]) / YARDS_TO_FEET;
+    float heightDiff = last[2] / (last[2] - second_last[2]);
 
     Vector3D result;
     for (int i = 0; i < 3; ++i)

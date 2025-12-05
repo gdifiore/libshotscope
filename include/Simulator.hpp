@@ -18,7 +18,6 @@ public:
 private:
     GolfBallFlight &flight;
 
-    const float dt = 0.01F;
     float currentTime = 0.0F;
 
     [[nodiscard]] auto isFlightOver() const -> bool;

@@ -4,6 +4,7 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "math_utils.hpp"
+#include "physics_constants.hpp"
 
 class GolfBallPhysicsVariables
 {
@@ -18,7 +19,7 @@ public:
 	}
 	[[nodiscard]] auto getRhoMetric() const -> float { return rhoMetric; }
 	[[nodiscard]] auto getC0() const -> float { return c0; }
-	[[nodiscard]] auto getBeta() const -> float { return beta; }
+	//[[nodiscard]] auto getBeta() const -> float { return physics_constants::BETA_PRESSURE_DECAY; }
 	[[nodiscard]] auto getV0() const -> float { return v0_magnitude; }
 	[[nodiscard]] auto getV0Vector() const -> Vector3D { return v0; }
 	[[nodiscard]] auto getW() const -> Vector3D { return w; }
@@ -44,7 +45,6 @@ private:
 	float rhoImperial = 0.0F;
 	float rhoMetric = 0.0F;
 	float c0 = 0.0F;
-	const float beta = 0.0001217F;
 	float tempC = 0.0F;
 	float elevationM = 0.0F;
 	float v0_magnitude;
