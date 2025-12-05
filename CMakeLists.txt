@@ -15,6 +15,7 @@ set(SOURCES
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
    ${PROJECT_SRC_DIR}/Simulator.cpp
    ${PROJECT_SRC_DIR}/GolfBallFlight.cpp
+   ${PROJECT_SRC_DIR}/FlightPhase.cpp
 )
 
 set(HEADERS
@@ -24,6 +25,9 @@ set(HEADERS
    ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
    ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallFlight.hpp
+   ${PROJECT_INCLUDE_DIR}/FlightPhase.hpp
+   ${PROJECT_INCLUDE_DIR}/BallState.hpp
+   ${PROJECT_INCLUDE_DIR}/ground_surface.hpp
    ${PROJECT_INCLUDE_DIR}/Simulator.hpp
    ${PROJECT_INCLUDE_DIR}/physics_constants.hpp
 )

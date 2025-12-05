@@ -14,11 +14,13 @@
  */
 
 #include "GolfBallFlight.hpp"
+#include "FlightPhase.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "physics_constants.hpp"
 
 #include <cmath>
+#include <memory>
 
 /**
  * @brief Constructs a GolfBallFlight object.
@@ -47,7 +49,7 @@ GolfBallFlight::GolfBallFlight(
 }
 
 /**
- * Initializes the golf ball flight by setting the initial position, velocity, and other variables.
+ * Initializes the golf ball flight by setting the initial position, velocity, and creating the aerial phase.
  *
  * Some of these have initial values from other classes, some need to be calculated for the first time.
  */
@@ -55,187 +57,31 @@ void GolfBallFlight::initialize()
 {
 	state.position = {ball.x0, ball.y0, ball.z0};
 	state.currentTime = 0.0F;
-
 	state.velocity = physicsVars.getV0Vector();
-	v = sqrt(state.velocity[0] * state.velocity[0] + state.velocity[1] * state.velocity[1] +
-			 state.velocity[2] * state.velocity[2]);
-	vMph = v / physics_constants::MPH_TO_FT_PER_S;
-	calculateVelocityw();
-	vw = v;
+	state.acceleration = {0.0F, 0.0F, 0.0F};
 
-	calculatePhi();
-	calculateTau();
-	calculateRw();
-	calculateRe_x_e5();
-	calculateSpinFactor();
+	// Create the aerial phase
+	aerialPhase = std::make_unique<AerialPhase>(physicsVars, ball, atmos);
 
-	calculateAccelD();
-	calculateAccelM();
-	calculateAccel();
-}
-
-void GolfBallFlight::calculatePosition()
-{
-	state.position[0] =
-		state.position[0] + state.velocity[0] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * state.acceleration[0] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
-	state.position[1] =
-		state.position[1] + state.velocity[1] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * state.acceleration[1] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
-	state.position[2] =
-		state.position[2] + state.velocity[2] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * state.acceleration[2] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
-}
-
-void GolfBallFlight::calculateV()
-{
-	float vx = state.velocity[0] + state.acceleration[0] * physics_constants::SIMULATION_TIME_STEP;
-	float vy = state.velocity[1] + state.acceleration[1] * physics_constants::SIMULATION_TIME_STEP;
-	float vz = state.velocity[2] + state.acceleration[2] * physics_constants::SIMULATION_TIME_STEP;
-
-	state.velocity = {vx, vy, vz};
-
-	v = sqrt(vx * vx + vy * vy + vz * vz);
-	vMph = v / physics_constants::MPH_TO_FT_PER_S;
-}
-
-// In physics, "velocity_w" typically refers to the velocity of an object in the horizontal direction.
-// It represents the speed at which the object is moving horizontally, without considering any vertical motion.
-void GolfBallFlight::calculateVelocityw()
-{
-	if (state.position[2] >= atmos.hWind)
-	{
-		vw = sqrt(pow(state.velocity[0] - velocity3D_w[0], 2) +
-				  pow(state.velocity[1] - velocity3D_w[1], 2) + pow(state.velocity[2], 2));
-		velocity3D_w[0] = physicsVars.getVw()[0];
-		velocity3D_w[1] = physicsVars.getVw()[1];
-	}
-	else
-	{
-		vw = v;
-		velocity3D_w[0] = 0;
-		velocity3D_w[1] = 0;
-	}
-
-	vwMph = v / physics_constants::MPH_TO_FT_PER_S;
-}
-
-void GolfBallFlight::calculateAccel()
-{
-	state.acceleration[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
-	state.acceleration[1] = accelerationDrag3D[1] + accelertaionMagnitude3D[1];
-	state.acceleration[2] =
-		accelerationDrag3D[2] + accelertaionMagnitude3D[2] - physics_constants::GRAVITY_FT_PER_S2;
-}
-
-void GolfBallFlight::calculateAccelD()
-{
-	accelerationDrag3D[0] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-							vw * (state.velocity[0] - velocity3D_w[0]);
-	accelerationDrag3D[1] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-							vw * (state.velocity[1] - velocity3D_w[1]);
-	accelerationDrag3D[2] = -physicsVars.getC0() * determineCoefficientOfDrag() *
-							vw * state.velocity[2];
-}
-
-void GolfBallFlight::calculateAccelM()
-{
-	accelertaionMagnitude3D[0] =
-		physicsVars.getC0() *
-		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-		(physicsVars.getW()[1] * state.velocity[2] -
-		 physicsVars.getW()[2] * (state.velocity[1] - velocity3D_w[1])) /
-		w_perp_div_w;
-	accelertaionMagnitude3D[1] =
-		physicsVars.getC0() *
-		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-		(physicsVars.getW()[2] * (state.velocity[0] - velocity3D_w[0]) -
-		 physicsVars.getW()[0] * state.velocity[2]) /
-		w_perp_div_w;
-	accelertaionMagnitude3D[2] =
-		physicsVars.getC0() *
-		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
-		(physicsVars.getW()[0] * (state.velocity[1] - velocity3D_w[1]) -
-		 physicsVars.getW()[1] * (state.velocity[0] - velocity3D_w[0])) /
-		w_perp_div_w;
-}
-
-void GolfBallFlight::calculatePhi()
-{
-	phi = atan2(state.position[1], state.position[2]) * 180 / M_PI;
-}
-
-void GolfBallFlight::calculateTau()
-{
-	tau =
-		1 / (physics_constants::TAU_COEFF * v / (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * M_PI * physics_constants::INCHES_PER_FOOT)));
-}
-
-void GolfBallFlight::calculateRw()
-{
-	rw = physicsVars.getROmega() * exp(-state.currentTime / tau);
-}
-
-void GolfBallFlight::calculateRe_x_e5()
-{
-	Re_x_e5 = (vwMph / physics_constants::RE_VELOCITY_DIVISOR) * physicsVars.getRe100() * physics_constants::RE_SCALE_FACTOR;
+	// Initialize the phase with the current state to calculate initial values
+	aerialPhase->initialize(state);
 }
 
 float GolfBallFlight::determineCoefficientOfDrag()
 {
-	if (getRe_x_e5() <= physics_constants::RE_THRESHOLD_LOW)
-	{
-		return physics_constants::CD_LOW;
-	}
-	else if (getRe_x_e5() < physics_constants::RE_THRESHOLD_HIGH)
-	{
-		return physics_constants::CD_LOW -
-			   (physics_constants::CD_LOW - physics_constants::CD_HIGH) * (Re_x_e5 - physics_constants::RE_THRESHOLD_LOW) /
-				   physics_constants::RE_THRESHOLD_LOW +
-			   physics_constants::CD_SPIN * spinFactor;
-	}
-	else
-	{
-		return physics_constants::CD_HIGH + physics_constants::CD_SPIN * spinFactor;
-	}
+	return aerialPhase->determineCoefficientOfDrag();
 }
 
 float GolfBallFlight::determineCoefficientOfLift()
 {
-	if (spinFactor <= physics_constants::SPIN_FACTOR_THRESHOLD)
-	{
-		return physics_constants::LIFT_COEFF1 * spinFactor +
-			   physics_constants::LIFT_COEFF2 * pow(spinFactor, 2);
-	}
-	else
-	{
-		return physics_constants::CL_DEFAULT;
-	}
-}
-
-void GolfBallFlight::calculateSpinFactor()
-{
-	spinFactor = rw / vw;
+	return aerialPhase->determineCoefficientOfLift();
 }
 
 /**
  * Calculates a single step in the golf ball's flight.
- * Updates the current time and calculates various parameters such as position, velocity, spin, and acceleration.
+ * Delegates to the current flight phase (AerialPhase).
  */
 void GolfBallFlight::calculateFlightStep()
 {
-	state.currentTime += physics_constants::SIMULATION_TIME_STEP;
-
-	calculatePosition();
-	calculateV();
-
-	calculateVelocityw();
-
-	calculatePhi();
-	calculateTau();
-	calculateRw();
-
-	calculateRe_x_e5();
-	calculateSpinFactor();
-
-	calculateAccelD();
-	calculateAccelM();
-	calculateAccel();
+	aerialPhase->calculateStep(state, physics_constants::SIMULATION_TIME_STEP);
 }
