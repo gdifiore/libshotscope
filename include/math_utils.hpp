@@ -12,10 +12,6 @@ namespace math_utils
     auto convertCelsiusToKelvin(float celsius) -> float;
     auto convertFahrenheitToKelvin(float fahrenheit) -> float;
 
-    constexpr float METERS_TO_FEET = 3.28084F;
-    constexpr float FEET_TO_METERS = 1.0F / METERS_TO_FEET;
-    constexpr float YARDS_TO_FEET = 3.0F;
-
     auto convertFeetToMeters(float feet) -> float;
     auto convertMetersToFeet(float meters) -> float;
 

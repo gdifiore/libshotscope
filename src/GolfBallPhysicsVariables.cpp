@@ -18,6 +18,7 @@
 #include "golf_ball.hpp"
 #include "atmosphere.hpp"
 #include "math_utils.hpp"
+#include "physics_constants.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -35,7 +36,7 @@
  *       Passing invalid or out-of-range data may lead to unexpected behavior or incorrect calculations.
  */
 GolfBallPhysicsVariables::GolfBallPhysicsVariables(const struct golfBall &ball, const struct atmosphericData &atmos)
-    : ball(ball), atmos(atmos), beta(0.0001217f)
+    : ball(ball), atmos(atmos)
 {
     tempC = math_utils::convertFahrenheitToCelsius(atmos.temp);
     elevationM = math_utils::convertFeetToMeters(atmos.elevation);
@@ -60,72 +61,72 @@ void GolfBallPhysicsVariables::calculateAllVariables()
 
 void GolfBallPhysicsVariables::calculateRhoMetric()
 {
-    rhoMetric = 1.2929 * ((273.0 / (math_utils::convertCelsiusToKelvin(tempC)) *
-                           ((barometricPressure * std::exp(-beta * elevationM) - 0.3783 * atmos.relHumidity * (SVP / 100.0)) / 760.0)));
+    rhoMetric = physics_constants::STD_AIR_DENSITY_KG_PER_M3 * ((physics_constants::KELVIN_OFFSET / (math_utils::convertCelsiusToKelvin(tempC)) *
+                           ((barometricPressure * std::exp(-physics_constants::BETA_PRESSURE_DECAY * elevationM) - physics_constants::WATER_VAPOR_COEFF * atmos.relHumidity * (SVP / 100.0)) / physics_constants::STD_PRESSURE_MMHG)));
 }
 
 void GolfBallPhysicsVariables::calculateRhoImperial()
 {
-    rhoImperial = rhoMetric * 0.06261;
+    rhoImperial = rhoMetric * physics_constants::KG_PER_M3_TO_LB_PER_FT3;
 }
 
 void GolfBallPhysicsVariables::calculateC0()
 {
-    c0 = 0.07182 * rhoImperial * (5.125 / ball.std_golf_ball_mass) *
-         std::pow(ball.std_golf_ball_circumference / 9.125, 2);
+    c0 = physics_constants::DRAG_FORCE_CONST * rhoImperial * (physics_constants::REF_BALL_MASS_OZ / physics_constants::STD_BALL_MASS_OZ) *
+         std::pow(physics_constants::STD_BALL_CIRCUMFERENCE_IN  / physics_constants::REF_BALL_CIRC_IN, 2);
 }
 
 void GolfBallPhysicsVariables::calculateV0()
 {
-    v0_magnitude = ball.exitSpeed * 1.467;
-    float v0x = v0_magnitude * std::cos(ball.launchAngle * M_PI / 180.0) * std::sin(ball.direction * M_PI / 180.0);
-    float v0y = v0_magnitude * std::cos(ball.launchAngle * M_PI / 180.0) * std::cos(ball.direction * M_PI / 180.0);
-    float v0z = v0_magnitude * std::sin(ball.launchAngle * M_PI / 180.0);
+    v0_magnitude = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
+    float v0x = v0_magnitude * std::cos(ball.launchAngle * physics_constants::DEG_TO_RAD) * std::sin(ball.direction * physics_constants::DEG_TO_RAD);
+    float v0y = v0_magnitude * std::cos(ball.launchAngle * physics_constants::DEG_TO_RAD) * std::cos(ball.direction * physics_constants::DEG_TO_RAD);
+    float v0z = v0_magnitude * std::sin(ball.launchAngle * physics_constants::DEG_TO_RAD);
     v0 = Vector3D{v0x, v0y, v0z};
 }
 
 void GolfBallPhysicsVariables::calculateW()
 {
-    float wx = (ball.backspin * std::cos(ball.direction * M_PI / 180.0) -
-                ball.sidespin * std::sin(ball.launchAngle * M_PI / 180.0) * std::sin(ball.direction * M_PI / 180.0)) *
-               M_PI / 30.0;
-    float wy = (-ball.backspin * std::sin(ball.direction * M_PI / 180.0) -
-                ball.sidespin * std::sin(ball.launchAngle * M_PI / 180.0) * std::cos(ball.direction * M_PI / 180.0)) *
-               M_PI / 30.0;
-    float wz = (ball.sidespin * std::cos(ball.launchAngle * M_PI / 180.0)) * M_PI / 30.0;
+    float wx = (ball.backspin * std::cos(ball.direction * physics_constants::DEG_TO_RAD) -
+                ball.sidespin * std::sin(ball.launchAngle * physics_constants::DEG_TO_RAD) * std::sin(ball.direction * physics_constants::DEG_TO_RAD)) *
+               physics_constants::RPM_TO_RAD_PER_S;
+    float wy = (-ball.backspin * std::sin(ball.direction * physics_constants::DEG_TO_RAD) -
+                ball.sidespin * std::sin(ball.launchAngle * physics_constants::DEG_TO_RAD) * std::cos(ball.direction * physics_constants::DEG_TO_RAD)) *
+               physics_constants::RPM_TO_RAD_PER_S;
+    float wz = (ball.sidespin * std::cos(ball.launchAngle * physics_constants::DEG_TO_RAD)) * physics_constants::RPM_TO_RAD_PER_S;
     w = Vector3D{wx, wy, wz};
 }
 
 void GolfBallPhysicsVariables::calculateOmega()
 {
-    omega = std::sqrt(std::pow(ball.backspin, 2) + std::pow(ball.sidespin, 2)) * M_PI / 30.0;
+    omega = std::sqrt(std::pow(ball.backspin, 2) + std::pow(ball.sidespin, 2)) * physics_constants::RPM_TO_RAD_PER_S;
 }
 
 void GolfBallPhysicsVariables::calculateROmega()
 {
-    rOmega = (ball.std_golf_ball_circumference / (2 * M_PI)) * (omega / 12.0);
+    rOmega = (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * M_PI)) * (omega / 12.0);
 }
 
 void GolfBallPhysicsVariables::calculateVw()
 {
-    float vxw = atmos.vWind * 1.467 * std::sin(atmos.phiWind * M_PI / 180.0);
-    float vyw = atmos.vWind * 1.467 * std::cos(atmos.phiWind * M_PI / 180.0);
+    float vxw = atmos.vWind * physics_constants::MPH_TO_FT_PER_S * std::sin(atmos.phiWind * physics_constants::DEG_TO_RAD);
+    float vyw = atmos.vWind * physics_constants::MPH_TO_FT_PER_S * std::cos(atmos.phiWind * physics_constants::DEG_TO_RAD);
     vw = Vector3D{vxw, vyw, 0.0f};
 }
 
 void GolfBallPhysicsVariables::calculateSVP()
 {
-    SVP = 4.5841 * std::exp((18.687 - tempC / 234.5) * tempC / (257.14 + tempC));
+    SVP = physics_constants::SVP_COEFF_A * std::exp((physics_constants::SVP_COEFF_B - tempC / physics_constants::SVP_COEFF_C) * tempC / (physics_constants::SVP_COEFF_D + tempC));
 }
 
 void GolfBallPhysicsVariables::calculateBarometricPressure()
 {
-    barometricPressure = atmos.pressure * 1000.0 / 39.37;
+    barometricPressure = atmos.pressure * physics_constants::INHG_TO_MMHG;
 }
 
 void GolfBallPhysicsVariables::calculateRe100()
 {
-    Re100 = rhoMetric * 44.7 * (ball.std_golf_ball_circumference / (M_PI * 39.37)) *
-            (math_utils::convertCelsiusToKelvin(tempC) + 120) /
-            (0.000001512 * std::pow(math_utils::convertCelsiusToKelvin(tempC), 1.5));
+    Re100 = rhoMetric * physics_constants::RE100_VELOCITY_M_PER_S * (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (M_PI * physics_constants::INCHES_PER_METER)) *
+            (math_utils::convertCelsiusToKelvin(tempC) + physics_constants::SUTHERLAND_CONSTANT) /
+            (physics_constants::SUTHERLAND_VISCOSITY_COEFF * std::pow(math_utils::convertCelsiusToKelvin(tempC), 1.5));
 }

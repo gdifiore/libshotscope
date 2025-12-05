@@ -18,7 +18,7 @@ int main()
 
     for (const auto& entry : result)
     {
-        printf("%.1f %.1f %.1f\n", entry[0]/math_utils::YARDS_TO_FEET, entry[1]/math_utils::YARDS_TO_FEET, entry[2]/math_utils::YARDS_TO_FEET);
+        printf("%.1f %.1f %.1f\n", entry[0]/physics_constants::YARDS_TO_FEET, entry[1]/physics_constants::YARDS_TO_FEET, entry[2]/physics_constants::YARDS_TO_FEET);
     }
 
     return 0;

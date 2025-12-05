@@ -16,7 +16,7 @@
 #include "GolfBallFlight.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
-#include "math_constants.hpp"
+#include "physics_constants.hpp"
 
 #include <cmath>
 
@@ -58,7 +58,7 @@ void GolfBallFlight::initialize()
 	velocity3D = physicsVars.getV0Vector();
 	v = sqrt(velocity3D[0] * velocity3D[0] + velocity3D[1] * velocity3D[1] +
 			 velocity3D[2] * velocity3D[2]);
-	vMph = v / 1.467;
+	vMph = v / physics_constants::MPH_TO_FT_PER_S;
 	calculateVelocityw();
 	vw = v;
 
@@ -76,23 +76,23 @@ void GolfBallFlight::initialize()
 void GolfBallFlight::calculatePosition()
 {
 	position[0] =
-		position[0] + velocity3D[0] * dt + 0.5 * acceleration3D[0] * dt * dt;
+		position[0] + velocity3D[0] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * acceleration3D[0] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
 	position[1] =
-		position[1] + velocity3D[1] * dt + 0.5 * acceleration3D[1] * dt * dt;
+		position[1] + velocity3D[1] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * acceleration3D[1] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
 	position[2] =
-		position[2] + velocity3D[2] * dt + 0.5 * acceleration3D[2] * dt * dt;
+		position[2] + velocity3D[2] * physics_constants::SIMULATION_TIME_STEP + physics_constants::HALF * acceleration3D[2] * physics_constants::SIMULATION_TIME_STEP * physics_constants::SIMULATION_TIME_STEP;
 }
 
 void GolfBallFlight::calculateV()
 {
-	float vx = velocity3D[0] + acceleration3D[0] * dt;
-	float vy = velocity3D[1] + acceleration3D[1] * dt;
-	float vz = velocity3D[2] + acceleration3D[2] * dt;
+	float vx = velocity3D[0] + acceleration3D[0] * physics_constants::SIMULATION_TIME_STEP;
+	float vy = velocity3D[1] + acceleration3D[1] * physics_constants::SIMULATION_TIME_STEP;
+	float vz = velocity3D[2] + acceleration3D[2] * physics_constants::SIMULATION_TIME_STEP;
 
 	velocity3D = {vx, vy, vz};
 
 	v = sqrt(vx * vx + vy * vy + vz * vz);
-	vMph = v / 1.467;
+	vMph = v / physics_constants::MPH_TO_FT_PER_S;
 }
 
 // In physics, "velocity_w" typically refers to the velocity of an object in the horizontal direction.
@@ -113,16 +113,15 @@ void GolfBallFlight::calculateVelocityw()
 		velocity3D_w[1] = 0;
 	}
 
-	vwMph = v / 1.467;
+	vwMph = v / physics_constants::MPH_TO_FT_PER_S;
 }
 
 void GolfBallFlight::calculateAccel()
 {
-	const float GRAVITY = 32.174;
 	acceleration3D[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
 	acceleration3D[1] = accelerationDrag3D[1] + accelertaionMagnitude3D[1];
 	acceleration3D[2] =
-		accelerationDrag3D[2] + accelertaionMagnitude3D[2] - GRAVITY;
+		accelerationDrag3D[2] + accelertaionMagnitude3D[2] - physics_constants::GRAVITY_FT_PER_S2;
 }
 
 void GolfBallFlight::calculateAccelD()
@@ -165,7 +164,7 @@ void GolfBallFlight::calculatePhi()
 void GolfBallFlight::calculateTau()
 {
 	tau =
-		1 / (0.00002 * v / (ball.std_golf_ball_circumference / (2 * M_PI * 12)));
+		1 / (physics_constants::TAU_COEFF * v / (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * M_PI * physics_constants::INCHES_PER_FOOT)));
 }
 
 void GolfBallFlight::calculateRw()
@@ -175,38 +174,38 @@ void GolfBallFlight::calculateRw()
 
 void GolfBallFlight::calculateRe_x_e5()
 {
-	Re_x_e5 = (vwMph / 100) * physicsVars.getRe100() * 0.00001;
+	Re_x_e5 = (vwMph / physics_constants::RE_VELOCITY_DIVISOR) * physicsVars.getRe100() * physics_constants::RE_SCALE_FACTOR;
 }
 
 float GolfBallFlight::determineCoefficientOfDrag()
 {
-	if (getRe_x_e5() <= math_constants::CdL)
+	if (getRe_x_e5() <= physics_constants::RE_THRESHOLD_LOW)
 	{
-		return math_constants::CdL;
+		return physics_constants::CD_LOW;
 	}
-	else if (getRe_x_e5() < 1)
+	else if (getRe_x_e5() < physics_constants::RE_THRESHOLD_HIGH)
 	{
-		return math_constants::CdL -
-			   (math_constants::CdL - math_constants::CdH) * (Re_x_e5 - 0.5) /
-				   0.5 +
-			   math_constants::CdS * spinFactor;
+		return physics_constants::CD_LOW -
+			   (physics_constants::CD_LOW - physics_constants::CD_HIGH) * (Re_x_e5 - physics_constants::RE_THRESHOLD_LOW) /
+				   physics_constants::RE_THRESHOLD_LOW +
+			   physics_constants::CD_SPIN * spinFactor;
 	}
 	else
 	{
-		return math_constants::CdH + math_constants::CdS * spinFactor;
+		return physics_constants::CD_HIGH + physics_constants::CD_SPIN * spinFactor;
 	}
 }
 
 float GolfBallFlight::determineCoefficientOfLift()
 {
-	if (spinFactor <= 0.3)
+	if (spinFactor <= physics_constants::SPIN_FACTOR_THRESHOLD)
 	{
-		return math_constants::coeff1 * spinFactor +
-			   math_constants::coeff2 * pow(spinFactor, 2);
+		return physics_constants::LIFT_COEFF1 * spinFactor +
+			   physics_constants::LIFT_COEFF2 * pow(spinFactor, 2);
 	}
 	else
 	{
-		return 0.305;
+		return physics_constants::CL_DEFAULT;
 	}
 }
 
@@ -221,7 +220,7 @@ void GolfBallFlight::calculateSpinFactor()
  */
 void GolfBallFlight::calculateFlightStep()
 {
-	currentTime += dt;
+	currentTime += physics_constants::SIMULATION_TIME_STEP;
 
 	calculatePosition();
 	calculateV();

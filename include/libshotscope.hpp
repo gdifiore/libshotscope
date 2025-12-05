@@ -6,7 +6,7 @@
 #include "Simulator.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
-#include "math_constants.hpp"
 #include "math_utils.hpp"
+#include "physics_constants.hpp"
 
 #endif // LIBSHOTSCOPE_HPP
