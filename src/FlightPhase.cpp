@@ -4,7 +4,7 @@
  * @brief Contains the implementation of flight phase classes.
  *
  * This file defines the different flight phases for golf ball simulation:
- * AerialPhase (fully implemented), BouncePhase (skeleton), and RollPhase (skeleton).
+ * AerialPhase, BouncePhase, and RollPhase.
  *
  * @copyright Copyright (c) 2024, Gabriel DiFiore
  */
@@ -14,6 +14,7 @@
 #include "golf_ball.hpp"
 #include "physics_constants.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 // ============================================================================
@@ -225,37 +226,71 @@ void AerialPhase::calculateAccel(BallState &state)
 }
 
 // ============================================================================
-// BouncePhase Implementation (Skeleton)
+// BouncePhase Implementation
 // ============================================================================
 
 BouncePhase::BouncePhase(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
 	const struct atmosphericData &atmos, const GroundSurface &ground)
-	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground)
+	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground),
+	  aerialPhase(physicsVars, ball, atmos)
 {
 }
 
 void BouncePhase::calculateStep(BallState &state, float dt)
 {
-	// TODO: Implement bounce physics
-	// This should handle:
-	// - Apply coefficient of restitution: vz_new = -ground.restitution * vz_old
-	// - Calculate friction effects on horizontal velocity based on ground.frictionStatic
-	// - Modify spin based on surface friction and ground.firmness
-	// - Update position based on new velocity
-	// - Consider ground.height for impact detection
-	(void)state; // Suppress unused parameter warning
-	(void)dt;
+	// Apply bounce impact when ball contacts ground while moving downward
+	if (state.position[2] <= ground.height && state.velocity[2] < 0.0F)
+	{
+		state.position[2] = ground.height;
+		state.velocity[2] = -ground.restitution * state.velocity[2];
+
+		// Apply friction to horizontal velocity components
+		float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
+		                         state.velocity[1] * state.velocity[1]);
+
+		if (vHorizontal > 0.0001F)
+		{
+			float frictionFactor = 1.0F - ground.frictionStatic * (1.0F - ground.firmness);
+			frictionFactor = std::max(0.0F, std::min(1.0F, frictionFactor));
+
+			state.velocity[0] *= frictionFactor;
+			state.velocity[1] *= frictionFactor;
+		}
+	}
+
+	// Calculate aerodynamic forces (drag, lift, Magnus effect)
+	aerialPhase.initialize(state);
+
+	// Update position and velocity
+	state.position[0] += state.velocity[0] * dt + 0.5F * state.acceleration[0] * dt * dt;
+	state.position[1] += state.velocity[1] * dt + 0.5F * state.acceleration[1] * dt * dt;
+	state.position[2] += state.velocity[2] * dt + 0.5F * state.acceleration[2] * dt * dt;
+
+	state.velocity[0] += state.acceleration[0] * dt;
+	state.velocity[1] += state.acceleration[1] * dt;
+	state.velocity[2] += state.acceleration[2] * dt;
+
+	state.currentTime += dt;
+
+	if (state.position[2] < ground.height)
+	{
+		state.position[2] = ground.height;
+	}
 }
 
 bool BouncePhase::isPhaseComplete(const BallState &state) const
 {
-	// TODO: Implement bounce completion logic
-	// Bounce is complete when:
-	// - Ball leaves ground again (state.position[2] > ground.height + threshold)
-	// - OR ball velocity is low enough to transition to roll
-	// Example: return state.velocity[2] < 0.1F && state.position[2] <= ground.height;
-	(void)state; // Suppress unused parameter warning
+	const float MIN_BOUNCE_VELOCITY = 1.0F;
+	const float GROUND_THRESHOLD = 0.1F;
+
+	// Transition to roll only when ball is on ground with low vertical velocity
+	if (state.position[2] <= ground.height + GROUND_THRESHOLD &&
+	    std::abs(state.velocity[2]) < MIN_BOUNCE_VELOCITY)
+	{
+		return true;
+	}
+
 	return false;
 }
 

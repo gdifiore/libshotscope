@@ -111,17 +111,12 @@ private:
 };
 
 /**
- * @brief Skeleton for the bounce phase (to be implemented).
+ * @brief Handles the ball's bounce when it contacts the ground.
  *
- * This phase will handle the ball's interaction with the ground during a bounce,
- * including energy loss, velocity changes, and spin modifications based on
- * surface properties.
- *
- * Implementation should:
- * - Apply coefficient of restitution to vertical velocity
- * - Calculate friction effects on horizontal velocity
- * - Modify spin based on surface friction and firmness
- * - Determine if ball will bounce again or transition to roll
+ * Applies coefficient of restitution to vertical velocity and friction
+ * to horizontal velocity based on surface properties. Uses aerodynamic
+ * calculations for trajectory between bounces to preserve Magnus effect
+ * and drag forces. Transitions to roll phase when velocity is low.
  */
 class BouncePhase : public FlightPhase
 {
@@ -139,6 +134,7 @@ private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 	GroundSurface ground;
+	AerialPhase aerialPhase; // Used for aerodynamic calculations between bounces
 };
 
 /**
