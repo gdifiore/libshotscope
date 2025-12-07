@@ -295,7 +295,7 @@ bool BouncePhase::isPhaseComplete(const BallState &state) const
 }
 
 // ============================================================================
-// RollPhase Implementation (Skeleton)
+// RollPhase Implementation
 // ============================================================================
 
 RollPhase::RollPhase(
@@ -307,23 +307,53 @@ RollPhase::RollPhase(
 
 void RollPhase::calculateStep(BallState &state, float dt)
 {
-	// TODO: Implement roll physics
-	// This should handle:
-	// - Calculate rolling friction force: F = -ground.frictionDynamic * mass * g * velocity_direction
-	// - Apply deceleration to horizontal velocity
-	// - Calculate spin decay during rolling
-	// - Update position: position += velocity * dt
-	// - Ensure ball stays on ground: state.position[2] = ground.height
-	(void)state; // Suppress unused parameter warning
-	(void)dt;
+	// Calculate horizontal velocity magnitude
+	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
+	                         state.velocity[1] * state.velocity[1]);
+
+	if (vHorizontal > 0.0001F)
+	{
+		// Calculate rolling friction deceleration
+		// Rolling friction coefficient is scaled by surface firmness
+		float rollingFriction = ROLLING_FRICTION_COEFF * (1.0F + ground.firmness);
+		float deceleration = rollingFriction * physics_constants::GRAVITY_FT_PER_S2;
+
+		// Calculate velocity reduction
+		float velocityReduction = deceleration * dt;
+
+		// Don't let velocity reverse direction
+		if (velocityReduction >= vHorizontal)
+		{
+			state.velocity[0] = 0.0F;
+			state.velocity[1] = 0.0F;
+		}
+		else
+		{
+			// Apply deceleration in direction opposite to motion
+			float velocityFactor = (vHorizontal - velocityReduction) / vHorizontal;
+			state.velocity[0] *= velocityFactor;
+			state.velocity[1] *= velocityFactor;
+		}
+
+		// Update position
+		state.position[0] += state.velocity[0] * dt;
+		state.position[1] += state.velocity[1] * dt;
+	}
+
+	// Ball stays on ground during roll
+	state.position[2] = ground.height;
+	state.velocity[2] = 0.0F;
+	state.acceleration[0] = 0.0F;
+	state.acceleration[1] = 0.0F;
+	state.acceleration[2] = 0.0F;
+
+	state.currentTime += dt;
 }
 
 bool RollPhase::isPhaseComplete(const BallState &state) const
 {
-	// TODO: Implement roll completion logic
-	// Roll is complete when ball comes to rest (velocity below threshold)
-	// Example: return sqrt(state.velocity[0]*state.velocity[0] +
-	//                      state.velocity[1]*state.velocity[1]) < 0.01F;
-	(void)state; // Suppress unused parameter warning
-	return false;
+	// Roll is complete when ball velocity drops below stopping threshold
+	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
+	                         state.velocity[1] * state.velocity[1]);
+	return vHorizontal < STOPPING_VELOCITY;
 }

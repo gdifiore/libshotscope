@@ -58,6 +58,7 @@ set(TEST_SOURCES
     ${PROJECT_TEST_DIR}/test_math_utils.cpp
     ${PROJECT_TEST_DIR}/test_ball_flight.cpp
     ${PROJECT_TEST_DIR}/test_bounce_phase.cpp
+    ${PROJECT_TEST_DIR}/test_roll_phase.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
 )
@@ -72,9 +73,6 @@ target_link_libraries(calculate_ball_landing ${PROJECT_NAME})
 
 add_executable(calculate_ball_trajectory examples/calculate_ball_trajectory.cpp)
 target_link_libraries(calculate_ball_trajectory ${PROJECT_NAME})
-
-add_executable(test_bounce_physics examples/test_bounce_physics.cpp)
-target_link_libraries(test_bounce_physics ${PROJECT_NAME})
 
 add_executable(visualize_trajectory examples/visualize_trajectory.cpp)
 target_link_libraries(visualize_trajectory ${PROJECT_NAME})

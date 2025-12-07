@@ -512,6 +512,7 @@ int main()
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
 	AerialPhase aerialPhase(physicsVars, ball, atmos);
 	BouncePhase bouncePhase(physicsVars, ball, atmos, ground);
+	RollPhase rollPhase(physicsVars, ball, atmos, ground);
 
 	// Initialize state
 	BallState state;
@@ -570,7 +571,13 @@ int main()
 			}
 			else if (phaseName == "bounce")
 			{
-				std::cout << "  Ball settled at t=" << state.currentTime << "s\n";
+				currentPhase = &rollPhase;
+				phaseName = "roll";
+				std::cout << "  Transitioned to roll phase at t=" << state.currentTime << "s\n";
+			}
+			else if (phaseName == "roll")
+			{
+				std::cout << "  Ball stopped at t=" << state.currentTime << "s\n";
 				break;
 			}
 		}

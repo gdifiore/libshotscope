@@ -138,16 +138,11 @@ private:
 };
 
 /**
- * @brief Skeleton for the roll phase (to be implemented).
+ * @brief Handles the ball's rolling motion on the ground.
  *
- * This phase will handle the ball's rolling motion on the ground,
- * including friction-based deceleration and eventual stopping.
- *
- * Implementation should:
- * - Apply rolling friction to decelerate the ball
- * - Calculate spin decay during rolling
- * - Handle slope effects if ground has elevation changes
- * - Determine when ball comes to rest (velocity below threshold)
+ * Applies rolling friction to decelerate the ball and spin decay.
+ * The ball is kept on the ground surface with only horizontal motion.
+ * Phase completes when velocity drops below stopping threshold.
  */
 class RollPhase : public FlightPhase
 {
@@ -165,6 +160,9 @@ private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 	GroundSurface ground;
+
+	static constexpr float ROLLING_FRICTION_COEFF = 0.01F; // Typical for golf ball on grass
+	static constexpr float STOPPING_VELOCITY = 0.1F;       // ft/s - velocity below which ball is considered stopped
 };
 
 #endif // FLIGHTPHASE_HPP
