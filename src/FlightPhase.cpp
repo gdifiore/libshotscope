@@ -62,6 +62,25 @@ void AerialPhase::initialize(BallState &state)
 	calculateAccel(state);
 }
 
+void AerialPhase::calculateAccelerations(BallState &state)
+{
+	// Calculate derived values and accelerations without modifying position or time
+	v = sqrt(state.velocity[0] * state.velocity[0] + state.velocity[1] * state.velocity[1] +
+			 state.velocity[2] * state.velocity[2]);
+	vMph = v / physics_constants::MPH_TO_FT_PER_S;
+
+	calculateVelocityw(state);
+	calculatePhi(state);
+	calculateTau();
+	calculateRw(state);
+	calculateRe_x_e5();
+	calculateSpinFactor();
+
+	calculateAccelD(state);
+	calculateAccelM(state);
+	calculateAccel(state);
+}
+
 void AerialPhase::calculateStep(BallState &state, float dt)
 {
 	state.currentTime += dt;
@@ -182,7 +201,15 @@ float AerialPhase::determineCoefficientOfLift()
 
 void AerialPhase::calculateSpinFactor()
 {
-	spinFactor = rw / vw;
+	const float MIN_VW = 0.01F; // Minimum velocity to avoid division by zero
+	if (vw < MIN_VW)
+	{
+		spinFactor = 0.0F; // Ball essentially stationary, no meaningful spin factor
+	}
+	else
+	{
+		spinFactor = rw / vw;
+	}
 }
 
 void AerialPhase::calculateAccelD(BallState &state)
@@ -260,7 +287,7 @@ void BouncePhase::calculateStep(BallState &state, float dt)
 	}
 
 	// Calculate aerodynamic forces (drag, lift, Magnus effect)
-	aerialPhase.initialize(state);
+	aerialPhase.calculateAccelerations(state);
 
 	// Update position and velocity
 	state.position[0] += state.velocity[0] * dt + 0.5F * state.acceleration[0] * dt * dt;
@@ -313,10 +340,8 @@ void RollPhase::calculateStep(BallState &state, float dt)
 
 	if (vHorizontal > 0.0001F)
 	{
-		// Calculate rolling friction deceleration
-		// Rolling friction coefficient is scaled by surface firmness
-		float rollingFriction = ROLLING_FRICTION_COEFF * (1.0F + ground.firmness);
-		float deceleration = rollingFriction * physics_constants::GRAVITY_FT_PER_S2;
+		// Calculate rolling friction deceleration using surface's dynamic friction
+		float deceleration = ground.frictionDynamic * physics_constants::GRAVITY_FT_PER_S2;
 
 		// Calculate velocity reduction
 		float velocityReduction = deceleration * dt;

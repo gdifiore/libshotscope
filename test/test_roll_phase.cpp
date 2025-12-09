@@ -162,33 +162,33 @@ TEST_F(RollPhaseTest, DoesNotReverseDirection)
 	EXPECT_GE(state.velocity[0], 0.0F);
 }
 
-TEST_F(RollPhaseTest, FirmerSurfaceHasMoreFriction)
+TEST_F(RollPhaseTest, HigherFrictionSlowsFaster)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
 
-	// Soft surface
-	ground.firmness = 0.2F;
-	RollPhase rollSoft(physicsVars, ball, atmos, ground);
+	// Low friction surface (fairway)
+	ground.frictionDynamic = 0.15F;
+	RollPhase rollLow(physicsVars, ball, atmos, ground);
 
-	// Firm surface
-	ground.firmness = 0.9F;
-	RollPhase rollFirm(physicsVars, ball, atmos, ground);
+	// High friction surface (rough)
+	ground.frictionDynamic = 0.5F;
+	RollPhase rollHigh(physicsVars, ball, atmos, ground);
 
 	// Same initial state
-	BallState stateSoft, stateFirm;
-	stateSoft.position = {0.0F, 0.0F, 0.0F};
-	stateSoft.velocity = {20.0F, 0.0F, 0.0F};
-	stateSoft.acceleration = {0.0F, 0.0F, 0.0F};
-	stateSoft.currentTime = 0.0F;
+	BallState stateLow, stateHigh;
+	stateLow.position = {0.0F, 0.0F, 0.0F};
+	stateLow.velocity = {20.0F, 0.0F, 0.0F};
+	stateLow.acceleration = {0.0F, 0.0F, 0.0F};
+	stateLow.currentTime = 0.0F;
 
-	stateFirm = stateSoft;
+	stateHigh = stateLow;
 
 	float dt = 0.1F;
-	rollSoft.calculateStep(stateSoft, dt);
-	rollFirm.calculateStep(stateFirm, dt);
+	rollLow.calculateStep(stateLow, dt);
+	rollHigh.calculateStep(stateHigh, dt);
 
-	// Firm surface should decelerate more (more rolling friction)
-	EXPECT_LT(stateFirm.velocity[0], stateSoft.velocity[0]);
+	// High friction should decelerate more
+	EXPECT_LT(stateHigh.velocity[0], stateLow.velocity[0]);
 }
 
 TEST_F(RollPhaseTest, NonZeroGroundHeight)

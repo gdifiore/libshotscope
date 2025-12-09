@@ -54,6 +54,7 @@ public:
 
 	void initialize(BallState &state);
 	void calculateStep(BallState &state, float dt) override;
+	void calculateAccelerations(BallState &state);
 	bool isPhaseComplete(const BallState &state) const override;
 
 	// Getters for physics variables (needed for testing)
@@ -161,8 +162,7 @@ private:
 	struct atmosphericData atmos;
 	GroundSurface ground;
 
-	static constexpr float ROLLING_FRICTION_COEFF = 0.01F; // Typical for golf ball on grass
-	static constexpr float STOPPING_VELOCITY = 0.1F;       // ft/s - velocity below which ball is considered stopped
+	static constexpr float STOPPING_VELOCITY = 0.1F; // ft/s - velocity below which ball is considered stopped
 };
 
 #endif // FLIGHTPHASE_HPP
