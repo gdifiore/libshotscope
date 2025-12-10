@@ -7,7 +7,7 @@
  */
 
 #include "FlightSimulator.hpp"
-#include <cassert>
+#include <stdexcept>
 
 FlightSimulator::FlightSimulator(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
@@ -31,8 +31,11 @@ void FlightSimulator::initialize(const BallState &initialState)
 
 void FlightSimulator::step(float dt)
 {
-	// Assert that the simulator has been initialized
-	assert(initialized && "FlightSimulator::step() called before initialize()");
+	// Ensure that the simulator has been initialized
+	if (!initialized)
+	{
+		throw std::logic_error("FlightSimulator::step() called before initialize()");
+	}
 
 	// Don't step if already complete
 	if (currentPhase == Phase::Complete)
@@ -68,8 +71,11 @@ bool FlightSimulator::isComplete() const
 
 const BallState &FlightSimulator::getState() const
 {
-	// Assert that the simulator has been initialized
-	assert(initialized && "FlightSimulator::getState() called before initialize()");
+	// Ensure that the simulator has been initialized
+	if (!initialized)
+	{
+		throw std::logic_error("FlightSimulator::getState() called before initialize()");
+	}
 	return state;
 }
 

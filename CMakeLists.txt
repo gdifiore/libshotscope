@@ -71,9 +71,6 @@ target_link_libraries(calculate_ball_landing ${PROJECT_NAME})
 add_executable(calculate_ball_trajectory examples/calculate_ball_trajectory.cpp)
 target_link_libraries(calculate_ball_trajectory ${PROJECT_NAME})
 
-add_executable(visualize_trajectory examples/visualize_trajectory.cpp)
-target_link_libraries(visualize_trajectory ${PROJECT_NAME})
-
 # Discover tests
 include(GoogleTest)
 gtest_discover_tests(libshotscope_tests)

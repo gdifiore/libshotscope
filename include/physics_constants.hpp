@@ -244,6 +244,42 @@ namespace physics_constants
     /// Integration coefficient (0.5 for Euler's method)
     constexpr float HALF = 0.5F;
 
+    // ========================================================================
+    // NUMERICAL STABILITY THRESHOLDS
+    // ========================================================================
+
+    /// Minimum velocity magnitude to avoid division by zero in calculations (ft/s)
+    /// Used in spin factor and friction calculations
+    constexpr float MIN_VELOCITY_THRESHOLD = 0.01F;
+
+    /// Minimum horizontal velocity for friction application (ft/s)
+    /// Below this, horizontal velocity is treated as zero to prevent numerical instability
+    constexpr float MIN_HORIZONTAL_VELOCITY = 0.0001F;
+
+    // ========================================================================
+    // PHASE TRANSITION THRESHOLDS
+    // ========================================================================
+
+    /// Minimum vertical velocity for bounce transition (ft/s)
+    /// Below this, ball transitions from bounce to roll phase
+    constexpr float MIN_BOUNCE_VELOCITY = 1.0F;
+
+    /// Ground contact threshold for phase detection (ft)
+    /// Ball is considered "on ground" when within this distance
+    constexpr float GROUND_CONTACT_THRESHOLD = 0.1F;
+
+    /// Stopping velocity threshold for roll phase (ft/s)
+    /// Below this, ball is considered stopped and simulation completes
+    constexpr float STOPPING_VELOCITY = 0.1F;
+
+    // ========================================================================
+    // SPIN DECAY DURING ROLLING
+    // ========================================================================
+
+    /// Spin decay rate during rolling phase (rad/s per second)
+    /// Ground friction causes faster spin decay than in air
+    constexpr float ROLL_SPIN_DECAY_RATE = 2.0F;
+
 } // namespace physics_constants
 
 #endif // PHYSICS_CONSTANTS_HPP

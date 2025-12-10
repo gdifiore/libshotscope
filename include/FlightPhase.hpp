@@ -158,8 +158,6 @@ private:
 	struct golfBall ball;
 	struct atmosphericData atmos;
 	GroundSurface ground;
-
-	static constexpr float STOPPING_VELOCITY = 0.1F; // ft/s - velocity below which ball is considered stopped
 };
 
 #endif // FLIGHTPHASE_HPP

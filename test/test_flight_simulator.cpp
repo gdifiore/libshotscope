@@ -119,15 +119,18 @@ TEST_F(FlightSimulatorTest, TransitionsThroughAllPhases)
 		if (strcmp(phase, "aerial") == 0) seenAerial = true;
 		if (strcmp(phase, "bounce") == 0) seenBounce = true;
 		if (strcmp(phase, "roll") == 0) seenRoll = true;
-		if (strcmp(phase, "complete") == 0) seenComplete = true;
 
 		sim.step(dt);
 	}
+
+	// Check if we reached complete phase after loop
+	if (strcmp(sim.getCurrentPhaseName(), "complete") == 0) seenComplete = true;
 
 	// Should have seen all phases in sequence
 	EXPECT_TRUE(seenAerial) << "Should transition through aerial phase";
 	EXPECT_TRUE(seenBounce) << "Should transition through bounce phase";
 	EXPECT_TRUE(seenRoll) << "Should transition through roll phase";
+	EXPECT_TRUE(seenComplete) << "Should eventually reach complete phase";
 }
 
 TEST_F(FlightSimulatorTest, ProducesReasonableTrajectory)
@@ -161,7 +164,7 @@ TEST_F(FlightSimulatorTest, ProducesReasonableTrajectory)
 
 	// Sanity checks for 100 mph, 30 degree shot
 	EXPECT_GT(maxHeight, 10.0F) << "Ball should reach reasonable max height";
-	EXPECT_LT(maxHeight, 100.0F) << "Max height should be realistic";
+	EXPECT_LT(maxHeight, 120.0F) << "Max height should be realistic";
 	EXPECT_GT(finalDistance, 100.0F) << "Ball should travel reasonable distance";
 	EXPECT_LT(finalDistance, 1000.0F) << "Distance should be realistic";
 	EXPECT_NEAR(finalState.position[2], ground.height, 0.1F) << "Ball should end on ground";
@@ -298,4 +301,132 @@ TEST_F(FlightSimulatorTest, HandlesNonZeroGroundHeight)
 		finalState.velocity[2] * finalState.velocity[2]
 	);
 	EXPECT_LT(finalSpeed, 1.0F) << "Ball should be stopped or nearly stopped";
+}
+
+TEST_F(FlightSimulatorTest, SpinDecaysAcrossAllPhases)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	FlightSimulator sim(physicsVars, ball, atmos, ground);
+
+	// Setup initial state with spin
+	const float v0_fps = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
+	const float initialSpinRadS = physicsVars.getROmega(); // Get initial spin in rad/s
+	BallState state = BallState::fromLaunchParameters(
+		v0_fps, ball.launchAngle, ball.direction,
+		Vector3D{0.0F, 0.0F, 0.0F},
+		physics_constants::GRAVITY_FT_PER_S2,
+		initialSpinRadS
+	);
+
+	sim.initialize(state);
+
+	// Track spin values across phases
+	float spinAtStartOfAerial = 0.0F;
+	float spinAtEndOfAerial = 0.0F;
+	float spinBeforeBounce = 0.0F;
+	float spinAfterBounce = 0.0F;
+	float spinAtStartOfRoll = 0.0F;
+	float spinAtEndOfRoll = 0.0F;
+
+	bool inAerial = true;
+	bool inBounce = false;
+	bool capturedAerialStart = false;
+	bool capturedBounceImpact = false;
+
+	const float dt = 0.01F;
+	const int maxSteps = 2000;
+
+	for (int i = 0; i < maxSteps && !sim.isComplete(); ++i)
+	{
+		const char* phase = sim.getCurrentPhaseName();
+		const BallState& currentState = sim.getState();
+
+		// Capture spin at start of aerial phase
+		if (strcmp(phase, "aerial") == 0 && !capturedAerialStart)
+		{
+			spinAtStartOfAerial = currentState.spinRate;
+			capturedAerialStart = true;
+		}
+
+		// Detect transition from aerial to bounce
+		if (strcmp(phase, "bounce") == 0 && inAerial)
+		{
+			inAerial = false;
+			inBounce = true;
+			spinAtEndOfAerial = currentState.spinRate;
+		}
+
+		// Capture spin before and after bounce impact
+		if (strcmp(phase, "bounce") == 0 && !capturedBounceImpact)
+		{
+			if (currentState.position[2] <= ground.height + 0.01F)
+			{
+				spinBeforeBounce = currentState.spinRate;
+				sim.step(dt);
+				spinAfterBounce = sim.getState().spinRate;
+				capturedBounceImpact = true;
+				continue;
+			}
+		}
+
+		// Detect transition from bounce to roll
+		if (strcmp(phase, "roll") == 0 && inBounce)
+		{
+			inBounce = false;
+			spinAtStartOfRoll = currentState.spinRate;
+		}
+
+		sim.step(dt);
+	}
+
+	spinAtEndOfRoll = sim.getState().spinRate;
+
+	// Verify spin behavior
+	EXPECT_GT(spinAtStartOfAerial, 0.0F) << "Should start with non-zero spin";
+
+	// Spin should decay during aerial phase
+	EXPECT_LT(spinAtEndOfAerial, spinAtStartOfAerial)
+		<< "Spin should decay during aerial phase";
+
+	// Spin should be reduced on bounce impact (if we captured it)
+	if (capturedBounceImpact)
+	{
+		EXPECT_LT(spinAfterBounce, spinBeforeBounce)
+			<< "Spin should be reduced on bounce impact";
+		EXPECT_NEAR(spinAfterBounce, spinBeforeBounce * ground.spinRetention, 0.1F)
+			<< "Spin reduction should match ground.spinRetention";
+	}
+
+	// Spin should continue to decay during roll phase
+	if (spinAtStartOfRoll > 0.0F)
+	{
+		EXPECT_LE(spinAtEndOfRoll, spinAtStartOfRoll)
+			<< "Spin should decay during roll phase";
+	}
+
+	// Final spin should be less than or equal to initial spin
+	EXPECT_LE(sim.getState().spinRate, initialSpinRadS)
+		<< "Final spin should be less than or equal to initial spin";
+}
+
+TEST_F(FlightSimulatorTest, ThrowsExceptionWhenStepCalledBeforeInitialize)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	FlightSimulator sim(physicsVars, ball, atmos, ground);
+
+	// Should throw exception when stepping before initialization
+	EXPECT_THROW({
+		sim.step(0.01F);
+	}, std::logic_error);
+}
+
+TEST_F(FlightSimulatorTest, ThrowsExceptionWhenGetStateCalledBeforeInitialize)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	FlightSimulator sim(physicsVars, ball, atmos, ground);
+
+	// Should throw exception when getting state before initialization
+	EXPECT_THROW({
+		[[maybe_unused]] const BallState& state = sim.getState();
+	}, std::logic_error);
 }

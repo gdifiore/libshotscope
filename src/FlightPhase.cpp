@@ -43,6 +43,12 @@ AerialPhase::AerialPhase(
 
 void AerialPhase::initialize(BallState &state)
 {
+	// Initialize spin from physicsVars if not already set
+	if (state.spinRate == 0.0F)
+	{
+		state.spinRate = physicsVars.getROmega();
+	}
+
 	// Calculate initial derived values without advancing time or position
 	v = sqrt(state.velocity[0] * state.velocity[0] + state.velocity[1] * state.velocity[1] +
 			 state.velocity[2] * state.velocity[2]);
@@ -85,11 +91,14 @@ void AerialPhase::calculateStep(BallState &state, float dt)
 {
 	state.currentTime += dt;
 
+	// Update spin with exponential decay
+	calculateTau();
+	state.spinRate = state.spinRate * exp(-dt / tau);
+
 	calculatePosition(state, dt);
 	calculateV(state, dt);
 	calculateVelocityw(state);
 	calculatePhi(state);
-	calculateTau();
 	calculateRw(state);
 	calculateRe_x_e5();
 	calculateSpinFactor();
@@ -158,7 +167,8 @@ void AerialPhase::calculateTau()
 
 void AerialPhase::calculateRw(BallState &state)
 {
-	rw = physicsVars.getROmega() * exp(-state.currentTime / tau);
+	// Use current spin rate from state (which decays over time)
+	rw = state.spinRate;
 }
 
 void AerialPhase::calculateRe_x_e5()
@@ -201,8 +211,7 @@ float AerialPhase::determineCoefficientOfLift()
 
 void AerialPhase::calculateSpinFactor()
 {
-	const float MIN_VW = 0.01F; // Minimum velocity to avoid division by zero
-	if (vw < MIN_VW)
+	if (vw < physics_constants::MIN_VELOCITY_THRESHOLD)
 	{
 		spinFactor = 0.0F; // Ball essentially stationary, no meaningful spin factor
 	}
@@ -276,7 +285,7 @@ void BouncePhase::calculateStep(BallState &state, float dt)
 		float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
 		                         state.velocity[1] * state.velocity[1]);
 
-		if (vHorizontal > 0.0001F)
+		if (vHorizontal > physics_constants::MIN_HORIZONTAL_VELOCITY)
 		{
 			float frictionFactor = 1.0F - ground.frictionStatic * (1.0F - ground.firmness);
 			frictionFactor = std::max(0.0F, std::min(1.0F, frictionFactor));
@@ -284,6 +293,9 @@ void BouncePhase::calculateStep(BallState &state, float dt)
 			state.velocity[0] *= frictionFactor;
 			state.velocity[1] *= frictionFactor;
 		}
+
+		// Reduce spin on impact
+		state.spinRate *= ground.spinRetention;
 	}
 
 	// Calculate aerodynamic forces (drag, lift, Magnus effect)
@@ -308,12 +320,9 @@ void BouncePhase::calculateStep(BallState &state, float dt)
 
 bool BouncePhase::isPhaseComplete(const BallState &state) const
 {
-	const float MIN_BOUNCE_VELOCITY = 1.0F;
-	const float GROUND_THRESHOLD = 0.1F;
-
 	// Transition to roll only when ball is on ground with low vertical velocity
-	if (state.position[2] <= ground.height + GROUND_THRESHOLD &&
-	    std::abs(state.velocity[2]) < MIN_BOUNCE_VELOCITY)
+	if (state.position[2] <= ground.height + physics_constants::GROUND_CONTACT_THRESHOLD &&
+	    std::abs(state.velocity[2]) < physics_constants::MIN_BOUNCE_VELOCITY)
 	{
 		return true;
 	}
@@ -338,7 +347,7 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
 	                         state.velocity[1] * state.velocity[1]);
 
-	if (vHorizontal > 0.0001F)
+	if (vHorizontal > physics_constants::MIN_HORIZONTAL_VELOCITY)
 	{
 		// Calculate rolling friction deceleration using surface's dynamic friction
 		float deceleration = ground.frictionDynamic * physics_constants::GRAVITY_FT_PER_S2;
@@ -365,6 +374,18 @@ void RollPhase::calculateStep(BallState &state, float dt)
 		state.position[1] += state.velocity[1] * dt;
 	}
 
+	// Apply spin decay during rolling (friction with ground)
+	// Rolling friction causes faster spin decay than in air
+	float spinDecay = physics_constants::ROLL_SPIN_DECAY_RATE * dt;
+	if (state.spinRate > spinDecay)
+	{
+		state.spinRate -= spinDecay;
+	}
+	else
+	{
+		state.spinRate = 0.0F;
+	}
+
 	// Ball stays on ground during roll
 	state.position[2] = ground.height;
 	state.velocity[2] = 0.0F;
@@ -380,5 +401,5 @@ bool RollPhase::isPhaseComplete(const BallState &state) const
 	// Roll is complete when ball velocity drops below stopping threshold
 	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
 	                         state.velocity[1] * state.velocity[1]);
-	return vHorizontal < STOPPING_VELOCITY;
+	return vHorizontal < physics_constants::STOPPING_VELOCITY;
 }

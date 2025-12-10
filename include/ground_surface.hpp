@@ -66,6 +66,18 @@ struct GroundSurface
 	float firmness = 0.8F;
 
 	/**
+	 * @brief Spin retention coefficient on impact.
+	 *
+	 * Determines how much spin is retained after ground impact.
+	 * Range: 0.0 (all spin lost) to 1.0 (no spin lost)
+	 * Typical values:
+	 * - Hard fairway: ~0.7-0.8 (20-30% spin loss)
+	 * - Soft rough: ~0.5-0.6 (40-50% spin loss)
+	 * - Green: ~0.75-0.85 (15-25% spin loss)
+	 */
+	float spinRetention = 0.75F;
+
+	/**
 	 * @brief Default constructor with typical fairway values.
 	 */
 	GroundSurface() = default;
@@ -73,9 +85,9 @@ struct GroundSurface
 	/**
 	 * @brief Constructs a GroundSurface with specified properties.
 	 */
-	GroundSurface(float h, float rest, float fStatic, float fDynamic, float firm)
+	GroundSurface(float h, float rest, float fStatic, float fDynamic, float firm, float spinRet = 0.75F)
 		: height(h), restitution(rest), frictionStatic(fStatic),
-		  frictionDynamic(fDynamic), firmness(firm) {}
+		  frictionDynamic(fDynamic), firmness(firm), spinRetention(spinRet) {}
 };
 
 #endif // GROUND_SURFACE_HPP
