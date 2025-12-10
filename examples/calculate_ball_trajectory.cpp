@@ -17,7 +17,7 @@ int main()
     GolfBallPhysicsVariables physVars(ball, atmos);
     FlightSimulator sim(physVars, ball, atmos, ground);
 
-    // Setup initial state - uses sensible defaults for position, acceleration, and time
+    // Setup initial state
     const float v0_fps = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
     BallState initialState = BallState::fromLaunchParameters(
         v0_fps,
