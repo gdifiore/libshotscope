@@ -235,3 +235,67 @@ TEST_F(FlightSimulatorTest, HandlesDifferentGroundConditions)
 	// Should still complete successfully
 	EXPECT_TRUE(sim.isComplete());
 }
+
+TEST_F(FlightSimulatorTest, HandlesNonZeroGroundHeight)
+{
+	// Test with ground elevated above z=0
+	GroundSurface elevatedGround;
+	elevatedGround.height = 10.0F;  // Ground at 10 feet elevation
+	elevatedGround.restitution = 0.4F;
+	elevatedGround.frictionStatic = 0.5F;
+	elevatedGround.frictionDynamic = 0.2F;
+	elevatedGround.firmness = 0.8F;
+
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	FlightSimulator sim(physicsVars, ball, atmos, elevatedGround);
+
+	// Start ball at ground level (z = 10.0)
+	BallState state;
+	const float v0_fps = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
+	const float theta_rad = ball.launchAngle * M_PI / 180.0F;
+
+	state.position = {0.0F, 0.0F, elevatedGround.height};
+	state.velocity = {v0_fps * std::cos(theta_rad), 0.0F, v0_fps * std::sin(theta_rad)};
+	state.acceleration = {0.0F, 0.0F, -physics_constants::GRAVITY_FT_PER_S2};
+	state.currentTime = 0.0F;
+
+	sim.initialize(state);
+
+	// Run to completion
+	const float dt = 0.01F;
+	const int maxSteps = 2000;
+	int steps = 0;
+
+	while (!sim.isComplete() && steps < maxSteps)
+	{
+		sim.step(dt);
+		steps++;
+
+		const BallState& currentState = sim.getState();
+
+		// After initial bounce, ball should not go significantly below ground
+		// Allow some tolerance during aerial-to-bounce transition
+		if (steps > 50)  // After initial aerial phase
+		{
+			EXPECT_GE(currentState.position[2], elevatedGround.height - 1.0F)
+				<< "Ball should not go far below ground level at step " << steps;
+		}
+	}
+
+	// Should complete successfully
+	EXPECT_TRUE(sim.isComplete()) << "Simulation should complete";
+	EXPECT_LT(steps, maxSteps) << "Simulation should complete before max steps";
+
+	// Final position should be at ground height
+	const BallState& finalState = sim.getState();
+	EXPECT_NEAR(finalState.position[2], elevatedGround.height, 0.1F)
+		<< "Ball should end at ground height";
+
+	// Final velocity should be near zero
+	float finalSpeed = std::sqrt(
+		finalState.velocity[0] * finalState.velocity[0] +
+		finalState.velocity[1] * finalState.velocity[1] +
+		finalState.velocity[2] * finalState.velocity[2]
+	);
+	EXPECT_LT(finalSpeed, 1.0F) << "Ball should be stopped or nearly stopped";
+}

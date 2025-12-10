@@ -15,10 +15,12 @@
  * (aerial, bounce, roll) and handles transitions automatically. Clients only need
  * to call step() repeatedly until the simulation is complete.
  *
+ * IMPORTANT: You must call initialize() before calling step() or getState().
+ *
  * Example usage:
  * @code
  * FlightSimulator sim(physicsVars, ball, atmos, ground);
- * sim.initialize(initialState);
+ * sim.initialize(initialState);  // REQUIRED before calling step()
  * while (!sim.isComplete()) {
  *     sim.step(0.01f);
  * }
@@ -53,6 +55,9 @@ public:
 	/**
 	 * @brief Advances the simulation by one time step.
 	 *
+	 * Must be called after initialize(). Calling before initialization will
+	 * trigger an assertion failure in debug builds.
+	 *
 	 * Automatically handles phase transitions when the current phase completes.
 	 * Safe to call even when simulation is complete (will have no effect).
 	 *
@@ -70,9 +75,11 @@ public:
 	/**
 	 * @brief Gets the current ball state.
 	 *
+	 * Must be called after initialize().
+	 *
 	 * @return Reference to the current ball state
 	 */
-	[[nodiscard]] const BallState &getState() const { return state; }
+	[[nodiscard]] const BallState &getState() const;
 
 	/**
 	 * @brief Gets the name of the current flight phase.

@@ -71,10 +71,10 @@ public:
 	}
 
 	// State variables
-	Vector3D position;      ///< Current position (x, y, z) in feet
-	Vector3D velocity;      ///< Current velocity (vx, vy, vz) in ft/s
-	Vector3D acceleration;  ///< Current acceleration (ax, ay, az) in ft/s²
-	float currentTime;      ///< Current simulation time in seconds
+	Vector3D position;      // Current position (x, y, z) in feet
+	Vector3D velocity;      // Current velocity (vx, vy, vz) in ft/s
+	Vector3D acceleration;  // Current acceleration (ax, ay, az) in ft/s²
+	float currentTime;      // Current simulation time in seconds
 };
 
 #endif // BALLSTATE_HPP

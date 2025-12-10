@@ -50,7 +50,8 @@ class AerialPhase : public FlightPhase
 public:
 	AerialPhase(GolfBallPhysicsVariables &physicsVars,
 	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos);
+	            const struct atmosphericData &atmos,
+	            const GroundSurface &ground);
 
 	void initialize(BallState &state);
 	void calculateStep(BallState &state, float dt) override;
@@ -76,6 +77,7 @@ private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
+	GroundSurface ground;
 
 	// Calculated variables (derived from state)
 	float v;

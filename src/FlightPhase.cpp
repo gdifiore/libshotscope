@@ -23,8 +23,8 @@
 
 AerialPhase::AerialPhase(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos)
-	: physicsVars(physicsVars), ball(ball), atmos(atmos)
+	const struct atmosphericData &atmos, const GroundSurface &ground)
+	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground)
 {
 	// Initialize calculated variables
 	v = 0.0F;
@@ -100,8 +100,8 @@ void AerialPhase::calculateStep(BallState &state, float dt)
 
 bool AerialPhase::isPhaseComplete(const BallState &state) const
 {
-	// Aerial phase is complete when ball reaches ground (z < 0)
-	return state.position[2] < 0.0F;
+	// Aerial phase is complete when ball reaches ground level
+	return state.position[2] < ground.height;
 }
 
 void AerialPhase::calculatePosition(BallState &state, float dt)
@@ -260,7 +260,7 @@ BouncePhase::BouncePhase(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
 	const struct atmosphericData &atmos, const GroundSurface &ground)
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground),
-	  aerialPhase(physicsVars, ball, atmos)
+	  aerialPhase(physicsVars, ball, atmos, ground)
 {
 }
 

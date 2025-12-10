@@ -7,12 +7,13 @@
  */
 
 #include "FlightSimulator.hpp"
+#include <cassert>
 
 FlightSimulator::FlightSimulator(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
 	const struct atmosphericData &atmos, const GroundSurface &ground)
 	: currentPhase(Phase::Aerial), initialized(false),
-	  aerialPhase(physicsVars, ball, atmos),
+	  aerialPhase(physicsVars, ball, atmos, ground),
 	  bouncePhase(physicsVars, ball, atmos, ground),
 	  rollPhase(physicsVars, ball, atmos, ground)
 {
@@ -30,8 +31,11 @@ void FlightSimulator::initialize(const BallState &initialState)
 
 void FlightSimulator::step(float dt)
 {
-	// Don't step if not initialized or already complete
-	if (!initialized || currentPhase == Phase::Complete)
+	// Assert that the simulator has been initialized
+	assert(initialized && "FlightSimulator::step() called before initialize()");
+
+	// Don't step if already complete
+	if (currentPhase == Phase::Complete)
 	{
 		return;
 	}
@@ -60,6 +64,13 @@ void FlightSimulator::step(float dt)
 bool FlightSimulator::isComplete() const
 {
 	return currentPhase == Phase::Complete;
+}
+
+const BallState &FlightSimulator::getState() const
+{
+	// Assert that the simulator has been initialized
+	assert(initialized && "FlightSimulator::getState() called before initialize()");
+	return state;
 }
 
 const char *FlightSimulator::getCurrentPhaseName() const
