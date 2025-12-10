@@ -38,7 +38,7 @@ AerialPhase::AerialPhase(
 	spinFactor = 0.0F;
 	velocity3D_w = {0.0F, 0.0F, 0.0F};
 	accelerationDrag3D = {0.0F, 0.0F, 0.0F};
-	accelertaionMagnitude3D = {0.0F, 0.0F, 0.0F};
+	accelerationMagnitude3D = {0.0F, 0.0F, 0.0F};
 }
 
 void AerialPhase::initialize(BallState &state)
@@ -142,7 +142,7 @@ void AerialPhase::calculateVelocityw(BallState &state)
 		velocity3D_w[1] = 0;
 	}
 
-	vwMph = v / physics_constants::MPH_TO_FT_PER_S;
+	vwMph = vw / physics_constants::MPH_TO_FT_PER_S;
 }
 
 void AerialPhase::calculatePhi(BallState &state)
@@ -224,19 +224,19 @@ void AerialPhase::calculateAccelD(BallState &state)
 
 void AerialPhase::calculateAccelM(BallState &state)
 {
-	accelertaionMagnitude3D[0] =
+	accelerationMagnitude3D[0] =
 		physicsVars.getC0() *
 		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
 		(physicsVars.getW()[1] * state.velocity[2] -
 		 physicsVars.getW()[2] * (state.velocity[1] - velocity3D_w[1])) /
 		w_perp_div_w;
-	accelertaionMagnitude3D[1] =
+	accelerationMagnitude3D[1] =
 		physicsVars.getC0() *
 		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
 		(physicsVars.getW()[2] * (state.velocity[0] - velocity3D_w[0]) -
 		 physicsVars.getW()[0] * state.velocity[2]) /
 		w_perp_div_w;
-	accelertaionMagnitude3D[2] =
+	accelerationMagnitude3D[2] =
 		physicsVars.getC0() *
 		(determineCoefficientOfLift() / physicsVars.getOmega()) * vw *
 		(physicsVars.getW()[0] * (state.velocity[1] - velocity3D_w[1]) -
@@ -246,9 +246,9 @@ void AerialPhase::calculateAccelM(BallState &state)
 
 void AerialPhase::calculateAccel(BallState &state)
 {
-	state.acceleration[0] = accelerationDrag3D[0] + accelertaionMagnitude3D[0];
-	state.acceleration[1] = accelerationDrag3D[1] + accelertaionMagnitude3D[1];
-	state.acceleration[2] = accelerationDrag3D[2] + accelertaionMagnitude3D[2] -
+	state.acceleration[0] = accelerationDrag3D[0] + accelerationMagnitude3D[0];
+	state.acceleration[1] = accelerationDrag3D[1] + accelerationMagnitude3D[1];
+	state.acceleration[2] = accelerationDrag3D[2] + accelerationMagnitude3D[2] -
 		physics_constants::GRAVITY_FT_PER_S2;
 }
 

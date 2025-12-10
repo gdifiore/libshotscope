@@ -13,9 +13,8 @@ include_directories(${PROJECT_INCLUDE_DIR})
 set(SOURCES
    ${PROJECT_SRC_DIR}/math_utils.cpp
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
-   ${PROJECT_SRC_DIR}/Simulator.cpp
-   ${PROJECT_SRC_DIR}/GolfBallFlight.cpp
    ${PROJECT_SRC_DIR}/FlightPhase.cpp
+   ${PROJECT_SRC_DIR}/FlightSimulator.cpp
 )
 
 set(HEADERS
@@ -24,11 +23,10 @@ set(HEADERS
    ${PROJECT_INCLUDE_DIR}/math_utils.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
    ${PROJECT_INCLUDE_DIR}/atmosphere.hpp
-   ${PROJECT_INCLUDE_DIR}/GolfBallFlight.hpp
    ${PROJECT_INCLUDE_DIR}/FlightPhase.hpp
+   ${PROJECT_INCLUDE_DIR}/FlightSimulator.hpp
    ${PROJECT_INCLUDE_DIR}/BallState.hpp
    ${PROJECT_INCLUDE_DIR}/ground_surface.hpp
-   ${PROJECT_INCLUDE_DIR}/Simulator.hpp
    ${PROJECT_INCLUDE_DIR}/physics_constants.hpp
 )
 
@@ -54,11 +52,10 @@ enable_testing()
 # Specify the test source files
 set(TEST_SOURCES
     ${PROJECT_TEST_DIR}/test_ball_physics_vars.cpp
-    ${PROJECT_TEST_DIR}/test_simulation.cpp
     ${PROJECT_TEST_DIR}/test_math_utils.cpp
-    ${PROJECT_TEST_DIR}/test_ball_flight.cpp
     ${PROJECT_TEST_DIR}/test_bounce_phase.cpp
     ${PROJECT_TEST_DIR}/test_roll_phase.cpp
+    ${PROJECT_TEST_DIR}/test_flight_simulator.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
 )
@@ -76,6 +73,9 @@ target_link_libraries(calculate_ball_trajectory ${PROJECT_NAME})
 
 add_executable(visualize_trajectory examples/visualize_trajectory.cpp)
 target_link_libraries(visualize_trajectory ${PROJECT_NAME})
+
+add_executable(simple_flight_simulation examples/simple_flight_simulation.cpp)
+target_link_libraries(simple_flight_simulation ${PROJECT_NAME})
 
 # Discover tests
 include(GoogleTest)

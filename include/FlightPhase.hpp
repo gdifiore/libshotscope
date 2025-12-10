@@ -63,15 +63,11 @@ public:
 	[[nodiscard]] auto getPhi() const -> float { return phi; }
 	[[nodiscard]] auto getTau() const -> float { return tau; }
 	[[nodiscard]] auto getRw() const -> float { return rw; }
-	[[nodiscard]] auto getWPerp() const -> float { return w_perp; }
 	[[nodiscard]] auto getWPerpDivW() const -> float { return w_perp_div_w; }
 	[[nodiscard]] auto getRe_x_e5() const -> float { return Re_x_e5; }
 	[[nodiscard]] auto getVw() const -> float { return vw; }
 	[[nodiscard]] auto getVwMph() const -> float { return vwMph; }
 	[[nodiscard]] auto getSpinFactor() const -> float { return spinFactor; }
-	[[nodiscard]] auto getVelocity3D_w() const -> const Vector3D & { return velocity3D_w; }
-	[[nodiscard]] auto getAccelerationDrag3D() const -> const Vector3D & { return accelerationDrag3D; }
-	[[nodiscard]] auto getAccelertaionMagnitude3D() const -> const Vector3D & { return accelertaionMagnitude3D; }
 
 	auto determineCoefficientOfDrag() -> float;
 	auto determineCoefficientOfLift() -> float;
@@ -87,7 +83,6 @@ private:
 	float phi;
 	float tau;
 	float rw;
-	float w_perp = 0.0F;
 	float w_perp_div_w = 1.0F;
 	float Re_x_e5;
 	float vw;
@@ -95,7 +90,7 @@ private:
 	float spinFactor;
 	Vector3D velocity3D_w;
 	Vector3D accelerationDrag3D;
-	Vector3D accelertaionMagnitude3D;
+	Vector3D accelerationMagnitude3D;
 
 	// Private calculation methods
 	void calculatePosition(BallState &state, float dt);
