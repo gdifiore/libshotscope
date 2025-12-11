@@ -39,3 +39,9 @@ CMakeFiles/*
 clang-tidy.sh
 .clang-tidy
 points.txt
+TODO
+*.html
+*.md
+!README.md
+examples/visualize_trajectory.cpp
+issues

@@ -1,0 +1,239 @@
+#include <gtest/gtest.h>
+#include <cmath>
+
+#include "BallState.hpp"
+#include "FlightPhase.hpp"
+#include "GolfBallPhysicsVariables.hpp"
+#include "atmosphere.hpp"
+#include "golf_ball.hpp"
+#include "ground_surface.hpp"
+#include "physics_constants.hpp"
+
+class RollPhaseTest : public ::testing::Test
+{
+protected:
+	void SetUp() override
+	{
+		// Default test ball and atmosphere
+		ball = {0.0, 0.0, 0.0, 100.0, 10.0, 0.0, 2000.0, 0.0};
+		atmos = {70.0, 0.0, 0.0, 0.0, 0.0, 50.0, 29.92};
+
+		// Default ground surface (fairway)
+		ground.height = 0.0F;
+		ground.restitution = 0.4F;
+		ground.frictionStatic = 0.5F;
+		ground.firmness = 0.8F;
+	}
+
+	golfBall ball;
+	atmosphericData atmos;
+	GroundSurface ground;
+};
+
+TEST_F(RollPhaseTest, DeceleratesFromRollingFriction)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	// Ball rolling on ground at 10 ft/s
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {10.0F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	float initialSpeed = state.velocity[0];
+	float dt = 0.1F;
+
+	roll.calculateStep(state, dt);
+
+	// Velocity should have decreased
+	EXPECT_LT(state.velocity[0], initialSpeed);
+	EXPECT_GT(state.velocity[0], 0.0F); // But not stopped yet
+}
+
+TEST_F(RollPhaseTest, KeepsBallOnGround)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	BallState state;
+	state.position = {0.0F, 0.0F, 5.0F}; // Start above ground
+	state.velocity = {10.0F, 0.0F, 5.0F}; // Some vertical velocity
+	state.acceleration = {0.0F, 0.0F, -physics_constants::GRAVITY_FT_PER_S2};
+	state.currentTime = 0.0F;
+
+	roll.calculateStep(state, 0.01F);
+
+	// Ball should be clamped to ground
+	EXPECT_EQ(state.position[2], ground.height);
+	EXPECT_EQ(state.velocity[2], 0.0F);
+}
+
+TEST_F(RollPhaseTest, UpdatesPositionBasedOnVelocity)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {10.0F, 5.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	float dt = 0.1F;
+	roll.calculateStep(state, dt);
+
+	// Position should have advanced (accounting for deceleration)
+	EXPECT_GT(state.position[0], 0.0F);
+	EXPECT_GT(state.position[1], 0.0F);
+	EXPECT_NEAR(state.position[0] / state.position[1], 10.0F / 5.0F, 0.1F); // Direction preserved
+}
+
+TEST_F(RollPhaseTest, PreservesDirectionWhileSlowing)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	// Ball rolling at 45 degrees
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {10.0F, 10.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	float initialAngle = atan2(state.velocity[1], state.velocity[0]);
+
+	roll.calculateStep(state, 0.1F);
+
+	float finalAngle = atan2(state.velocity[1], state.velocity[0]);
+
+	// Direction should be preserved
+	EXPECT_NEAR(initialAngle, finalAngle, 0.01F);
+}
+
+TEST_F(RollPhaseTest, StopsWhenVelocityTooLow)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	// Ball rolling very slowly
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {0.5F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	// Roll for a while
+	for (int i = 0; i < 100; ++i)
+	{
+		roll.calculateStep(state, 0.01F);
+		if (roll.isPhaseComplete(state))
+		{
+			break;
+		}
+	}
+
+	// Ball should have stopped
+	EXPECT_TRUE(roll.isPhaseComplete(state));
+
+	// Velocity should be very small
+	float finalSpeed = sqrt(state.velocity[0] * state.velocity[0] +
+	                        state.velocity[1] * state.velocity[1]);
+	EXPECT_LT(finalSpeed, 0.1F);
+}
+
+TEST_F(RollPhaseTest, DoesNotReverseDirection)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	// Ball rolling slowly forward
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {0.2F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	// Large timestep that would reverse velocity if not clamped
+	roll.calculateStep(state, 1.0F);
+
+	// Velocity should be zero or positive, never negative
+	EXPECT_GE(state.velocity[0], 0.0F);
+}
+
+TEST_F(RollPhaseTest, HigherFrictionSlowsFaster)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+
+	// Low friction surface (fairway)
+	ground.frictionDynamic = 0.15F;
+	RollPhase rollLow(physicsVars, ball, atmos, ground);
+
+	// High friction surface (rough)
+	ground.frictionDynamic = 0.5F;
+	RollPhase rollHigh(physicsVars, ball, atmos, ground);
+
+	// Same initial state
+	BallState stateLow, stateHigh;
+	stateLow.position = {0.0F, 0.0F, 0.0F};
+	stateLow.velocity = {20.0F, 0.0F, 0.0F};
+	stateLow.acceleration = {0.0F, 0.0F, 0.0F};
+	stateLow.currentTime = 0.0F;
+
+	stateHigh = stateLow;
+
+	float dt = 0.1F;
+	rollLow.calculateStep(stateLow, dt);
+	rollHigh.calculateStep(stateHigh, dt);
+
+	// High friction should decelerate more
+	EXPECT_LT(stateHigh.velocity[0], stateLow.velocity[0]);
+}
+
+TEST_F(RollPhaseTest, NonZeroGroundHeight)
+{
+	ground.height = 10.0F;
+
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F}; // Start at z=0
+	state.velocity = {10.0F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	roll.calculateStep(state, 0.01F);
+
+	// Ball should be at ground height
+	EXPECT_EQ(state.position[2], ground.height);
+}
+
+TEST_F(RollPhaseTest, EventuallyStops)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, ground);
+
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {15.0F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	bool stopped = false;
+	int maxSteps = 10000;
+
+	for (int i = 0; i < maxSteps; ++i)
+	{
+		roll.calculateStep(state, 0.01F);
+		if (roll.isPhaseComplete(state))
+		{
+			stopped = true;
+			break;
+		}
+	}
+
+	EXPECT_TRUE(stopped);
+	EXPECT_LT(state.currentTime, 100.0F); // Should stop in reasonable time
+}
