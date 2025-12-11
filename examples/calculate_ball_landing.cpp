@@ -16,12 +16,21 @@ int main()
     GolfBallPhysicsVariables physVars(ball, atmos);
     FlightSimulator sim(physVars, ball, atmos, ground);
 
-    // Setup initial state
+    // Setup initial state from sensor data
     const float v0_fps = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
+    Vector3D start_pos{
+        ball.x0 * physics_constants::YARDS_TO_FEET,
+        ball.y0 * physics_constants::YARDS_TO_FEET,
+        ball.z0 * physics_constants::YARDS_TO_FEET
+    };
+
     BallState initialState = BallState::fromLaunchParameters(
         v0_fps,
         ball.launchAngle,
-        ball.direction
+        ball.direction,
+        start_pos,
+        physics_constants::GRAVITY_FT_PER_S2,
+        physVars.getROmega()  // Initial spin from backspin/sidespin
     );
 
     sim.initialize(initialState);
