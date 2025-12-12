@@ -58,6 +58,12 @@ public:
 	void calculateAccelerations(BallState &state);
 	bool isPhaseComplete(const BallState &state) const override;
 
+	/**
+	 * @brief Updates the ground surface for this phase.
+	 * @param newGround The new ground surface properties
+	 */
+	void updateGround(const GroundSurface &newGround);
+
 	// Getters for physics variables (needed for testing)
 	[[nodiscard]] auto getV() const -> float { return v; }
 	[[nodiscard]] auto getVMph() const -> float { return vMph; }
@@ -127,6 +133,12 @@ public:
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
 
+	/**
+	 * @brief Updates the ground surface for this phase.
+	 * @param newGround The new ground surface properties
+	 */
+	void updateGround(const GroundSurface &newGround);
+
 private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
@@ -152,6 +164,12 @@ public:
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
+
+	/**
+	 * @brief Updates the ground surface for this phase.
+	 * @param newGround The new ground surface properties
+	 */
+	void updateGround(const GroundSurface &newGround);
 
 private:
 	GolfBallPhysicsVariables &physicsVars;

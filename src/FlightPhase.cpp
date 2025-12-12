@@ -261,6 +261,11 @@ void AerialPhase::calculateAccel(BallState &state)
 		physics_constants::GRAVITY_FT_PER_S2;
 }
 
+void AerialPhase::updateGround(const GroundSurface &newGround)
+{
+	ground = newGround;
+}
+
 // ============================================================================
 // BouncePhase Implementation
 // ============================================================================
@@ -328,6 +333,13 @@ bool BouncePhase::isPhaseComplete(const BallState &state) const
 	}
 
 	return false;
+}
+
+void BouncePhase::updateGround(const GroundSurface &newGround)
+{
+	ground = newGround;
+	// Also update the embedded aerial phase
+	aerialPhase.updateGround(newGround);
 }
 
 // ============================================================================
@@ -402,4 +414,9 @@ bool RollPhase::isPhaseComplete(const BallState &state) const
 	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
 	                         state.velocity[1] * state.velocity[1]);
 	return vHorizontal < physics_constants::STOPPING_VELOCITY;
+}
+
+void RollPhase::updateGround(const GroundSurface &newGround)
+{
+	ground = newGround;
 }

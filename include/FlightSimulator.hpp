@@ -4,9 +4,11 @@
 #include "BallState.hpp"
 #include "FlightPhase.hpp"
 #include "GolfBallPhysicsVariables.hpp"
+#include "GroundProvider.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include <memory>
 
 /**
  * @brief Manages the complete flight simulation with automatic phase transitions.
@@ -32,6 +34,9 @@ public:
 	/**
 	 * @brief Constructs a flight simulator with the given parameters.
 	 *
+	 * This constructor uses a uniform ground surface (same properties everywhere).
+	 * For backward compatibility with existing code.
+	 *
 	 * @param physicsVars Physics variables calculator
 	 * @param ball Golf ball parameters
 	 * @param atmos Atmospheric conditions
@@ -41,6 +46,23 @@ public:
 	                const struct golfBall &ball,
 	                const struct atmosphericData &atmos,
 	                const GroundSurface &ground);
+
+	/**
+	 * @brief Constructs a flight simulator with a custom ground provider.
+	 *
+	 * This constructor allows for dynamic ground type changes during the trajectory.
+	 * The ground provider will be queried at phase transitions to get ground properties
+	 * based on the ball's current XY position.
+	 *
+	 * @param physicsVars Physics variables calculator
+	 * @param ball Golf ball parameters
+	 * @param atmos Atmospheric conditions
+	 * @param groundProvider Ground provider for position-dependent ground properties
+	 */
+	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
+	                const struct golfBall &ball,
+	                const struct atmosphericData &atmos,
+	                const GroundProvider &groundProvider);
 
 	/**
 	 * @brief Initializes the simulation with the given initial state.
@@ -108,10 +130,27 @@ private:
 	BouncePhase bouncePhase;
 	RollPhase rollPhase;
 
+	// Ground provider support
+	const GroundProvider *groundProvider;
+	std::unique_ptr<UniformGroundProvider> uniformProvider;
+	GroundSurface currentGround;
+	int rollStepCounter;
+
 	/**
 	 * @brief Checks if the current phase is complete and transitions if needed.
 	 */
 	void checkPhaseTransition();
+
+	/**
+	 * @brief Updates the current ground surface based on ball position.
+	 *
+	 * Queries the ground provider at the specified XY position and updates
+	 * all flight phases with the new ground properties.
+	 *
+	 * @param x Lateral position in feet
+	 * @param y Forward/downrange position in feet
+	 */
+	void updateGroundAtPosition(float x, float y);
 };
 
 #endif // FLIGHT_SIMULATOR_HPP
