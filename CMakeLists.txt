@@ -53,9 +53,16 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
-# Set compilation flags
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+# Set compilation flags based on compiler
+if(MSVC)
+    # MSVC-specific flags
+    set(CMAKE_CXX_FLAGS "/W4")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+else()
+    # GCC/Clang flags
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+endif()
 
 # Include Google Test
 include(FetchContent)
