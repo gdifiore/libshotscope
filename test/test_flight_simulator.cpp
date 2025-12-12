@@ -219,7 +219,7 @@ TEST_F(FlightSimulatorTest, HandlesDifferentGroundConditions)
 
 	BallState state;
 	const float v0_fps = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
-	const float theta_rad = ball.launchAngle * M_PI / 180.0F;
+	const float theta_rad = ball.launchAngle * physics_constants::DEG_TO_RAD;
 
 	state.position = {0.0F, 0.0F, 0.0F};
 	state.velocity = {v0_fps * std::cos(theta_rad), 0.0F, v0_fps * std::sin(theta_rad)};
@@ -255,7 +255,7 @@ TEST_F(FlightSimulatorTest, HandlesNonZeroGroundHeight)
 	// Start ball at ground level (z = 10.0)
 	BallState state;
 	const float v0_fps = ball.exitSpeed * physics_constants::MPH_TO_FT_PER_S;
-	const float theta_rad = ball.launchAngle * M_PI / 180.0F;
+	const float theta_rad = ball.launchAngle * physics_constants::DEG_TO_RAD;
 
 	state.position = {0.0F, 0.0F, elevatedGround.height};
 	state.velocity = {v0_fps * std::cos(theta_rad), 0.0F, v0_fps * std::sin(theta_rad)};

@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# Check if Clang is installed
-if ! command -v clang &> /dev/null; then
-    echo "Clang is not installed. Installing Clang..."
-    sudo apt-get update
-    sudo apt-get install clang
+# Use Clang if available and not overridden, otherwise use system default
+if [ -z "$CC" ] && [ -z "$CXX" ]; then
+    if command -v clang &> /dev/null; then
+        echo "Using Clang compiler"
+        export CC=clang
+        export CXX=clang++
+    else
+        echo "Using system default compiler"
+    fi
+else
+    echo "Using compiler from environment: CC=$CC, CXX=$CXX"
 fi
-
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
 
 # Create build directory
 mkdir -p build
@@ -18,8 +21,8 @@ cd build
 cmake ..
 
 # Build the project
-make
+cmake --build .
 
-echo "password needed to sudo make install"
-
-sudo make install
+# Optionally install (uncomment if you want to install system-wide)
+# echo "Installing to system directories (password may be required)"
+# sudo cmake --install .
