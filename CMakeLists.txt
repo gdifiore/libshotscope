@@ -64,6 +64,14 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 endif()
 
+# Code coverage option
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+if(ENABLE_COVERAGE AND NOT MSVC)
+    message(STATUS "Building with code coverage enabled")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+endif()
+
 # Include Google Test
 include(FetchContent)
 FetchContent_Declare(

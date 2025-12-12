@@ -84,15 +84,22 @@ namespace physics_constants
     constexpr float RE100_VELOCITY_M_PER_S = 44.7F;
 
     // ========================================================================
+    // MATHEMATICAL CONSTANTS
+    // ========================================================================
+
+    /// Pi constant (for MSVC compatibility where M_PI is not standard)
+    constexpr float PI = 3.14159265358979323846F;
+
+    // ========================================================================
     // ANGULAR CONVERSION FACTORS
     // ========================================================================
 
     /// Degrees to radians conversion factor (π/180)
-    constexpr float DEG_TO_RAD = 3.14159265358979323846F / 180.0F;
+    constexpr float DEG_TO_RAD = PI / 180.0F;
 
     /// RPM to radians per second conversion factor (π/30)
     /// 1 RPM = 2π rad / 60 s = π/30 rad/s
-    constexpr float RPM_TO_RAD_PER_S = 3.14159265358979323846F / 30.0F;
+    constexpr float RPM_TO_RAD_PER_S = PI / 30.0F;
 
     // ========================================================================
     // PRESSURE CONVERSION FACTORS

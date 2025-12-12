@@ -156,13 +156,13 @@ void AerialPhase::calculateVelocityw(BallState &state)
 
 void AerialPhase::calculatePhi(BallState &state)
 {
-	phi = atan2(state.position[1], state.position[2]) * 180 / M_PI;
+	phi = atan2(state.position[1], state.position[2]) * 180 / physics_constants::PI;
 }
 
 void AerialPhase::calculateTau()
 {
 	tau = 1 / (physics_constants::TAU_COEFF * v /
-		(physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * M_PI * physics_constants::INCHES_PER_FOOT)));
+		(physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * physics_constants::PI * physics_constants::INCHES_PER_FOOT)));
 }
 
 void AerialPhase::calculateRw(BallState &state)

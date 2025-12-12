@@ -104,7 +104,7 @@ void GolfBallPhysicsVariables::calculateOmega()
 
 void GolfBallPhysicsVariables::calculateROmega()
 {
-    rOmega = (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * M_PI)) * (omega / 12.0);
+    rOmega = (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * physics_constants::PI)) * (omega / 12.0);
 }
 
 void GolfBallPhysicsVariables::calculateVw()
@@ -126,7 +126,7 @@ void GolfBallPhysicsVariables::calculateBarometricPressure()
 
 void GolfBallPhysicsVariables::calculateRe100()
 {
-    Re100 = rhoMetric * physics_constants::RE100_VELOCITY_M_PER_S * (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (M_PI * physics_constants::INCHES_PER_METER)) *
+    Re100 = rhoMetric * physics_constants::RE100_VELOCITY_M_PER_S * (physics_constants::STD_BALL_CIRCUMFERENCE_IN / (physics_constants::PI * physics_constants::INCHES_PER_METER)) *
             (math_utils::convertCelsiusToKelvin(tempC) + physics_constants::SUTHERLAND_CONSTANT) /
             (physics_constants::SUTHERLAND_VISCOSITY_COEFF * std::pow(math_utils::convertCelsiusToKelvin(tempC), 1.5));
 }
