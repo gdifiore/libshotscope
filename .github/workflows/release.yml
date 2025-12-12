@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body: |
+            ## libshotscope ${{ steps.get_version.outputs.version }}
+
+            ### Installation
+            Download the appropriate binary for your platform below.
+
+            ### Building from Source
+            See the [README](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for build instructions.
+
+  build-release:
+    name: Build ${{ matrix.os }}
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: libshotscope.a
+            asset_name: libshotscope-linux-x86_64.a
+          - os: macos-latest
+            artifact_name: libshotscope.a
+            asset_name: libshotscope-macos-x86_64.a
+          - os: windows-latest
+            artifact_name: shotscope.lib
+            asset_name: libshotscope-windows-x86_64.lib
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Package headers
+        run: |
+          mkdir -p package/include
+          cp -r include/* package/include/
+          cp build/include/version.hpp package/include/
+
+      - name: Create archive (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cp build/${{ matrix.artifact_name }} package/
+          cd package
+          tar -czf ../libshotscope-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz .
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cp build/Release/${{ matrix.artifact_name }} package/
+          cd package
+          7z a ../libshotscope-Windows-${{ needs.create-release.outputs.version }}.zip .
+
+      - name: Upload Release Asset (Unix)
+        if: runner.os != 'Windows'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./libshotscope-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz
+          asset_name: libshotscope-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload Release Asset (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./libshotscope-Windows-${{ needs.create-release.outputs.version }}.zip
+          asset_name: libshotscope-Windows-${{ needs.create-release.outputs.version }}.zip
+          asset_content_type: application/zip

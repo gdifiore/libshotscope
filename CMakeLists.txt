@@ -1,14 +1,28 @@
 cmake_minimum_required(VERSION 3.14)
-project(shotscope)
+project(shotscope VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Version information
+set(SHOTSCOPE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(SHOTSCOPE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(SHOTSCOPE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(SHOTSCOPE_VERSION ${PROJECT_VERSION})
 
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(PROJECT_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
 
+# Configure version header
+configure_file(
+    "${PROJECT_INCLUDE_DIR}/version.hpp.in"
+    "${PROJECT_BINARY_DIR}/include/version.hpp"
+    @ONLY
+)
+
 include_directories(${PROJECT_INCLUDE_DIR})
+include_directories(${PROJECT_BINARY_DIR}/include)
 
 set(SOURCES
    ${PROJECT_SRC_DIR}/math_utils.cpp
@@ -32,6 +46,12 @@ set(HEADERS
 
 # Create the static library
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
+
+# Set library version properties
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 
 # Set compilation flags
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
@@ -77,3 +97,4 @@ gtest_discover_tests(libshotscope_tests)
 
 install(TARGETS shotscope DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
+install(FILES "${PROJECT_BINARY_DIR}/include/version.hpp" DESTINATION include)
