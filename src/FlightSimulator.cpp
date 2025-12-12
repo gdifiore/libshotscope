@@ -3,7 +3,7 @@
  * @author Gabriel DiFiore
  * @brief Implementation of the FlightSimulator class for automated phase management.
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #include "FlightSimulator.hpp"
@@ -140,10 +140,10 @@ void FlightSimulator::checkPhaseTransition()
 	switch (currentPhase)
 	{
 	case Phase::Aerial:
-		// Update ground at current position before checking if aerial phase is complete
-		updateGroundAtPosition(state.position[0], state.position[1]);
 		if (aerialPhase.isPhaseComplete(state))
 		{
+			// Update ground at impact point before transitioning to bounce
+			updateGroundAtPosition(state.position[0], state.position[1]);
 			currentPhase = Phase::Bounce;
 		}
 		break;
@@ -154,7 +154,7 @@ void FlightSimulator::checkPhaseTransition()
 			// Update ground before transitioning to roll
 			updateGroundAtPosition(state.position[0], state.position[1]);
 			currentPhase = Phase::Roll;
-			rollStepCounter = 0;  // Reset counter for roll phase
+			rollStepCounter = 0; // Reset counter for roll phase
 		}
 		break;
 

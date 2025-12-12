@@ -49,9 +49,9 @@ class AerialPhase : public FlightPhase
 {
 public:
 	AerialPhase(GolfBallPhysicsVariables &physicsVars,
-	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos,
-	            const GroundSurface &ground);
+				const struct golfBall &ball,
+				const struct atmosphericData &atmos,
+				const GroundSurface &ground);
 
 	void initialize(BallState &state);
 	void calculateStep(BallState &state, float dt) override;
@@ -126,9 +126,9 @@ class BouncePhase : public FlightPhase
 {
 public:
 	BouncePhase(GolfBallPhysicsVariables &physicsVars,
-	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos,
-	            const GroundSurface &ground);
+				const struct golfBall &ball,
+				const struct atmosphericData &atmos,
+				const GroundSurface &ground);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
@@ -158,9 +158,9 @@ class RollPhase : public FlightPhase
 {
 public:
 	RollPhase(GolfBallPhysicsVariables &physicsVars,
-	          const struct golfBall &ball,
-	          const struct atmosphericData &atmos,
-	          const GroundSurface &ground);
+			  const struct golfBall &ball,
+			  const struct atmosphericData &atmos,
+			  const GroundSurface &ground);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;

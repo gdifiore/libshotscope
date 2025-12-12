@@ -43,9 +43,9 @@ public:
 	 * @param ground Ground surface properties
 	 */
 	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
-	                const struct golfBall &ball,
-	                const struct atmosphericData &atmos,
-	                const GroundSurface &ground);
+					const struct golfBall &ball,
+					const struct atmosphericData &atmos,
+					const GroundSurface &ground);
 
 	/**
 	 * @brief Constructs a flight simulator with a custom ground provider.
@@ -60,9 +60,9 @@ public:
 	 * @param groundProvider Ground provider for position-dependent ground properties
 	 */
 	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
-	                const struct golfBall &ball,
-	                const struct atmosphericData &atmos,
-	                const GroundProvider &groundProvider);
+					const struct golfBall &ball,
+					const struct atmosphericData &atmos,
+					const GroundProvider &groundProvider);
 
 	/**
 	 * @brief Initializes the simulation with the given initial state.
@@ -116,10 +116,10 @@ private:
 	 */
 	enum class Phase
 	{
-		Aerial,   // Ball in flight
-		Bounce,   // Ball bouncing on ground
-		Roll,     // Ball rolling on ground
-		Complete  // Simulation finished
+		Aerial,	 // Ball in flight
+		Bounce,	 // Ball bouncing on ground
+		Roll,	 // Ball rolling on ground
+		Complete // Simulation finished
 	};
 
 	Phase currentPhase;

@@ -6,7 +6,7 @@
  * This file contains functions that perform mathematical
  * utilities, e.g. converting between units.
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #include "math_utils.hpp"

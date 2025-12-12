@@ -8,7 +8,7 @@
  * ground mappings to model fairways, roughs, greens, and other surfaces with
  * varying properties and heights.
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #ifndef GROUND_PROVIDER_HPP
@@ -28,6 +28,10 @@
  * - Elevated surfaces (hills, elevated greens)
  * - Bunkers with different firmness and friction
  * - Terrain variations across the course
+ *
+ * Thread Safety: Implementations must be const-safe and thread-safe for
+ * concurrent read access if the same provider instance is shared across
+ * multiple simulators.
  *
  * Example implementation:
  * @code
@@ -59,6 +63,10 @@ public:
 	 *
 	 * The implementation should be efficient as it may be called multiple times
 	 * during a simulation (typically 3-10 times for a full trajectory).
+	 *
+	 * Exception Safety: Implementations should not throw exceptions. If the
+	 * position is invalid or out of bounds, return a reasonable default surface
+	 * rather than throwing.
 	 *
 	 * @param x Lateral position in feet (perpendicular to target line)
 	 * @param y Forward/downrange position in feet (along target line)

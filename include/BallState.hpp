@@ -25,10 +25,10 @@ public:
 	 * @brief Constructs a BallState with zero-initialized values.
 	 */
 	BallState() : position{0.0F, 0.0F, 0.0F},
-	              velocity{0.0F, 0.0F, 0.0F},
-	              acceleration{0.0F, 0.0F, 0.0F},
-	              currentTime(0.0F),
-	              spinRate(0.0F) {}
+				  velocity{0.0F, 0.0F, 0.0F},
+				  acceleration{0.0F, 0.0F, 0.0F},
+				  currentTime(0.0F),
+				  spinRate(0.0F) {}
 
 	/**
 	 * @brief Constructs a BallState with specified initial values.
@@ -72,9 +72,9 @@ public:
 		// direction=0 (straight) should give vy=max, vx=0
 		// direction>0 (right) should give vx>0
 		Vector3D velocity{
-			speed_fps * std::cos(theta_rad) * std::sin(phi_rad),  // vx: lateral (right)
-			speed_fps * std::cos(theta_rad) * std::cos(phi_rad),  // vy: forward (downrange)
-			speed_fps * std::sin(theta_rad)                        // vz: vertical (up)
+			speed_fps * std::cos(theta_rad) * std::sin(phi_rad), // vx: lateral (right)
+			speed_fps * std::cos(theta_rad) * std::cos(phi_rad), // vy: forward (downrange)
+			speed_fps * std::sin(theta_rad)						 // vz: vertical (up)
 		};
 
 		Vector3D acceleration{0.0F, 0.0F, -gravity};
@@ -83,11 +83,11 @@ public:
 	}
 
 	// State variables
-	Vector3D position;      // Current position (x=lateral, y=forward, z=height) in feet
-	Vector3D velocity;      // Current velocity (vx, vy, vz) in ft/s
-	Vector3D acceleration;  // Current acceleration (ax, ay, az) in ft/s²
-	float currentTime;      // Current simulation time in seconds
-	float spinRate;         // Current spin rate in rad/s
+	Vector3D position;	   // Current position (x=lateral, y=forward, z=height) in feet
+	Vector3D velocity;	   // Current velocity (vx, vy, vz) in ft/s
+	Vector3D acceleration; // Current acceleration (ax, ay, az) in ft/s²
+	float currentTime;	   // Current simulation time in seconds
+	float spinRate;		   // Current spin rate in rad/s
 };
 
 #endif // BALLSTATE_HPP
