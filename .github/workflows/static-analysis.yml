@@ -1,0 +1,61 @@
+name: Static Analysis
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  clang-tidy:
+    name: Clang-Tidy
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang clang-tidy
+
+    - name: Configure CMake
+      env:
+        CC: clang
+        CXX: clang++
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+    - name: Run clang-tidy
+      run: |
+        find src -name '*.cpp' | xargs clang-tidy -p build --warnings-as-errors='' --format-style=file
+
+  cppcheck:
+    name: Cppcheck
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install cppcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all \
+          --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          --inline-suppr \
+          --error-exitcode=1 \
+          --std=c++17 \
+          -I include \
+          src/ \
+          2>&1 | tee cppcheck-report.txt
+
+    - name: Upload cppcheck report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cppcheck-report
+        path: cppcheck-report.txt

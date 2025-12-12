@@ -65,8 +65,8 @@ public:
 		float gravity = physics_constants::GRAVITY_FT_PER_S2,
 		float initial_spin_rad_s = 0.0F)
 	{
-		const float theta_rad = launch_angle_deg * M_PI / 180.0F;
-		const float phi_rad = direction_deg * M_PI / 180.0F;
+		const float theta_rad = launch_angle_deg * physics_constants::DEG_TO_RAD;
+		const float phi_rad = direction_deg * physics_constants::DEG_TO_RAD;
 
 		// Coordinate system: x=lateral, y=forward, z=height
 		// direction=0 (straight) should give vy=max, vx=0

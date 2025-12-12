@@ -1,0 +1,87 @@
+name: Multi-Platform CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} - ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [default]
+        include:
+          # Linux builds with GCC and Clang
+          - os: ubuntu-latest
+            compiler: gcc
+            cc: gcc
+            cxx: g++
+          - os: ubuntu-latest
+            compiler: clang
+            cc: clang
+            cxx: clang++
+          # macOS with AppleClang
+          - os: macos-latest
+            compiler: default
+            cc: clang
+            cxx: clang++
+          # Windows with MSVC
+          - os: windows-latest
+            compiler: default
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up compiler (Linux)
+      if: runner.os == 'Linux' && matrix.compiler != 'default'
+      run: |
+        if [ "${{ matrix.compiler }}" = "clang" ]; then
+          sudo apt-get update
+          sudo apt-get install -y clang
+        fi
+
+    - name: Cache CMake build
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          !build/_deps
+        key: ${{ runner.os }}-${{ matrix.compiler }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.compiler }}-cmake-
+
+    - name: Configure CMake (Unix)
+      if: runner.os != 'Windows'
+      env:
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Build
+      run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+    - name: Test
+      working-directory: build
+      run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
+
+    - name: Upload build artifacts
+      if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc'
+      uses: actions/upload-artifact@v4
+      with:
+        name: libshotscope-${{ runner.os }}
+        path: |
+          build/libshotscope.a
+          build/include/version.hpp
