@@ -7,6 +7,9 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include "terrain_interface.hpp"
+
+#include <memory>
 
 /**
  * @brief Manages the complete flight simulation with automatic phase transitions.
@@ -36,11 +39,13 @@ public:
 	 * @param ball Golf ball parameters
 	 * @param atmos Atmospheric conditions
 	 * @param ground Ground surface properties
+	 * @param terrain Terrain interface for height/normal queries (optional, defaults to flat terrain)
 	 */
 	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
 	                const struct golfBall &ball,
 	                const struct atmosphericData &atmos,
-	                const GroundSurface &ground);
+	                const GroundSurface &ground,
+	                std::shared_ptr<TerrainInterface> terrain = nullptr);
 
 	/**
 	 * @brief Initializes the simulation with the given initial state.

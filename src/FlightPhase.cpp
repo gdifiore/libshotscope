@@ -12,6 +12,7 @@
 #include "FlightPhase.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
+#include "ground_physics.hpp"
 #include "physics_constants.hpp"
 
 #include <algorithm>
@@ -23,8 +24,8 @@
 
 AerialPhase::AerialPhase(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, const GroundSurface &ground)
-	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground)
+	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
+	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain)
 {
 	// Initialize calculated variables
 	v = 0.0F;
@@ -110,7 +111,8 @@ void AerialPhase::calculateStep(BallState &state, float dt)
 bool AerialPhase::isPhaseComplete(const BallState &state) const
 {
 	// Aerial phase is complete when ball reaches ground level
-	return state.position[2] < ground.height;
+	float terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	return state.position[2] <= terrainHeight;
 }
 
 void AerialPhase::calculatePosition(BallState &state, float dt)
@@ -267,35 +269,31 @@ void AerialPhase::calculateAccel(BallState &state)
 
 BouncePhase::BouncePhase(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, const GroundSurface &ground)
-	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground),
-	  aerialPhase(physicsVars, ball, atmos, ground)
+	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
+	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain),
+	  aerialPhase(physicsVars, ball, atmos, terrain)
 {
 }
 
 void BouncePhase::calculateStep(BallState &state, float dt)
 {
+	// Get terrain data at ball position
+	float terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	Vector3D surfaceNormal = terrain->getNormal(state.position[0], state.position[1]);
+	const GroundSurface& surface = terrain->getSurfaceProperties(state.position[0], state.position[1]);
+
 	// Apply bounce impact when ball contacts ground while moving downward
-	if (state.position[2] <= ground.height && state.velocity[2] < 0.0F)
+	float velocityDotNormal = state.velocity[0] * surfaceNormal[0] +
+	                          state.velocity[1] * surfaceNormal[1] +
+	                          state.velocity[2] * surfaceNormal[2];
+
+	if (state.position[2] <= terrainHeight && velocityDotNormal < 0.0F)
 	{
-		state.position[2] = ground.height;
-		state.velocity[2] = -ground.restitution * state.velocity[2];
-
-		// Apply friction to horizontal velocity components
-		float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
-		                         state.velocity[1] * state.velocity[1]);
-
-		if (vHorizontal > physics_constants::MIN_HORIZONTAL_VELOCITY)
-		{
-			float frictionFactor = 1.0F - ground.frictionStatic * (1.0F - ground.firmness);
-			frictionFactor = std::max(0.0F, std::min(1.0F, frictionFactor));
-
-			state.velocity[0] *= frictionFactor;
-			state.velocity[1] *= frictionFactor;
-		}
-
-		// Reduce spin on impact
-		state.spinRate *= ground.spinRetention;
+		// Use ground physics module for realistic bounce
+		auto result = GroundPhysics::calculateBounce(state.velocity, surfaceNormal, state.spinRate, surface);
+		state.velocity = result.newVelocity;
+		state.spinRate = result.newSpinRate;
+		state.position[2] = terrainHeight;
 	}
 
 	// Calculate aerodynamic forces (drag, lift, Magnus effect)
@@ -312,22 +310,23 @@ void BouncePhase::calculateStep(BallState &state, float dt)
 
 	state.currentTime += dt;
 
-	if (state.position[2] < ground.height)
+	// Ensure ball doesn't go below terrain (recalculate since position changed)
+	terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	if (state.position[2] < terrainHeight)
 	{
-		state.position[2] = ground.height;
+		state.position[2] = terrainHeight;
 	}
 }
 
 bool BouncePhase::isPhaseComplete(const BallState &state) const
 {
-	// Transition to roll only when ball is on ground with low vertical velocity
-	if (state.position[2] <= ground.height + physics_constants::GROUND_CONTACT_THRESHOLD &&
-	    std::abs(state.velocity[2]) < physics_constants::MIN_BOUNCE_VELOCITY)
-	{
-		return true;
-	}
+	// Get terrain data at ball position
+	float terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	Vector3D surfaceNormal = terrain->getNormal(state.position[0], state.position[1]);
+	float heightAboveGround = state.position[2] - terrainHeight;
 
-	return false;
+	// Use ground physics module to determine transition
+	return GroundPhysics::shouldTransitionToRoll(state.velocity, surfaceNormal, heightAboveGround);
 }
 
 // ============================================================================
@@ -336,46 +335,50 @@ bool BouncePhase::isPhaseComplete(const BallState &state) const
 
 RollPhase::RollPhase(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, const GroundSurface &ground)
-	: physicsVars(physicsVars), ball(ball), atmos(atmos), ground(ground)
+	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
+	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain)
 {
 }
 
 void RollPhase::calculateStep(BallState &state, float dt)
 {
-	// Calculate horizontal velocity magnitude
-	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
-	                         state.velocity[1] * state.velocity[1]);
+	// Get terrain data at ball position
+	float terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	Vector3D surfaceNormal = terrain->getNormal(state.position[0], state.position[1]);
+	const GroundSurface& surface = terrain->getSurfaceProperties(state.position[0], state.position[1]);
 
-	if (vHorizontal > physics_constants::MIN_HORIZONTAL_VELOCITY)
+	// Store old velocity direction for reversal check
+	float oldVelX = state.velocity[0];
+	float oldVelY = state.velocity[1];
+
+	// Use ground physics module to calculate acceleration on slope
+	state.acceleration = GroundPhysics::calculateRollAcceleration(state.velocity, surfaceNormal, state.spinRate, surface);
+
+	// Update velocity
+	state.velocity[0] += state.acceleration[0] * dt;
+	state.velocity[1] += state.acceleration[1] * dt;
+	state.velocity[2] += state.acceleration[2] * dt;
+
+	// Prevent velocity from reversing direction (clamp to zero instead)
+	if (oldVelX * state.velocity[0] < 0.0F)
 	{
-		// Calculate rolling friction deceleration using surface's dynamic friction
-		float deceleration = ground.frictionDynamic * physics_constants::GRAVITY_FT_PER_S2;
-
-		// Calculate velocity reduction
-		float velocityReduction = deceleration * dt;
-
-		// Don't let velocity reverse direction
-		if (velocityReduction >= vHorizontal)
-		{
-			state.velocity[0] = 0.0F;
-			state.velocity[1] = 0.0F;
-		}
-		else
-		{
-			// Apply deceleration in direction opposite to motion
-			float velocityFactor = (vHorizontal - velocityReduction) / vHorizontal;
-			state.velocity[0] *= velocityFactor;
-			state.velocity[1] *= velocityFactor;
-		}
-
-		// Update position
-		state.position[0] += state.velocity[0] * dt;
-		state.position[1] += state.velocity[1] * dt;
+		state.velocity[0] = 0.0F;
+	}
+	if (oldVelY * state.velocity[1] < 0.0F)
+	{
+		state.velocity[1] = 0.0F;
 	}
 
-	// Apply spin decay during rolling (friction with ground)
-	// Rolling friction causes faster spin decay than in air
+	// Update position
+	state.position[0] += state.velocity[0] * dt;
+	state.position[1] += state.velocity[1] * dt;
+
+	// Keep ball on terrain surface (recalculate height at new position)
+	terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	state.position[2] = terrainHeight;
+	state.velocity[2] = 0.0F;
+
+	// Apply spin decay during rolling
 	float spinDecay = physics_constants::ROLL_SPIN_DECAY_RATE * dt;
 	if (state.spinRate > spinDecay)
 	{
@@ -385,13 +388,6 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	{
 		state.spinRate = 0.0F;
 	}
-
-	// Ball stays on ground during roll
-	state.position[2] = ground.height;
-	state.velocity[2] = 0.0F;
-	state.acceleration[0] = 0.0F;
-	state.acceleration[1] = 0.0F;
-	state.acceleration[2] = 0.0F;
 
 	state.currentTime += dt;
 }

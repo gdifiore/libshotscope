@@ -6,6 +6,9 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include "terrain_interface.hpp"
+
+#include <memory>
 
 /**
  * @brief Base class for different flight phases of a golf ball.
@@ -51,7 +54,7 @@ public:
 	AerialPhase(GolfBallPhysicsVariables &physicsVars,
 	            const struct golfBall &ball,
 	            const struct atmosphericData &atmos,
-	            const GroundSurface &ground);
+	            std::shared_ptr<TerrainInterface> terrain);
 
 	void initialize(BallState &state);
 	void calculateStep(BallState &state, float dt) override;
@@ -77,7 +80,7 @@ private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
-	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 
 	// Calculated variables (derived from state)
 	float v;
@@ -122,7 +125,7 @@ public:
 	BouncePhase(GolfBallPhysicsVariables &physicsVars,
 	            const struct golfBall &ball,
 	            const struct atmosphericData &atmos,
-	            const GroundSurface &ground);
+	            std::shared_ptr<TerrainInterface> terrain);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
@@ -131,7 +134,7 @@ private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
-	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 	AerialPhase aerialPhase; // Used for aerodynamic calculations between bounces
 };
 
@@ -148,7 +151,7 @@ public:
 	RollPhase(GolfBallPhysicsVariables &physicsVars,
 	          const struct golfBall &ball,
 	          const struct atmosphericData &atmos,
-	          const GroundSurface &ground);
+	          std::shared_ptr<TerrainInterface> terrain);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
@@ -157,7 +160,7 @@ private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
-	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 };
 
 #endif // FLIGHTPHASE_HPP

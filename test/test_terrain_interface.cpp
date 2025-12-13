@@ -3,6 +3,52 @@
 #include <libshotscope.hpp>
 #include <terrain_interface.hpp>
 
+#include <cmath>
+
+// Simple mock terrain with a constant slope for testing
+class MockSlopedTerrain : public TerrainInterface
+{
+public:
+    MockSlopedTerrain(float slopeAngleDegrees, const GroundSurface& surface)
+        : surface(surface)
+    {
+        // Calculate slope in Y direction (downrange)
+        float angleRad = slopeAngleDegrees * 3.14159F / 180.0F;
+        slopeRise = std::tan(angleRad);
+
+        // Normal vector for a slope descending in +Y direction
+        // Perpendicular to slope surface, pointing upward
+        normal[0] = 0.0F;
+        normal[1] = std::sin(angleRad);  // Tilts forward for downslope
+        normal[2] = std::cos(angleRad);  // Upward component
+    }
+
+    float getHeight(float x, float y) const override
+    {
+        (void)x;  // Slope only in Y direction
+        return -y * slopeRise;  // Descends as Y increases
+    }
+
+    Vector3D getNormal(float x, float y) const override
+    {
+        (void)x;
+        (void)y;
+        return normal;
+    }
+
+    const GroundSurface& getSurfaceProperties(float x, float y) const override
+    {
+        (void)x;
+        (void)y;
+        return surface;
+    }
+
+private:
+    GroundSurface surface;
+    float slopeRise;
+    Vector3D normal;
+};
+
 TEST(TerrainInterfaceTest, FlatTerrainReturnsConstantHeight)
 {
     GroundSurface surface;
@@ -78,4 +124,101 @@ TEST(TerrainInterfaceTest, FlatTerrainWorksWithDefaultGroundSurface)
 
     const GroundSurface& props = terrain.getSurfaceProperties(0.0F, 0.0F);
     EXPECT_NEAR(props.restitution, 0.4F, 0.001F);  // Default COR
+}
+
+// Basic sanity checks for sloped terrain integration
+
+TEST(TerrainInterfaceTest, MockSlopedTerrainCalculatesHeightCorrectly)
+{
+    GroundSurface surface;
+    MockSlopedTerrain terrain(10.0F, surface);  // 10 degree downward slope
+
+    // At y=0, height should be 0
+    EXPECT_NEAR(terrain.getHeight(0.0F, 0.0F), 0.0F, 0.001F);
+
+    // As y increases (downrange), height decreases
+    float height10 = terrain.getHeight(0.0F, 10.0F);
+    float height20 = terrain.getHeight(0.0F, 20.0F);
+
+    EXPECT_LT(height10, 0.0F);     // Below starting point
+    EXPECT_LT(height20, height10); // Even lower
+}
+
+TEST(TerrainInterfaceTest, MockSlopedTerrainNormalIsUnitLength)
+{
+    GroundSurface surface;
+    MockSlopedTerrain terrain(20.0F, surface);
+
+    Vector3D normal = terrain.getNormal(0.0F, 0.0F);
+    float mag = math_utils::magnitude(normal);
+
+    EXPECT_NEAR(mag, 1.0F, 0.001F);
+}
+
+TEST(TerrainInterfaceTest, BallBouncesOnSlopedTerrain)
+{
+    // Set up sloped terrain
+    GroundSurface surface;
+    surface.restitution = 0.5F;
+    surface.frictionStatic = 0.3F;
+    surface.firmness = 1.0F;
+    auto terrain = std::make_shared<MockSlopedTerrain>(15.0F, surface);
+
+    // Set up physics
+    golfBall ball{0.0, 0.0, 0.0, 100.0, 10.0, 0.0, 2000.0, 0.0};
+    atmosphericData atmos{70.0, 0.0, 0.0, 0.0, 0.0, 50.0, 29.92};
+    GolfBallPhysicsVariables physicsVars(ball, atmos);
+
+    // Create bounce phase with sloped terrain
+    BouncePhase bounce(physicsVars, ball, atmos, terrain);
+
+    // Ball falling straight down onto slope
+    BallState state;
+    state.position = {0.0F, 10.0F, terrain->getHeight(0.0F, 10.0F)};
+    state.velocity = {0.0F, 0.0F, -10.0F};
+    state.acceleration = {0.0F, 0.0F, -physics_constants::GRAVITY_FT_PER_S2};
+    state.currentTime = 0.0F;
+
+    bounce.calculateStep(state, 0.01F);
+
+    // After bounce on slope, ball should have forward velocity component
+    EXPECT_GT(state.velocity[1], 0.0F);  // Should redirect downslope
+}
+
+TEST(TerrainInterfaceTest, BallRollsDownSlope)
+{
+    // Set up sloped terrain
+    GroundSurface surface;
+    surface.frictionDynamic = 0.15F;
+    auto terrain = std::make_shared<MockSlopedTerrain>(10.0F, surface);
+
+    // Set up physics
+    golfBall ball{0.0, 0.0, 0.0, 100.0, 10.0, 0.0, 2000.0, 0.0};
+    atmosphericData atmos{70.0, 0.0, 0.0, 0.0, 0.0, 50.0, 29.92};
+    GolfBallPhysicsVariables physicsVars(ball, atmos);
+
+    // Create roll phase
+    RollPhase roll(physicsVars, ball, atmos, terrain);
+
+    // Ball rolling slowly on slope
+    BallState state;
+    state.position = {0.0F, 10.0F, terrain->getHeight(0.0F, 10.0F)};
+    state.velocity = {0.0F, 2.0F, 0.0F};  // Slow forward velocity
+    state.acceleration = {0.0F, 0.0F, 0.0F};
+    state.currentTime = 0.0F;
+
+    float initialVelocity = state.velocity[1];
+
+    // Roll for a bit
+    for (int i = 0; i < 10; ++i)
+    {
+        roll.calculateStep(state, 0.01F);
+    }
+
+    // Ball should accelerate downslope
+    EXPECT_GT(state.velocity[1], initialVelocity);
+
+    // Ball should stay on terrain surface
+    float expectedHeight = terrain->getHeight(state.position[0], state.position[1]);
+    EXPECT_NEAR(state.position[2], expectedHeight, 0.001F);
 }

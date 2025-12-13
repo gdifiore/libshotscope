@@ -7,7 +7,10 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include "terrain_interface.hpp"
 #include "physics_constants.hpp"
+
+#include <memory>
 
 class RollPhaseTest : public ::testing::Test
 {
@@ -23,17 +26,21 @@ protected:
 		ground.restitution = 0.4F;
 		ground.frictionStatic = 0.5F;
 		ground.firmness = 0.8F;
+
+		// Create flat terrain from ground
+		terrain = std::make_shared<FlatTerrain>(ground);
 	}
 
 	golfBall ball;
 	atmosphericData atmos;
 	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 };
 
 TEST_F(RollPhaseTest, DeceleratesFromRollingFriction)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	// Ball rolling on ground at 10 ft/s
 	BallState state;
@@ -55,7 +62,7 @@ TEST_F(RollPhaseTest, DeceleratesFromRollingFriction)
 TEST_F(RollPhaseTest, KeepsBallOnGround)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 5.0F}; // Start above ground
@@ -73,7 +80,7 @@ TEST_F(RollPhaseTest, KeepsBallOnGround)
 TEST_F(RollPhaseTest, UpdatesPositionBasedOnVelocity)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 0.0F};
@@ -93,7 +100,7 @@ TEST_F(RollPhaseTest, UpdatesPositionBasedOnVelocity)
 TEST_F(RollPhaseTest, PreservesDirectionWhileSlowing)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	// Ball rolling at 45 degrees
 	BallState state;
@@ -115,7 +122,7 @@ TEST_F(RollPhaseTest, PreservesDirectionWhileSlowing)
 TEST_F(RollPhaseTest, StopsWhenVelocityTooLow)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	// Ball rolling very slowly
 	BallState state;
@@ -146,7 +153,7 @@ TEST_F(RollPhaseTest, StopsWhenVelocityTooLow)
 TEST_F(RollPhaseTest, DoesNotReverseDirection)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	// Ball rolling slowly forward
 	BallState state;
@@ -168,11 +175,13 @@ TEST_F(RollPhaseTest, HigherFrictionSlowsFaster)
 
 	// Low friction surface (fairway)
 	ground.frictionDynamic = 0.15F;
-	RollPhase rollLow(physicsVars, ball, atmos, ground);
+	auto terrainLow = std::make_shared<FlatTerrain>(ground);
+	RollPhase rollLow(physicsVars, ball, atmos, terrainLow);
 
 	// High friction surface (rough)
 	ground.frictionDynamic = 0.5F;
-	RollPhase rollHigh(physicsVars, ball, atmos, ground);
+	auto terrainHigh = std::make_shared<FlatTerrain>(ground);
+	RollPhase rollHigh(physicsVars, ball, atmos, terrainHigh);
 
 	// Same initial state
 	BallState stateLow, stateHigh;
@@ -194,9 +203,10 @@ TEST_F(RollPhaseTest, HigherFrictionSlowsFaster)
 TEST_F(RollPhaseTest, NonZeroGroundHeight)
 {
 	ground.height = 10.0F;
+	terrain = std::make_shared<FlatTerrain>(ground);  // Recreate with updated ground
 
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 0.0F}; // Start at z=0
@@ -213,7 +223,7 @@ TEST_F(RollPhaseTest, NonZeroGroundHeight)
 TEST_F(RollPhaseTest, EventuallyStops)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	RollPhase roll(physicsVars, ball, atmos, ground);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 0.0F};

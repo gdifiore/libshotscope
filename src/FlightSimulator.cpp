@@ -11,11 +11,12 @@
 
 FlightSimulator::FlightSimulator(
 	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, const GroundSurface &ground)
+	const struct atmosphericData &atmos, const GroundSurface &ground,
+	std::shared_ptr<TerrainInterface> terrain)
 	: currentPhase(Phase::Aerial), initialized(false),
-	  aerialPhase(physicsVars, ball, atmos, ground),
-	  bouncePhase(physicsVars, ball, atmos, ground),
-	  rollPhase(physicsVars, ball, atmos, ground)
+	  aerialPhase(physicsVars, ball, atmos, terrain ? terrain : std::make_shared<FlatTerrain>(ground)),
+	  bouncePhase(physicsVars, ball, atmos, terrain ? terrain : std::make_shared<FlatTerrain>(ground)),
+	  rollPhase(physicsVars, ball, atmos, terrain ? terrain : std::make_shared<FlatTerrain>(ground))
 {
 }
 
