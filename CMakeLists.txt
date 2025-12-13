@@ -29,6 +29,7 @@ set(SOURCES
    ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
    ${PROJECT_SRC_DIR}/FlightPhase.cpp
    ${PROJECT_SRC_DIR}/FlightSimulator.cpp
+   ${PROJECT_SRC_DIR}/ground_physics.cpp
 )
 
 set(HEADERS
@@ -41,6 +42,8 @@ set(HEADERS
    ${PROJECT_INCLUDE_DIR}/FlightSimulator.hpp
    ${PROJECT_INCLUDE_DIR}/BallState.hpp
    ${PROJECT_INCLUDE_DIR}/ground_surface.hpp
+   ${PROJECT_INCLUDE_DIR}/terrain_interface.hpp
+   ${PROJECT_INCLUDE_DIR}/ground_physics.hpp
    ${PROJECT_INCLUDE_DIR}/physics_constants.hpp
 )
 
@@ -92,6 +95,7 @@ set(TEST_SOURCES
     ${PROJECT_TEST_DIR}/test_roll_phase.cpp
     ${PROJECT_TEST_DIR}/test_flight_simulator.cpp
     ${PROJECT_TEST_DIR}/test_terrain_interface.cpp
+    ${PROJECT_TEST_DIR}/test_ground_physics.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
 )
