@@ -7,6 +7,37 @@
  * allowing different terrain implementations (flat, heightmap, procedural, etc.)
  * to be used interchangeably in the flight simulation.
  *
+ * Example usage:
+ * @code
+ * // Define a custom terrain implementation
+ * class MyTerrain : public TerrainInterface {
+ * public:
+ *     MyTerrain(const GroundSurface& surface) : surface_(surface) {}
+ *
+ *     float getHeight(float x, float y) const override {
+ *         // Return terrain height at position (x, y) in feet
+ *         return computeHeightFromHeightmap(x, y);
+ *     }
+ *
+ *     Vector3D getNormal(float x, float y) const override {
+ *         // Return unit normal vector perpendicular to surface at (x, y)
+ *         return computeNormalFromGradient(x, y);
+ *     }
+ *
+ *     const GroundSurface& getSurfaceProperties(float x, float y) const override {
+ *         // Return surface properties (friction, restitution, etc.) at (x, y)
+ *         return surface_;
+ *     }
+ *
+ * private:
+ *     GroundSurface surface_;
+ * };
+ *
+ * // Use custom terrain in flight simulation
+ * auto terrain = std::make_shared<MyTerrain>(groundSurface);
+ * FlightSimulator sim(physicsVars, ball, atmos, groundSurface, terrain);
+ * @endcode
+ *
  * @copyright Copyright (c) 2024, Gabriel DiFiore
  */
 

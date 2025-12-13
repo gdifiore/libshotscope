@@ -48,6 +48,8 @@ namespace GroundPhysics
         // Apply friction to tangent component
         // Friction reduces tangent velocity based on surface properties
         float frictionFactor = 1.0F - surface.frictionStatic * (1.0F - surface.firmness);
+        // Clamp to [0, 1] to prevent non-physical behavior with extreme parameters
+        frictionFactor = std::max(0.0F, std::min(1.0F, frictionFactor));
         Vector3D velocityTangentAfter = {
             velocityTangent[0] * frictionFactor,
             velocityTangent[1] * frictionFactor,
@@ -81,10 +83,12 @@ namespace GroundPhysics
         // Get horizontal velocity magnitude
         float vHorizontal = std::sqrt(velocity[0] * velocity[0] + velocity[1] * velocity[1]);
 
-        // Avoid division by zero
+        // Zero or near-zero velocity: no rolling acceleration applied
+        // This is physically correct as friction direction is undefined when stationary
+        // and gravity component along slope is balanced by static friction at rest
         if (vHorizontal < physics_constants::MIN_VELOCITY_THRESHOLD)
         {
-            return acceleration;
+            return acceleration;  // {0.0F, 0.0F, 0.0F}
         }
 
         // Calculate slope angle from normal

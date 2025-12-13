@@ -2,6 +2,7 @@
 
 #include <libshotscope.hpp>
 #include <terrain_interface.hpp>
+#include <physics_constants.hpp>
 
 #include <cmath>
 
@@ -13,7 +14,7 @@ public:
         : surface(surface)
     {
         // Calculate slope in Y direction (downrange)
-        float angleRad = slopeAngleDegrees * 3.14159F / 180.0F;
+        float angleRad = slopeAngleDegrees * physics_constants::DEG_TO_RAD;
         slopeRise = std::tan(angleRad);
 
         // Normal vector for a slope descending in +Y direction
