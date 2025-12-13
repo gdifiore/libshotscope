@@ -16,6 +16,13 @@ namespace math_utils
     auto convertMetersToFeet(float meters) -> float;
 
     auto getDistanceInYards(Vector3D position) -> float;
+
+    // Vector math operations
+    auto dot(const Vector3D& a, const Vector3D& b) -> float;
+    auto cross(const Vector3D& a, const Vector3D& b) -> Vector3D;
+    auto magnitude(const Vector3D& v) -> float;
+    auto normalize(const Vector3D& v) -> Vector3D;
+    auto project(const Vector3D& v, const Vector3D& onto) -> Vector3D;
 }
 
 #endif // MATH_UTILS_HPP
