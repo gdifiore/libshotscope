@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <stdexcept>
 
 // ============================================================================
 // AerialPhase Implementation
@@ -27,6 +28,11 @@ AerialPhase::AerialPhase(
 	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain)
 {
+	if (!terrain)
+	{
+		throw std::invalid_argument("Terrain interface must not be null");
+	}
+
 	// Initialize calculated variables
 	v = 0.0F;
 	vMph = 0.0F;
@@ -93,6 +99,8 @@ void AerialPhase::calculateStep(BallState &state, float dt)
 	state.currentTime += dt;
 
 	// Update spin with exponential decay
+	// Exponential model is appropriate for aerodynamic damping, where
+	// the torque opposing spin is proportional to the spin rate itself
 	calculateTau();
 	state.spinRate = state.spinRate * exp(-dt / tau);
 
@@ -273,6 +281,10 @@ BouncePhase::BouncePhase(
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain),
 	  aerialPhase(physicsVars, ball, atmos, terrain)
 {
+	if (!terrain)
+	{
+		throw std::invalid_argument("Terrain interface must not be null");
+	}
 }
 
 void BouncePhase::calculateStep(BallState &state, float dt)
@@ -338,6 +350,10 @@ RollPhase::RollPhase(
 	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain)
 {
+	if (!terrain)
+	{
+		throw std::invalid_argument("Terrain interface must not be null");
+	}
 }
 
 void RollPhase::calculateStep(BallState &state, float dt)
@@ -360,11 +376,15 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	state.velocity[2] += state.acceleration[2] * dt;
 
 	// Prevent velocity from reversing direction (clamp to zero instead)
-	if (oldVelX * state.velocity[0] < 0.0F)
+	// Only prevent reversal if we had meaningful initial velocity
+	// If velocity was near zero, allow direction change (e.g., ball starting to roll downhill)
+	constexpr float MIN_VEL_FOR_REVERSAL_CHECK = 0.01F;  // 0.01 ft/s threshold
+
+	if (std::abs(oldVelX) > MIN_VEL_FOR_REVERSAL_CHECK && oldVelX * state.velocity[0] < 0.0F)
 	{
 		state.velocity[0] = 0.0F;
 	}
-	if (oldVelY * state.velocity[1] < 0.0F)
+	if (std::abs(oldVelY) > MIN_VEL_FOR_REVERSAL_CHECK && oldVelY * state.velocity[1] < 0.0F)
 	{
 		state.velocity[1] = 0.0F;
 	}
@@ -379,6 +399,10 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	state.velocity[2] = 0.0F;
 
 	// Apply spin decay during rolling (handles both backspin and topspin)
+	// Linear model is appropriate for rolling friction, where the ground
+	// applies an approximately constant torque opposing the spin
+	// Note: This differs from aerial phase which uses exponential decay
+	// due to the different physics of aerodynamic vs. contact friction
 	float spinDecay = physics_constants::ROLL_SPIN_DECAY_RATE * dt;
 	if (std::abs(state.spinRate) > spinDecay)
 	{

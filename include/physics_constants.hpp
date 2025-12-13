@@ -275,6 +275,10 @@ namespace physics_constants
     /// Ball is considered "on ground" when within this distance
     constexpr float GROUND_CONTACT_THRESHOLD = 0.1F;
 
+    /// Normal vector unit length tolerance for validation
+    /// Surface normals must be unit vectors within this tolerance
+    constexpr float NORMAL_VECTOR_TOLERANCE = 0.01F;
+
     /// Stopping velocity threshold for roll phase (ft/s)
     /// Below this, ball is considered stopped and simulation completes
     constexpr float STOPPING_VELOCITY = 0.1F;

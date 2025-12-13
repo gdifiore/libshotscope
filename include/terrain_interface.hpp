@@ -36,6 +36,10 @@
  * // Use custom terrain in flight simulation
  * auto terrain = std::make_shared<MyTerrain>(groundSurface);
  * FlightSimulator sim(physicsVars, ball, atmos, groundSurface, terrain);
+ *
+ * // Note: When a custom terrain is provided, the groundSurface parameter
+ * // serves as a fallback for backward compatibility. The flight simulator
+ * // will query terrain properties from the TerrainInterface implementation.
  * @endcode
  *
  * @copyright Copyright (c) 2024, Gabriel DiFiore
@@ -72,8 +76,11 @@ public:
     /**
      * Gets the surface normal vector at the given horizontal position.
      *
-     * The normal vector points upward from the surface and has unit length.
-     * For flat terrain, this is always (0, 0, 1).
+     * The normal vector points upward from the surface (away from solid terrain,
+     * into the air) and has unit length. It is perpendicular to the tangent plane
+     * of the surface at the given position. For a horizontal flat surface, this is
+     * always (0, 0, 1). For sloped surfaces, the normal tilts accordingly while
+     * maintaining unit length.
      *
      * @param x The x-coordinate (lateral position in feet).
      * @param y The y-coordinate (forward position in feet).

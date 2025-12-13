@@ -302,3 +302,64 @@ TEST_F(RollPhaseTest, SpinDecaysToZeroFromNegative)
 		EXPECT_LT(state.spinRate, 0.0F);
 	}
 }
+
+TEST_F(RollPhaseTest, BallCanStartRollingFromNearZeroVelocityOnSlope)
+{
+	// Create sloped terrain (10 degree downslope)
+	ground.frictionDynamic = 0.15F;
+
+	// Create a simple sloped terrain for testing
+	class TestSlopedTerrain : public TerrainInterface
+	{
+	private:
+		GroundSurface surface_;
+		Vector3D normal_;
+	public:
+		TestSlopedTerrain(const GroundSurface& surface) : surface_(surface)
+		{
+			float angle = 10.0F * physics_constants::DEG_TO_RAD;
+			normal_ = {0.0F, std::sin(angle), std::cos(angle)};
+		}
+
+		float getHeight(float x, float y) const override {
+			(void)x; (void)y;
+			return 0.0F;
+		}
+
+		Vector3D getNormal(float x, float y) const override {
+			(void)x; (void)y;
+			return normal_;
+		}
+
+		const GroundSurface& getSurfaceProperties(float x, float y) const override {
+			(void)x; (void)y;
+			return surface_;
+		}
+	};
+
+	auto slopedTerrain = std::make_shared<TestSlopedTerrain>(ground);
+
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, slopedTerrain);
+
+	// Ball starting with very small velocity (just above MIN_VELOCITY_THRESHOLD)
+	// This tests that the velocity reversal fix allows the ball to accelerate
+	// from near-zero velocity without getting stuck
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {0.0F, 0.02F, 0.0F};  // Small velocity above MIN_VELOCITY_THRESHOLD
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.currentTime = 0.0F;
+
+	float initialVelocity = state.velocity[1];
+
+	// Roll for several steps
+	for (int i = 0; i < 20; ++i)
+	{
+		roll.calculateStep(state, 0.01F);
+	}
+
+	// Ball should accelerate downslope (gravity > friction on 10° slope)
+	// Without the fix, the ball could get stuck at zero if velocity reversed
+	EXPECT_GT(state.velocity[1], initialVelocity);
+}
