@@ -91,6 +91,7 @@ set(TEST_SOURCES
     ${PROJECT_TEST_DIR}/test_bounce_phase.cpp
     ${PROJECT_TEST_DIR}/test_roll_phase.cpp
     ${PROJECT_TEST_DIR}/test_flight_simulator.cpp
+    ${PROJECT_TEST_DIR}/test_terrain_interface.cpp
     ${PROJECT_SRC_DIR}/GolfBallPhysicsVariables.cpp
     ${PROJECT_SRC_DIR}/math_utils.cpp
 )
