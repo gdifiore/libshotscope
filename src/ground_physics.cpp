@@ -9,6 +9,7 @@
 #include "ground_physics.hpp"
 #include "physics_constants.hpp"
 
+#include <cassert>
 #include <cmath>
 
 namespace GroundPhysics
@@ -20,6 +21,12 @@ namespace GroundPhysics
         const GroundSurface& surface)
     {
         BounceResult result;
+
+#ifndef NDEBUG
+        // Validate that surface normal is unit length
+        float normalMag = math_utils::magnitude(surfaceNormal);
+        assert(std::abs(normalMag - 1.0F) < 0.01F && "Surface normal must be unit length");
+#endif
 
         // Decompose velocity into normal and tangent components
         // v_normal = (v · n) * n
@@ -77,6 +84,12 @@ namespace GroundPhysics
     {
         // Suppress unused parameter warning (may be used in future enhancements)
         (void)spinRate;
+
+#ifndef NDEBUG
+        // Validate that surface normal is unit length
+        float normalMag = math_utils::magnitude(surfaceNormal);
+        assert(std::abs(normalMag - 1.0F) < 0.01F && "Surface normal must be unit length");
+#endif
 
         Vector3D acceleration = {0.0F, 0.0F, 0.0F};
 
@@ -144,6 +157,12 @@ namespace GroundPhysics
         const Vector3D& surfaceNormal,
         float heightAboveGround)
     {
+#ifndef NDEBUG
+        // Validate that surface normal is unit length
+        float normalMag = math_utils::magnitude(surfaceNormal);
+        assert(std::abs(normalMag - 1.0F) < 0.01F && "Surface normal must be unit length");
+#endif
+
         // Check if ball is close to the ground
         if (heightAboveGround > physics_constants::GROUND_CONTACT_THRESHOLD)
         {

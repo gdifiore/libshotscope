@@ -378,11 +378,12 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	state.position[2] = terrainHeight;
 	state.velocity[2] = 0.0F;
 
-	// Apply spin decay during rolling
+	// Apply spin decay during rolling (handles both backspin and topspin)
 	float spinDecay = physics_constants::ROLL_SPIN_DECAY_RATE * dt;
-	if (state.spinRate > spinDecay)
+	if (std::abs(state.spinRate) > spinDecay)
 	{
-		state.spinRate -= spinDecay;
+		// Decay toward zero, preserving spin direction
+		state.spinRate -= std::copysign(spinDecay, state.spinRate);
 	}
 	else
 	{

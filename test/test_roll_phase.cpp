@@ -247,3 +247,58 @@ TEST_F(RollPhaseTest, EventuallyStops)
 	EXPECT_TRUE(stopped);
 	EXPECT_LT(state.currentTime, 100.0F); // Should stop in reasonable time
 }
+
+TEST_F(RollPhaseTest, HandlesNegativeSpinRate)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
+
+	// Ball rolling with backspin (negative spin rate)
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {10.0F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.spinRate = -500.0F;  // Backspin
+	state.currentTime = 0.0F;
+
+	// Roll for several steps
+	for (int i = 0; i < 10; ++i)
+	{
+		roll.calculateStep(state, 0.01F);
+	}
+
+	// Spin should decay toward zero but remain negative
+	EXPECT_LT(state.spinRate, 0.0F);  // Still backspin
+	EXPECT_GT(state.spinRate, -500.0F);  // But reduced in magnitude
+}
+
+TEST_F(RollPhaseTest, SpinDecaysToZeroFromNegative)
+{
+	GolfBallPhysicsVariables physicsVars(ball, atmos);
+	RollPhase roll(physicsVars, ball, atmos, terrain);
+
+	// Ball rolling slowly with small backspin
+	BallState state;
+	state.position = {0.0F, 0.0F, 0.0F};
+	state.velocity = {5.0F, 0.0F, 0.0F};
+	state.acceleration = {0.0F, 0.0F, 0.0F};
+	state.spinRate = -5.0F;  // Small backspin
+	state.currentTime = 0.0F;
+
+	float initialSpinMag = std::abs(state.spinRate);
+
+	// Roll for several steps
+	for (int i = 0; i < 100; ++i)
+	{
+		roll.calculateStep(state, 0.01F);
+	}
+
+	// Spin magnitude should have decreased
+	EXPECT_LT(std::abs(state.spinRate), initialSpinMag);
+
+	// If spin hasn't reached zero yet, it should still be negative (backspin)
+	if (state.spinRate != 0.0F)
+	{
+		EXPECT_LT(state.spinRate, 0.0F);
+	}
+}

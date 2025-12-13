@@ -38,7 +38,7 @@ TEST(GroundPhysicsTest, BounceOn45DegreeSlope)
     Vector3D velocity{0.0F, 0.0F, -10.0F};
 
     // 45-degree slope (normal pointing up and to the side)
-    float angle = 45.0F * 3.14159F / 180.0F;
+    float angle = 45.0F * physics_constants::DEG_TO_RAD;
     Vector3D normal{0.0F, std::sin(angle), std::cos(angle)};
 
     GroundSurface surface;
@@ -108,7 +108,7 @@ TEST(GroundPhysicsTest, RollDownhillAccelerates)
     Vector3D velocity{0.0F, 1.0F, 0.0F};  // Moving slowly forward
 
     // 30-degree downhill slope
-    float angle = 30.0F * 3.14159F / 180.0F;
+    float angle = 30.0F * physics_constants::DEG_TO_RAD;
     Vector3D normal{0.0F, std::sin(angle), std::cos(angle)};
 
     GroundSurface surface;
@@ -127,7 +127,7 @@ TEST(GroundPhysicsTest, RollUphillDecelerates)
     Vector3D velocity{0.0F, 5.0F, 0.0F};  // Moving forward (uphill)
 
     // 20-degree uphill slope (normal tilted backward)
-    float angle = 20.0F * 3.14159F / 180.0F;
+    float angle = 20.0F * physics_constants::DEG_TO_RAD;
     Vector3D normal{0.0F, -std::sin(angle), std::cos(angle)};
 
     GroundSurface surface;
@@ -197,7 +197,7 @@ TEST(GroundPhysicsTest, BounceWorksWithUnitNormal)
     Vector3D velocity{0.0F, 0.0F, -10.0F};
 
     // Create a normalized 30-degree slope normal
-    float angle = 30.0F * 3.14159F / 180.0F;
+    float angle = 30.0F * physics_constants::DEG_TO_RAD;
     Vector3D normal{0.0F, std::sin(angle), std::cos(angle)};
 
     // Verify it's unit length
@@ -240,4 +240,89 @@ TEST(GroundPhysicsTest, HighFrictionReducesTangentialVelocity)
     float originalTangentialSpeed = std::sqrt(10.0F * 10.0F + 10.0F * 10.0F);
 
     EXPECT_LT(tangentialSpeed, originalTangentialSpeed * 0.8F);
+}
+
+// Test bounce on very steep slope (80 degrees)
+TEST(GroundPhysicsTest, BounceOnSteepSlope)
+{
+    // Ball falling down and slightly backward onto steep slope
+    Vector3D velocity{0.0F, -2.0F, -10.0F};
+
+    // 80-degree slope (very steep, near vertical)
+    float angle = 80.0F * physics_constants::DEG_TO_RAD;
+    Vector3D normal{0.0F, std::sin(angle), std::cos(angle)};
+
+    // Verify normal is unit length
+    float normalMag = math_utils::magnitude(normal);
+    EXPECT_NEAR(normalMag, 1.0F, 0.001F);
+
+    // Verify ball is moving toward surface (v · n < 0)
+    float vDotNBefore = math_utils::dot(velocity, normal);
+    EXPECT_LT(vDotNBefore, 0.0F);
+
+    GroundSurface surface;
+    surface.restitution = 0.5F;
+    surface.frictionStatic = 0.3F;
+    surface.firmness = 0.8F;
+    surface.spinRetention = 0.5F;
+
+    auto result = GroundPhysics::calculateBounce(velocity, normal, 0.0F, surface);
+
+    // Verify velocity is reflected away from surface after bounce
+    float vDotNAfter = math_utils::dot(result.newVelocity, normal);
+    EXPECT_GT(vDotNAfter, 0.0F);  // Should be moving away from surface
+
+    // Result should be valid (non-zero)
+    float resultMag = math_utils::magnitude(result.newVelocity);
+    EXPECT_GT(resultMag, 0.0F);
+}
+
+// Test bounce on vertical wall (90 degrees)
+TEST(GroundPhysicsTest, BounceOnVerticalWall)
+{
+    Vector3D velocity{5.0F, 0.0F, -5.0F};
+
+    // 90-degree wall (vertical surface, normal points horizontally)
+    Vector3D normal{1.0F, 0.0F, 0.0F};
+
+    GroundSurface surface;
+    surface.restitution = 0.6F;
+    surface.frictionStatic = 0.4F;
+    surface.firmness = 0.5F;  // Medium firmness allows friction
+    surface.spinRetention = 0.5F;
+
+    auto result = GroundPhysics::calculateBounce(velocity, normal, 0.0F, surface);
+
+    // Horizontal component should reverse (with COR applied)
+    EXPECT_LT(result.newVelocity[0], 0.0F);  // Should bounce back
+    EXPECT_NEAR(result.newVelocity[0], -velocity[0] * surface.restitution, 0.5F);
+
+    // Vertical component should be reduced by friction but not reversed
+    // frictionFactor = 1.0 - 0.4 * (1.0 - 0.5) = 0.8
+    EXPECT_LT(result.newVelocity[2], 0.0F);  // Still falling
+    EXPECT_GT(result.newVelocity[2], velocity[2]);  // But slower (friction)
+    EXPECT_NEAR(result.newVelocity[2], velocity[2] * 0.8F, 0.5F);
+}
+
+// Test roll acceleration on steep slope
+TEST(GroundPhysicsTest, RollOnSteepSlopeAcceleratesSignificantly)
+{
+    Vector3D velocity{0.0F, 2.0F, 0.0F};
+
+    // 60-degree slope (steep)
+    float angle = 60.0F * physics_constants::DEG_TO_RAD;
+    Vector3D normal{0.0F, std::sin(angle), std::cos(angle)};
+
+    GroundSurface surface;
+    surface.frictionDynamic = 0.2F;
+    surface.firmness = 0.8F;
+
+    auto acceleration = GroundPhysics::calculateRollAcceleration(velocity, normal, 0.0F, surface);
+
+    // On steep slope, gravity component should cause significant acceleration
+    float accelMag = math_utils::magnitude(acceleration);
+    EXPECT_GT(accelMag, 5.0F);  // Should be significant on 60-degree slope
+
+    // Acceleration should be primarily in +Y direction (downslope)
+    EXPECT_GT(acceleration[1], 0.0F);
 }
