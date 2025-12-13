@@ -6,7 +6,7 @@
  * This file defines the different flight phases for golf ball simulation:
  * AerialPhase, BouncePhase, and RollPhase.
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #include "FlightPhase.hpp"
@@ -110,17 +110,19 @@ void AerialPhase::calculateStep(BallState &state, float dt)
 bool AerialPhase::isPhaseComplete(const BallState &state) const
 {
 	// Aerial phase is complete when ball reaches ground level
-	return state.position[2] < ground.height;
+	// Use small epsilon for robust float comparison
+	const float GROUND_CONTACT_EPSILON = 0.01F;
+	return state.position[2] < (ground.height - GROUND_CONTACT_EPSILON);
 }
 
 void AerialPhase::calculatePosition(BallState &state, float dt)
 {
 	state.position[0] = state.position[0] + state.velocity[0] * dt +
-		physics_constants::HALF * state.acceleration[0] * dt * dt;
+						physics_constants::HALF * state.acceleration[0] * dt * dt;
 	state.position[1] = state.position[1] + state.velocity[1] * dt +
-		physics_constants::HALF * state.acceleration[1] * dt * dt;
+						physics_constants::HALF * state.acceleration[1] * dt * dt;
 	state.position[2] = state.position[2] + state.velocity[2] * dt +
-		physics_constants::HALF * state.acceleration[2] * dt * dt;
+						physics_constants::HALF * state.acceleration[2] * dt * dt;
 }
 
 void AerialPhase::calculateV(BallState &state, float dt)
@@ -174,7 +176,7 @@ void AerialPhase::calculateRw(BallState &state)
 void AerialPhase::calculateRe_x_e5()
 {
 	Re_x_e5 = (vwMph / physics_constants::RE_VELOCITY_DIVISOR) *
-		physicsVars.getRe100() * physics_constants::RE_SCALE_FACTOR;
+			  physicsVars.getRe100() * physics_constants::RE_SCALE_FACTOR;
 }
 
 float AerialPhase::determineCoefficientOfDrag()
@@ -187,7 +189,7 @@ float AerialPhase::determineCoefficientOfDrag()
 	{
 		return physics_constants::CD_LOW -
 			   (physics_constants::CD_LOW - physics_constants::CD_HIGH) *
-			   (Re_x_e5 - physics_constants::RE_THRESHOLD_LOW) / physics_constants::RE_THRESHOLD_LOW +
+				   (Re_x_e5 - physics_constants::RE_THRESHOLD_LOW) / physics_constants::RE_THRESHOLD_LOW +
 			   physics_constants::CD_SPIN * spinFactor;
 	}
 	else
@@ -258,7 +260,12 @@ void AerialPhase::calculateAccel(BallState &state)
 	state.acceleration[0] = accelerationDrag3D[0] + accelerationMagnitude3D[0];
 	state.acceleration[1] = accelerationDrag3D[1] + accelerationMagnitude3D[1];
 	state.acceleration[2] = accelerationDrag3D[2] + accelerationMagnitude3D[2] -
-		physics_constants::GRAVITY_FT_PER_S2;
+							physics_constants::GRAVITY_FT_PER_S2;
+}
+
+void AerialPhase::updateGround(const GroundSurface &newGround)
+{
+	ground = newGround;
 }
 
 // ============================================================================
@@ -283,7 +290,7 @@ void BouncePhase::calculateStep(BallState &state, float dt)
 
 		// Apply friction to horizontal velocity components
 		float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
-		                         state.velocity[1] * state.velocity[1]);
+								 state.velocity[1] * state.velocity[1]);
 
 		if (vHorizontal > physics_constants::MIN_HORIZONTAL_VELOCITY)
 		{
@@ -322,12 +329,19 @@ bool BouncePhase::isPhaseComplete(const BallState &state) const
 {
 	// Transition to roll only when ball is on ground with low vertical velocity
 	if (state.position[2] <= ground.height + physics_constants::GROUND_CONTACT_THRESHOLD &&
-	    std::abs(state.velocity[2]) < physics_constants::MIN_BOUNCE_VELOCITY)
+		std::abs(state.velocity[2]) < physics_constants::MIN_BOUNCE_VELOCITY)
 	{
 		return true;
 	}
 
 	return false;
+}
+
+void BouncePhase::updateGround(const GroundSurface &newGround)
+{
+	ground = newGround;
+	// Also update the embedded aerial phase
+	aerialPhase.updateGround(newGround);
 }
 
 // ============================================================================
@@ -345,7 +359,7 @@ void RollPhase::calculateStep(BallState &state, float dt)
 {
 	// Calculate horizontal velocity magnitude
 	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
-	                         state.velocity[1] * state.velocity[1]);
+							 state.velocity[1] * state.velocity[1]);
 
 	if (vHorizontal > physics_constants::MIN_HORIZONTAL_VELOCITY)
 	{
@@ -400,6 +414,11 @@ bool RollPhase::isPhaseComplete(const BallState &state) const
 {
 	// Roll is complete when ball velocity drops below stopping threshold
 	float vHorizontal = sqrt(state.velocity[0] * state.velocity[0] +
-	                         state.velocity[1] * state.velocity[1]);
+							 state.velocity[1] * state.velocity[1]);
 	return vHorizontal < physics_constants::STOPPING_VELOCITY;
+}
+
+void RollPhase::updateGround(const GroundSurface &newGround)
+{
+	ground = newGround;
 }

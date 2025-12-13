@@ -49,14 +49,20 @@ class AerialPhase : public FlightPhase
 {
 public:
 	AerialPhase(GolfBallPhysicsVariables &physicsVars,
-	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos,
-	            const GroundSurface &ground);
+				const struct golfBall &ball,
+				const struct atmosphericData &atmos,
+				const GroundSurface &ground);
 
 	void initialize(BallState &state);
 	void calculateStep(BallState &state, float dt) override;
 	void calculateAccelerations(BallState &state);
 	bool isPhaseComplete(const BallState &state) const override;
+
+	/**
+	 * @brief Updates the ground surface for this phase.
+	 * @param newGround The new ground surface properties
+	 */
+	void updateGround(const GroundSurface &newGround);
 
 	// Getters for physics variables (needed for testing)
 	[[nodiscard]] auto getV() const -> float { return v; }
@@ -120,12 +126,18 @@ class BouncePhase : public FlightPhase
 {
 public:
 	BouncePhase(GolfBallPhysicsVariables &physicsVars,
-	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos,
-	            const GroundSurface &ground);
+				const struct golfBall &ball,
+				const struct atmosphericData &atmos,
+				const GroundSurface &ground);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
+
+	/**
+	 * @brief Updates the ground surface for this phase.
+	 * @param newGround The new ground surface properties
+	 */
+	void updateGround(const GroundSurface &newGround);
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
@@ -146,12 +158,18 @@ class RollPhase : public FlightPhase
 {
 public:
 	RollPhase(GolfBallPhysicsVariables &physicsVars,
-	          const struct golfBall &ball,
-	          const struct atmosphericData &atmos,
-	          const GroundSurface &ground);
+			  const struct golfBall &ball,
+			  const struct atmosphericData &atmos,
+			  const GroundSurface &ground);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
+
+	/**
+	 * @brief Updates the ground surface for this phase.
+	 * @param newGround The new ground surface properties
+	 */
+	void updateGround(const GroundSurface &newGround);
 
 private:
 	GolfBallPhysicsVariables &physicsVars;

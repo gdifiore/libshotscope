@@ -23,11 +23,33 @@ Field definitions are documented in `include/golf_ball.hpp` and `include/atmosph
 
 ### 2. Ground Surface Properties
 
+#### Single Ground Surface (Simple)
+
 ```c++
 GroundSurface ground; // Uses default fairway properties
 ```
 
 The `GroundSurface` struct defines physical surface characteristics that affect bounce and roll behavior. Default values represent typical fairway conditions. See `include/ground_surface.hpp` for available parameters including restitution coefficient, friction coefficients, firmness, and spin retention.
+
+#### Dynamic Ground Surfaces (Advanced)
+
+For simulations requiring different ground types throughout the trajectory (e.g., fairway → rough → green), implement the `GroundProvider` interface:
+
+```c++
+class MyGroundProvider : public GroundProvider {
+public:
+    GroundSurface getGroundAt(float x, float y) const override {
+        // Return different surfaces based on position
+        // x = lateral position (feet)
+        // y = downrange position (feet)
+    }
+};
+
+MyGroundProvider provider;
+FlightSimulator sim(physVars, ball, atmos, provider);
+```
+
+See [Ground Providers Guide](ground_providers.md) for details.
 
 ### 3. Physics Variables
 
@@ -146,3 +168,24 @@ The simulator automatically manages three flight phases:
 3. **Roll**: Ball rolling along the ground until coming to rest
 
 Phase transitions occur automatically based on physical conditions. The current phase can be queried using `sim.getCurrentPhaseName()`.
+
+## Advanced Features
+
+### Dynamic Ground Surfaces
+
+When using a `GroundProvider` instead of a single `GroundSurface`, the simulator automatically queries ground properties at the ball's current position during phase transitions. This enables realistic modeling of:
+
+- Golf holes with fairways, roughs, and greens
+- Elevated surfaces (e.g., raised greens)
+- Varying terrain firmness and friction
+- Bunkers and other hazards
+
+Ground is queried before each bounce and periodically during rolling (every 0.1s), so the ball automatically picks up surface changes as it moves. See the [Ground Providers Guide](ground_providers.md) for details.
+
+### Example Programs
+
+The `examples/` directory contains complete working implementations:
+
+- **calculate_ball_landing.cpp**: Compute final landing position only
+- **calculate_ball_trajectory.cpp**: Collect full trajectory for visualization
+- **multi_ground_simulation.cpp**: Demonstrate dynamic ground types (fairway/rough/green)
