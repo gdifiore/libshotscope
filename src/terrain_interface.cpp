@@ -1,0 +1,37 @@
+/**
+ * @file terrain_interface.cpp
+ * @author Gabriel DiFiore
+ * @brief Implementation of terrain interface adapters.
+ *
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
+ */
+
+#include "terrain_interface.hpp"
+#include "GroundProvider.hpp"
+
+TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
+	: provider_(provider), cachedSurface_{}
+{
+}
+
+float TerrainProviderAdapter::getHeight(float x, float y) const
+{
+	// GroundProvider assumes flat terrain, so query the ground height from provider
+	cachedSurface_ = provider_->getGroundAt(x, y);
+	return cachedSurface_.height;
+}
+
+Vector3D TerrainProviderAdapter::getNormal(float x, float y) const
+{
+	(void)x;
+	(void)y;
+	// GroundProvider assumes flat terrain, so normal is always vertical
+	return {0.0F, 0.0F, 1.0F};
+}
+
+const GroundSurface& TerrainProviderAdapter::getSurfaceProperties(float x, float y) const
+{
+	// Query provider for ground properties at this position
+	cachedSurface_ = provider_->getGroundAt(x, y);
+	return cachedSurface_;
+}

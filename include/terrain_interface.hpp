@@ -164,4 +164,33 @@ private:
     GroundSurface surface;
 };
 
+// Forward declaration for GroundProvider
+class GroundProvider;
+
+/**
+ * Adapter that wraps a GroundProvider to work as a TerrainInterface.
+ *
+ * This adapter allows the GroundProvider system (position-dependent ground properties)
+ * to work with the TerrainInterface system. It assumes flat terrain with varying
+ * surface properties based on position.
+ */
+class TerrainProviderAdapter : public TerrainInterface
+{
+public:
+	/**
+	 * Constructs an adapter from a GroundProvider.
+	 *
+	 * @param provider The ground provider to wrap (must outlive this adapter)
+	 */
+	explicit TerrainProviderAdapter(const GroundProvider* provider);
+
+	[[nodiscard]] auto getHeight(float x, float y) const -> float override;
+	[[nodiscard]] auto getNormal(float x, float y) const -> Vector3D override;
+	[[nodiscard]] auto getSurfaceProperties(float x, float y) const -> const GroundSurface& override;
+
+private:
+	const GroundProvider* provider_;
+	mutable GroundSurface cachedSurface_;  // Mutable for caching in const method
+};
+
 #endif // TERRAIN_INTERFACE_HPP

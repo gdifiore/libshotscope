@@ -11,7 +11,7 @@
  * The GolfBallPhysicsVariables class takes a golf ball object and atmospheric data as input,
  * and provides methods to calculate all the required variables.
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #include "GolfBallPhysicsVariables.hpp"
@@ -62,7 +62,7 @@ void GolfBallPhysicsVariables::calculateAllVariables()
 void GolfBallPhysicsVariables::calculateRhoMetric()
 {
     rhoMetric = physics_constants::STD_AIR_DENSITY_KG_PER_M3 * ((physics_constants::KELVIN_OFFSET / (math_utils::convertCelsiusToKelvin(tempC)) *
-                           ((barometricPressure * std::exp(-physics_constants::BETA_PRESSURE_DECAY * elevationM) - physics_constants::WATER_VAPOR_COEFF * atmos.relHumidity * (SVP / 100.0)) / physics_constants::STD_PRESSURE_MMHG)));
+                                                                 ((barometricPressure * std::exp(-physics_constants::BETA_PRESSURE_DECAY * elevationM) - physics_constants::WATER_VAPOR_COEFF * atmos.relHumidity * (SVP / 100.0)) / physics_constants::STD_PRESSURE_MMHG)));
 }
 
 void GolfBallPhysicsVariables::calculateRhoImperial()
@@ -73,7 +73,7 @@ void GolfBallPhysicsVariables::calculateRhoImperial()
 void GolfBallPhysicsVariables::calculateC0()
 {
     c0 = physics_constants::DRAG_FORCE_CONST * rhoImperial * (physics_constants::REF_BALL_MASS_OZ / physics_constants::STD_BALL_MASS_OZ) *
-         std::pow(physics_constants::STD_BALL_CIRCUMFERENCE_IN  / physics_constants::REF_BALL_CIRC_IN, 2);
+         std::pow(physics_constants::STD_BALL_CIRCUMFERENCE_IN / physics_constants::REF_BALL_CIRC_IN, 2);
 }
 
 void GolfBallPhysicsVariables::calculateV0()

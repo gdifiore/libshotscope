@@ -4,6 +4,7 @@
 #include "FlightSimulator.hpp"
 #include "FlightPhase.hpp"
 #include "GolfBallPhysicsVariables.hpp"
+#include "GroundProvider.hpp"
 #include "BallState.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"

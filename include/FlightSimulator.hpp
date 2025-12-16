@@ -4,6 +4,7 @@
 #include "BallState.hpp"
 #include "FlightPhase.hpp"
 #include "GolfBallPhysicsVariables.hpp"
+#include "GroundProvider.hpp"
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
@@ -35,6 +36,9 @@ public:
 	/**
 	 * @brief Constructs a flight simulator with the given parameters.
 	 *
+	 * This constructor uses a uniform ground surface (same properties everywhere).
+	 * For backward compatibility with existing code.
+	 *
 	 * @param physicsVars Physics variables calculator
 	 * @param ball Golf ball parameters
 	 * @param atmos Atmospheric conditions
@@ -46,6 +50,22 @@ public:
 	                const struct atmosphericData &atmos,
 	                const GroundSurface &ground,
 	                std::shared_ptr<TerrainInterface> terrain = nullptr);
+
+	/**
+	 * @brief Constructs a flight simulator with a custom ground provider.
+	 *
+	 * This constructor allows for dynamic ground type changes during the trajectory.
+	 * The ground provider is wrapped in a TerrainInterface adapter for compatibility.
+	 *
+	 * @param physicsVars Physics variables calculator
+	 * @param ball Golf ball parameters
+	 * @param atmos Atmospheric conditions
+	 * @param groundProvider Ground provider for position-dependent ground properties
+	 */
+	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
+	                const struct golfBall &ball,
+	                const struct atmosphericData &atmos,
+	                const GroundProvider &groundProvider);
 
 	/**
 	 * @brief Initializes the simulation with the given initial state.
@@ -99,15 +119,19 @@ private:
 	 */
 	enum class Phase
 	{
-		Aerial,   // Ball in flight
-		Bounce,   // Ball bouncing on ground
-		Roll,     // Ball rolling on ground
-		Complete  // Simulation finished
+		Aerial,	 // Ball in flight
+		Bounce,	 // Ball bouncing on ground
+		Roll,	 // Ball rolling on ground
+		Complete // Simulation finished
 	};
 
 	Phase currentPhase;
 	BallState state;
 	bool initialized;
+
+	// Terrain storage (for GroundProvider adapter lifetime management)
+	// Must be declared before phases since phases depend on it
+	std::shared_ptr<TerrainInterface> terrainStorage_;
 
 	AerialPhase aerialPhase;
 	BouncePhase bouncePhase;
