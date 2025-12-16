@@ -21,11 +21,12 @@ TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
 
 void TerrainProviderAdapter::updateCache(float x, float y) const
 {
-	if (x != cachedX_ || y != cachedY_)
+	if (!cacheValid_ || x != cachedX_ || y != cachedY_)
 	{
 		cachedSurface_ = provider_->getGroundAt(x, y);
 		cachedX_ = x;
 		cachedY_ = y;
+		cacheValid_ = true;
 	}
 }
 
