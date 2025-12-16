@@ -71,6 +71,11 @@ public:
 			0.75F   // spinRetention: good spin retention
 		};
 	}
+
+	std::unique_ptr<GroundProvider> clone() const override
+	{
+		return std::make_unique<GolfHoleGroundProvider>(*this);
+	}
 };
 
 int main()

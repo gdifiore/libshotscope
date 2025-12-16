@@ -173,6 +173,8 @@ class GroundProvider;
  * This adapter allows the GroundProvider system (position-dependent ground properties)
  * to work with the TerrainInterface system. It assumes flat terrain with varying
  * surface properties based on position.
+ *
+ * The adapter owns a copy of the provider to ensure proper lifetime management.
  */
 class TerrainProviderAdapter : public TerrainInterface
 {
@@ -180,7 +182,11 @@ public:
 	/**
 	 * Constructs an adapter from a GroundProvider.
 	 *
-	 * @param provider The ground provider to wrap (must outlive this adapter)
+	 * Creates a copy of the provider to ensure it remains valid for the
+	 * lifetime of this adapter.
+	 *
+	 * @param provider The ground provider to wrap (will be cloned)
+	 * @throws std::invalid_argument if provider is null
 	 */
 	explicit TerrainProviderAdapter(const GroundProvider* provider);
 
@@ -189,7 +195,7 @@ public:
 	[[nodiscard]] auto getSurfaceProperties(float x, float y) const -> const GroundSurface& override;
 
 private:
-	const GroundProvider* provider_;
+	std::unique_ptr<GroundProvider> provider_;
 	mutable GroundSurface cachedSurface_;  // Mutable for caching in const method
 };
 

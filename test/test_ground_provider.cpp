@@ -52,6 +52,11 @@ public:
 			0.75F   // spinRetention
 		};
 	}
+
+	std::unique_ptr<GroundProvider> clone() const override
+	{
+		return std::make_unique<SimpleTestGroundProvider>(*this);
+	}
 };
 
 /**
@@ -82,6 +87,11 @@ public:
 		// Fairway
 		return GroundSurface{
 			0.0F, 0.4F, 0.5F, 0.2F, 0.8F, 0.75F};
+	}
+
+	std::unique_ptr<GroundProvider> clone() const override
+	{
+		return std::make_unique<LateralTestGroundProvider>(*this);
 	}
 };
 
@@ -403,6 +413,11 @@ TEST_F(GroundProviderTest, MultipleGroundTransitions)
 			{
 				return GroundSurface{2.0F, 0.3F, 0.4F, 0.15F, 0.9F, 0.8F}; // Zone 3 (elevated 2ft, lower friction)
 			}
+		}
+
+		std::unique_ptr<GroundProvider> clone() const override
+		{
+			return std::make_unique<MultiZoneProvider>(*this);
 		}
 	};
 

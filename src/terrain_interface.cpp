@@ -8,10 +8,15 @@
 
 #include "terrain_interface.hpp"
 #include "GroundProvider.hpp"
+#include <stdexcept>
 
 TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
-	: provider_(provider), cachedSurface_{}
+	: provider_(provider ? provider->clone() : nullptr), cachedSurface_{}
 {
+	if (!provider)
+	{
+		throw std::invalid_argument("GroundProvider pointer must not be null");
+	}
 }
 
 float TerrainProviderAdapter::getHeight(float x, float y) const
