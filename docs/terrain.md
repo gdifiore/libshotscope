@@ -4,6 +4,26 @@
 
 The terrain system provides a flexible interface for simulating golf ball interactions with varying ground conditions. The `TerrainInterface` abstraction allows for custom terrain implementations including flat surfaces, slopes, heightmaps, and procedurally generated landscapes.
 
+## Choosing Between TerrainInterface and GroundProvider
+
+The library provides two interfaces for customizing ground behavior. Choose based on whether you need elevation changes:
+
+### TerrainInterface
+
+Use when you need 3D terrain:
+- Elevation changes (hills, slopes, elevated greens)
+- Varying surface normals for realistic slope physics
+- Direct control over height, normal vector, and surface properties at any position
+
+### GroundProvider
+
+Use for flat terrain with varying materials:
+- Different surface properties at different positions (fairway, rough, green)
+- Simpler implementation - only surface properties, no geometric calculations
+- Backward compatibility with existing code
+
+Note: `GroundProvider` is internally wrapped in a `TerrainProviderAdapter` that assumes flat terrain. The height comes from the surface properties, and the normal is always vertical. For sloped terrain, use `TerrainInterface`.
+
 ## Quick Start
 
 For flat terrain (backward compatible with existing code):

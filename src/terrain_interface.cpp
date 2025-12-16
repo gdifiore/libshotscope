@@ -19,10 +19,20 @@ TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
 	}
 }
 
+void TerrainProviderAdapter::updateCache(float x, float y) const
+{
+	if (x != cachedX_ || y != cachedY_)
+	{
+		cachedSurface_ = provider_->getGroundAt(x, y);
+		cachedX_ = x;
+		cachedY_ = y;
+	}
+}
+
 float TerrainProviderAdapter::getHeight(float x, float y) const
 {
 	// GroundProvider assumes flat terrain, so query the ground height from provider
-	cachedSurface_ = provider_->getGroundAt(x, y);
+	updateCache(x, y);
 	return cachedSurface_.height;
 }
 
@@ -36,7 +46,7 @@ Vector3D TerrainProviderAdapter::getNormal(float x, float y) const
 
 const GroundSurface& TerrainProviderAdapter::getSurfaceProperties(float x, float y) const
 {
-	// Query provider for ground properties at this position
-	cachedSurface_ = provider_->getGroundAt(x, y);
+	// Query provider for ground properties at this position (uses cache)
+	updateCache(x, y);
 	return cachedSurface_;
 }

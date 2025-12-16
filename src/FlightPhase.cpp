@@ -378,13 +378,12 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	// Prevent velocity from reversing direction (clamp to zero instead)
 	// Only prevent reversal if we had meaningful initial velocity
 	// If velocity was near zero, allow direction change (e.g., ball starting to roll downhill)
-	constexpr float MIN_VEL_FOR_REVERSAL_CHECK = 0.01F;  // 0.01 ft/s threshold
-
-	if (std::abs(oldVelX) > MIN_VEL_FOR_REVERSAL_CHECK && oldVelX * state.velocity[0] < 0.0F)
+	// Use same threshold as STOPPING_VELOCITY to avoid unrealistic stopping on slopes
+	if (std::abs(oldVelX) > physics_constants::STOPPING_VELOCITY && oldVelX * state.velocity[0] < 0.0F)
 	{
 		state.velocity[0] = 0.0F;
 	}
-	if (std::abs(oldVelY) > MIN_VEL_FOR_REVERSAL_CHECK && oldVelY * state.velocity[1] < 0.0F)
+	if (std::abs(oldVelY) > physics_constants::STOPPING_VELOCITY && oldVelY * state.velocity[1] < 0.0F)
 	{
 		state.velocity[1] = 0.0F;
 	}

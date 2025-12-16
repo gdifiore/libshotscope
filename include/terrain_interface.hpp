@@ -52,6 +52,7 @@
 #include "math_utils.hpp"
 
 #include <memory>
+#include <limits>
 
 /**
  * Abstract interface for terrain queries.
@@ -197,6 +198,11 @@ public:
 private:
 	std::unique_ptr<GroundProvider> provider_;
 	mutable GroundSurface cachedSurface_;  // Mutable for caching in const method
+	mutable float cachedX_ = std::numeric_limits<float>::quiet_NaN();
+	mutable float cachedY_ = std::numeric_limits<float>::quiet_NaN();
+
+	// Helper to update cache only when position changes
+	void updateCache(float x, float y) const;
 };
 
 #endif // TERRAIN_INTERFACE_HPP

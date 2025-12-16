@@ -2,7 +2,27 @@
 
 ## Overview
 
-The `GroundProvider` interface lets you change ground properties based on position - model fairways, roughs, greens, elevation changes, etc.
+The `GroundProvider` interface lets you change ground properties based on position - model fairways, roughs, greens, and other surface variations on flat terrain.
+
+## Choosing Between GroundProvider and TerrainInterface
+
+### GroundProvider
+
+Use for flat terrain with varying materials:
+- Fairway, rough, and green with different properties
+- Simple API - return surface properties based on position
+- Good for upgrading existing code with minimal changes
+
+Limitation: Assumes flat terrain. The surface normal is always vertical.
+
+### TerrainInterface
+
+Use for 3D terrain with elevation:
+- Hills, slopes, or elevated greens
+- Slope-dependent bounce physics (varying surface normals)
+- Full control over terrain geometry
+
+See the [Terrain System Guide](terrain.md) for implementing 3D terrain.
 
 ```cpp
 class GroundProvider {
