@@ -6,7 +6,7 @@
  * @brief Physical constants used in golf ball trajectory calculations.
  *
  * This file consolidates all physical constants, conversion factors, and
- * empirical coefficients used throughout the libshotscope library. Constants
+ * empirical coefficients used throughout the libgolf library. Constants
  * are organized by category for easy reference.
  *
  * Reference: Based on work by Prof. Alan M. Nathan, University of Illinois

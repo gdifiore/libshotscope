@@ -81,7 +81,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc'
       uses: actions/upload-artifact@v4
       with:
-        name: libshotscope-${{ runner.os }}
+        name: libgolf-${{ runner.os }}
         path: |
-          build/libshotscope.a
+          build/libgolf.a
           build/include/version.hpp

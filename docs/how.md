@@ -5,7 +5,7 @@
 Run `build.sh` in the root directory to build and install the library. Include the main header in your source files:
 
 ```c++
-#include <libshotscope.hpp>
+#include <libgolf.hpp>
 ```
 
 ## Basic Setup

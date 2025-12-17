@@ -34,7 +34,7 @@ set(SOURCES
 )
 
 set(HEADERS
-   ${PROJECT_INCLUDE_DIR}/libshotscope.hpp
+   ${PROJECT_INCLUDE_DIR}/libgolf.hpp
    ${PROJECT_INCLUDE_DIR}/golf_ball.hpp
    ${PROJECT_INCLUDE_DIR}/math_utils.hpp
    ${PROJECT_INCLUDE_DIR}/GolfBallPhysicsVariables.hpp
@@ -104,8 +104,8 @@ set(TEST_SOURCES
 )
 
 # Add test executable and link with gtest_main and the static library
-add_executable(libshotscope_tests ${TEST_SOURCES})
-target_link_libraries(libshotscope_tests ${PROJECT_NAME} GTest::gtest_main)
+add_executable(libgolf_tests ${TEST_SOURCES})
+target_link_libraries(libgolf_tests ${PROJECT_NAME} GTest::gtest_main)
 
 # Examples
 add_executable(calculate_ball_landing examples/calculate_ball_landing.cpp)
@@ -119,7 +119,7 @@ target_link_libraries(multi_ground_simulation ${PROJECT_NAME})
 
 # Discover tests
 include(GoogleTest)
-gtest_discover_tests(libshotscope_tests)
+gtest_discover_tests(libgolf_tests)
 
 install(TARGETS shotscope DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)

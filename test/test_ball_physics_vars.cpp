@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <libshotscope.hpp>
+#include <libgolf.hpp>
 
 // Test default initial values from a spreadsheet created by Alan M. Nathan at
 // U. of Illinois

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <libshotscope.hpp>
+#include <libgolf.hpp>
 #include <ground_physics.hpp>
 
 #include <cmath>

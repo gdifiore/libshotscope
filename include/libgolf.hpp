@@ -1,5 +1,5 @@
-#ifndef LIBSHOTSCOPE_HPP
-#define LIBSHOTSCOPE_HPP
+#ifndef LIBGOLF_HPP
+#define LIBGOLF_HPP
 
 #include "FlightSimulator.hpp"
 #include "FlightPhase.hpp"
@@ -14,4 +14,4 @@
 #include "math_utils.hpp"
 #include "physics_constants.hpp"
 
-#endif // LIBSHOTSCOPE_HPP
+#endif // LIBGOLF_HPP

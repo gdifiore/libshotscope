@@ -31,7 +31,7 @@ jobs:
           draft: false
           prerelease: false
           body: |
-            ## libshotscope ${{ steps.get_version.outputs.version }}
+            ## libgolf ${{ steps.get_version.outputs.version }}
 
             ### Installation
             Download the appropriate binary for your platform below.
@@ -48,14 +48,14 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: ubuntu-latest
-            artifact_name: libshotscope.a
-            asset_name: libshotscope-linux-x86_64.a
+            artifact_name: libgolf.a
+            asset_name: libgolf-linux-x86_64.a
           - os: macos-latest
-            artifact_name: libshotscope.a
-            asset_name: libshotscope-macos-x86_64.a
+            artifact_name: libgolf.a
+            asset_name: libgolf-macos-x86_64.a
           - os: windows-latest
             artifact_name: shotscope.lib
-            asset_name: libshotscope-windows-x86_64.lib
+            asset_name: libgolf-windows-x86_64.lib
 
     steps:
       - uses: actions/checkout@v4
@@ -77,14 +77,14 @@ jobs:
         run: |
           cp build/${{ matrix.artifact_name }} package/
           cd package
-          tar -czf ../libshotscope-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz .
+          tar -czf ../libgolf-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz .
 
       - name: Create archive (Windows)
         if: runner.os == 'Windows'
         run: |
           cp build/Release/${{ matrix.artifact_name }} package/
           cd package
-          7z a ../libshotscope-Windows-${{ needs.create-release.outputs.version }}.zip .
+          7z a ../libgolf-Windows-${{ needs.create-release.outputs.version }}.zip .
 
       - name: Upload Release Asset (Unix)
         if: runner.os != 'Windows'
@@ -93,8 +93,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./libshotscope-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz
-          asset_name: libshotscope-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz
+          asset_path: ./libgolf-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz
+          asset_name: libgolf-${{ runner.os }}-${{ needs.create-release.outputs.version }}.tar.gz
           asset_content_type: application/gzip
 
       - name: Upload Release Asset (Windows)
@@ -104,6 +104,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./libshotscope-Windows-${{ needs.create-release.outputs.version }}.zip
-          asset_name: libshotscope-Windows-${{ needs.create-release.outputs.version }}.zip
+          asset_path: ./libgolf-Windows-${{ needs.create-release.outputs.version }}.zip
+          asset_name: libgolf-Windows-${{ needs.create-release.outputs.version }}.zip
           asset_content_type: application/zip
