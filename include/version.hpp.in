@@ -1,17 +1,17 @@
 #ifndef LIBGOLF_VERSION_HPP
 #define LIBGOLF_VERSION_HPP
 
-#define SHOTSCOPE_VERSION_MAJOR @SHOTSCOPE_VERSION_MAJOR@
-#define SHOTSCOPE_VERSION_MINOR @SHOTSCOPE_VERSION_MINOR@
-#define SHOTSCOPE_VERSION_PATCH @SHOTSCOPE_VERSION_PATCH@
-#define SHOTSCOPE_VERSION_STRING "@SHOTSCOPE_VERSION@"
+#define GOLF_VERSION_MAJOR @GOLF_VERSION_MAJOR@
+#define GOLF_VERSION_MINOR @GOLF_VERSION_MINOR@
+#define GOLF_VERSION_PATCH @GOLF_VERSION_PATCH@
+#define GOLF_VERSION_STRING "@GOLF_VERSION@"
 
 namespace shotscope {
     struct Version {
-        static constexpr int MAJOR = SHOTSCOPE_VERSION_MAJOR;
-        static constexpr int MINOR = SHOTSCOPE_VERSION_MINOR;
-        static constexpr int PATCH = SHOTSCOPE_VERSION_PATCH;
-        static constexpr const char* STRING = SHOTSCOPE_VERSION_STRING;
+        static constexpr int MAJOR = GOLF_VERSION_MAJOR;
+        static constexpr int MINOR = GOLF_VERSION_MINOR;
+        static constexpr int PATCH = GOLF_VERSION_PATCH;
+        static constexpr const char* STRING = GOLF_VERSION_STRING;
     };
 }
 
