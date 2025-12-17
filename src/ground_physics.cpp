@@ -3,7 +3,7 @@
  * @author Gabriel DiFiore
  * @brief Implementation of ground interaction physics.
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #include "ground_physics.hpp"
@@ -112,8 +112,7 @@ namespace GroundPhysics
         float cosTheta = surfaceNormal[2];
 
         // For very flat surfaces, use simplified calculation
-        constexpr float FLAT_SURFACE_THRESHOLD = 0.999F;  // ~2.5 degrees
-        if (cosTheta > FLAT_SURFACE_THRESHOLD)
+        if (cosTheta > physics_constants::FLAT_SURFACE_THRESHOLD)
         {
             // Nearly flat surface: only rolling friction opposes motion
             float deceleration = surface.frictionDynamic * physics_constants::GRAVITY_FT_PER_S2;

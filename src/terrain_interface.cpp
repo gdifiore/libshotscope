@@ -8,7 +8,9 @@
 
 #include "terrain_interface.hpp"
 #include "GroundProvider.hpp"
+#include "physics_constants.hpp"
 #include <stdexcept>
+#include <cmath>
 
 TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
 	: provider_(provider ? provider->clone() : nullptr), cachedSurface_{}
@@ -21,7 +23,9 @@ TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
 
 void TerrainProviderAdapter::updateCache(float x, float y) const
 {
-	if (!cacheValid_ || x != cachedX_ || y != cachedY_)
+	if (!cacheValid_ ||
+		std::abs(x - cachedX_) > physics_constants::POSITION_EPSILON ||
+		std::abs(y - cachedY_) > physics_constants::POSITION_EPSILON)
 	{
 		cachedSurface_ = provider_->getGroundAt(x, y);
 		cachedX_ = x;
@@ -37,7 +41,7 @@ float TerrainProviderAdapter::getHeight(float x, float y) const
 	return cachedSurface_.height;
 }
 
-Vector3D TerrainProviderAdapter::getNormal(float x, float y) const
+Vector3D TerrainProviderAdapter::getNormal(float x, float y) const noexcept
 {
 	(void)x;
 	(void)y;

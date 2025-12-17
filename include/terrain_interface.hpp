@@ -42,7 +42,7 @@
  * // will query terrain properties from the TerrainInterface implementation.
  * @endcode
  *
- * @copyright Copyright (c) 2024, Gabriel DiFiore
+ * @copyright Copyright (c) 2025, Gabriel DiFiore
  */
 
 #ifndef TERRAIN_INTERFACE_HPP
@@ -53,6 +53,7 @@
 
 #include <memory>
 #include <limits>
+#include <stdexcept>
 
 /**
  * Abstract interface for terrain queries.
@@ -113,8 +114,32 @@ public:
      * Constructs a flat terrain with the given surface properties.
      *
      * @param surface The ground surface properties to use everywhere.
+     * @throws std::invalid_argument if surface properties are out of valid ranges.
      */
-    explicit FlatTerrain(const GroundSurface& surface) : surface(surface) {}
+    explicit FlatTerrain(const GroundSurface& surface) : surface(surface)
+    {
+        // Validate surface properties are in physically meaningful ranges
+        if (surface.restitution < 0.0F || surface.restitution > 1.0F)
+        {
+            throw std::invalid_argument("Restitution must be in range [0.0, 1.0]");
+        }
+        if (surface.frictionStatic < 0.0F)
+        {
+            throw std::invalid_argument("Static friction must be non-negative");
+        }
+        if (surface.frictionDynamic < 0.0F)
+        {
+            throw std::invalid_argument("Dynamic friction must be non-negative");
+        }
+        if (surface.firmness < 0.0F)
+        {
+            throw std::invalid_argument("Firmness must be non-negative");
+        }
+        if (surface.spinRetention < 0.0F || surface.spinRetention > 1.0F)
+        {
+            throw std::invalid_argument("Spin retention must be in range [0.0, 1.0]");
+        }
+    }
 
     /**
      * Gets the terrain height (constant everywhere).
@@ -123,7 +148,7 @@ public:
      * @param y The y-coordinate (unused for flat terrain).
      * @return The terrain height in feet.
      */
-    [[nodiscard]] auto getHeight(float x, float y) const -> float override
+    [[nodiscard]] auto getHeight(float x, float y) const noexcept -> float override
     {
         // Suppress unused parameter warnings
         (void)x;
@@ -138,7 +163,7 @@ public:
      * @param y The y-coordinate (unused for flat terrain).
      * @return The unit normal vector (0, 0, 1).
      */
-    [[nodiscard]] auto getNormal(float x, float y) const -> Vector3D override
+    [[nodiscard]] auto getNormal(float x, float y) const noexcept -> Vector3D override
     {
         // Suppress unused parameter warnings
         (void)x;
@@ -153,7 +178,7 @@ public:
      * @param y The y-coordinate (unused for flat terrain).
      * @return The ground surface properties.
      */
-    [[nodiscard]] auto getSurfaceProperties(float x, float y) const -> const GroundSurface& override
+    [[nodiscard]] auto getSurfaceProperties(float x, float y) const noexcept -> const GroundSurface& override
     {
         // Suppress unused parameter warnings
         (void)x;
@@ -176,6 +201,11 @@ class GroundProvider;
  * surface properties based on position.
  *
  * The adapter owns a copy of the provider to ensure proper lifetime management.
+ *
+ * @note Thread Safety: This class is NOT thread-safe for concurrent access.
+ * The internal position cache uses mutable members without synchronization.
+ * If concurrent access is required, external synchronization must be provided
+ * by the caller (e.g., using a mutex).
  */
 class TerrainProviderAdapter : public TerrainInterface
 {
@@ -192,7 +222,7 @@ public:
 	explicit TerrainProviderAdapter(const GroundProvider* provider);
 
 	[[nodiscard]] auto getHeight(float x, float y) const -> float override;
-	[[nodiscard]] auto getNormal(float x, float y) const -> Vector3D override;
+	[[nodiscard]] auto getNormal(float x, float y) const noexcept -> Vector3D override;
 	[[nodiscard]] auto getSurfaceProperties(float x, float y) const -> const GroundSurface& override;
 
 private:
