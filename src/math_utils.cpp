@@ -84,3 +84,83 @@ float math_utils::getDistanceInYards(Vector3D position)
 
     return distanceInYards;
 }
+
+/**
+ * Calculates the dot product of two 3D vectors.
+ *
+ * @param a The first vector.
+ * @param b The second vector.
+ * @return The dot product (scalar).
+ */
+float math_utils::dot(const Vector3D& a, const Vector3D& b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+/**
+ * Calculates the cross product of two 3D vectors.
+ *
+ * @param a The first vector.
+ * @param b The second vector.
+ * @return The cross product vector (perpendicular to both a and b).
+ */
+Vector3D math_utils::cross(const Vector3D& a, const Vector3D& b)
+{
+    return {
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    };
+}
+
+/**
+ * Calculates the magnitude (length) of a 3D vector.
+ *
+ * @param v The vector.
+ * @return The magnitude of the vector.
+ */
+float math_utils::magnitude(const Vector3D& v)
+{
+    return std::sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+}
+
+/**
+ * Normalizes a 3D vector to unit length.
+ *
+ * @param v The vector to normalize.
+ * @return The normalized vector (magnitude = 1).
+ * @throws std::invalid_argument if the vector has zero magnitude.
+ */
+Vector3D math_utils::normalize(const Vector3D& v)
+{
+    float mag = magnitude(v);
+
+    if (mag < physics_constants::MIN_VELOCITY_THRESHOLD)
+    {
+        throw std::invalid_argument("Cannot normalize zero-length vector");
+    }
+
+    return {v[0] / mag, v[1] / mag, v[2] / mag};
+}
+
+/**
+ * Projects vector v onto vector 'onto'.
+ *
+ * @param v The vector to project.
+ * @param onto The vector to project onto.
+ * @return The projection of v onto 'onto'.
+ * @throws std::invalid_argument if 'onto' has zero magnitude.
+ */
+Vector3D math_utils::project(const Vector3D& v, const Vector3D& onto)
+{
+    float ontoMagSquared = dot(onto, onto);
+
+    if (ontoMagSquared < physics_constants::MIN_VELOCITY_THRESHOLD * physics_constants::MIN_VELOCITY_THRESHOLD)
+    {
+        throw std::invalid_argument("Cannot project onto zero-length vector");
+    }
+
+    float scale = dot(v, onto) / ontoMagSquared;
+
+    return {onto[0] * scale, onto[1] * scale, onto[2] * scale};
+}

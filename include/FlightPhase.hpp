@@ -6,6 +6,9 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include "terrain_interface.hpp"
+
+#include <memory>
 
 /**
  * @brief Base class for different flight phases of a golf ball.
@@ -49,20 +52,14 @@ class AerialPhase : public FlightPhase
 {
 public:
 	AerialPhase(GolfBallPhysicsVariables &physicsVars,
-				const struct golfBall &ball,
-				const struct atmosphericData &atmos,
-				const GroundSurface &ground);
+	            const struct golfBall &ball,
+	            const struct atmosphericData &atmos,
+	            std::shared_ptr<TerrainInterface> terrain);
 
 	void initialize(BallState &state);
 	void calculateStep(BallState &state, float dt) override;
 	void calculateAccelerations(BallState &state);
 	bool isPhaseComplete(const BallState &state) const override;
-
-	/**
-	 * @brief Updates the ground surface for this phase.
-	 * @param newGround The new ground surface properties
-	 */
-	void updateGround(const GroundSurface &newGround);
 
 	// Getters for physics variables (needed for testing)
 	[[nodiscard]] auto getV() const -> float { return v; }
@@ -83,7 +80,7 @@ private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
-	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 
 	// Calculated variables (derived from state)
 	float v;
@@ -126,24 +123,18 @@ class BouncePhase : public FlightPhase
 {
 public:
 	BouncePhase(GolfBallPhysicsVariables &physicsVars,
-				const struct golfBall &ball,
-				const struct atmosphericData &atmos,
-				const GroundSurface &ground);
+	            const struct golfBall &ball,
+	            const struct atmosphericData &atmos,
+	            std::shared_ptr<TerrainInterface> terrain);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
-
-	/**
-	 * @brief Updates the ground surface for this phase.
-	 * @param newGround The new ground surface properties
-	 */
-	void updateGround(const GroundSurface &newGround);
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
-	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 	AerialPhase aerialPhase; // Used for aerodynamic calculations between bounces
 };
 
@@ -158,24 +149,18 @@ class RollPhase : public FlightPhase
 {
 public:
 	RollPhase(GolfBallPhysicsVariables &physicsVars,
-			  const struct golfBall &ball,
-			  const struct atmosphericData &atmos,
-			  const GroundSurface &ground);
+	          const struct golfBall &ball,
+	          const struct atmosphericData &atmos,
+	          std::shared_ptr<TerrainInterface> terrain);
 
 	void calculateStep(BallState &state, float dt) override;
 	bool isPhaseComplete(const BallState &state) const override;
-
-	/**
-	 * @brief Updates the ground surface for this phase.
-	 * @param newGround The new ground surface properties
-	 */
-	void updateGround(const GroundSurface &newGround);
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
 	struct golfBall ball;
 	struct atmosphericData atmos;
-	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 };
 
 #endif // FLIGHTPHASE_HPP

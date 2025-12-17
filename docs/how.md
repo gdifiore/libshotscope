@@ -27,9 +27,12 @@ Field definitions are documented in `include/golf_ball.hpp` and `include/atmosph
 
 ```c++
 GroundSurface ground; // Uses default fairway properties
+
+// Or with custom values using constructor:
+// GroundSurface green{0.0f, 0.35f, 0.4f, 0.12f, 0.95f, 0.85f};
 ```
 
-The `GroundSurface` struct defines physical surface characteristics that affect bounce and roll behavior. Default values represent typical fairway conditions. See `include/ground_surface.hpp` for available parameters including restitution coefficient, friction coefficients, firmness, and spin retention.
+The `GroundSurface` struct defines physical surface characteristics that affect bounce and roll behavior. Default values represent typical fairway conditions. You can customize using the constructor: `GroundSurface{height, restitution, frictionStatic, frictionDynamic, firmness, spinRetention}`. See `include/ground_surface.hpp` for parameter details.
 
 #### Dynamic Ground Surfaces (Advanced)
 

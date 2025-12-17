@@ -7,7 +7,10 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include "terrain_interface.hpp"
 #include "physics_constants.hpp"
+
+#include <memory>
 
 class BouncePhaseTest : public ::testing::Test
 {
@@ -23,17 +26,21 @@ protected:
 		ground.restitution = 0.4F;
 		ground.frictionStatic = 0.5F;
 		ground.firmness = 0.8F;
+
+		// Create flat terrain from ground
+		terrain = std::make_shared<FlatTerrain>(ground);
 	}
 
 	golfBall ball;
 	atmosphericData atmos;
 	GroundSurface ground;
+	std::shared_ptr<TerrainInterface> terrain;
 };
 
 TEST_F(BouncePhaseTest, AppliesCoefficientOfRestitution)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Ball falling straight down at 30 ft/s
 	BallState state;
@@ -55,7 +62,7 @@ TEST_F(BouncePhaseTest, AppliesCoefficientOfRestitution)
 TEST_F(BouncePhaseTest, AppliesFrictionToHorizontalVelocity)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Ball with horizontal and vertical velocity
 	BallState state;
@@ -76,7 +83,7 @@ TEST_F(BouncePhaseTest, AppliesFrictionToHorizontalVelocity)
 TEST_F(BouncePhaseTest, EnergyRetentionMatchesCORSquared)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Ball falling vertically
 	float impactVelocity = -30.0F;
@@ -101,9 +108,10 @@ TEST_F(BouncePhaseTest, DifferentCORValues)
 {
 	// Test with high COR (hard surface)
 	ground.restitution = 0.8F;
+	terrain = std::make_shared<FlatTerrain>(ground);  // Recreate with updated ground
 
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 0.0F};
@@ -122,7 +130,7 @@ TEST_F(BouncePhaseTest, DifferentCORValues)
 TEST_F(BouncePhaseTest, HandlesMultipleBounces)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Ball falling down
 	BallState state;
@@ -155,7 +163,7 @@ TEST_F(BouncePhaseTest, HandlesMultipleBounces)
 TEST_F(BouncePhaseTest, TransitionsToRollPhaseWhenVelocityIsLow)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Ball on ground with low vertical velocity
 	BallState state;
@@ -170,7 +178,7 @@ TEST_F(BouncePhaseTest, TransitionsToRollPhaseWhenVelocityIsLow)
 TEST_F(BouncePhaseTest, DoesNotCompleteWhileBallIsDescending)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Ball still falling
 	BallState state;
@@ -185,7 +193,7 @@ TEST_F(BouncePhaseTest, DoesNotCompleteWhileBallIsDescending)
 TEST_F(BouncePhaseTest, DoesNotReApplyBounceWhileBallIsAirborne)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	// Initial impact
 	BallState state;
@@ -214,9 +222,10 @@ TEST_F(BouncePhaseTest, HighFrictionSurface)
 	// Soft surface with high friction
 	ground.frictionStatic = 0.8F;
 	ground.firmness = 0.3F;
+	terrain = std::make_shared<FlatTerrain>(ground);  // Recreate with updated ground
 
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 0.0F};
@@ -234,7 +243,7 @@ TEST_F(BouncePhaseTest, HighFrictionSurface)
 TEST_F(BouncePhaseTest, PreventsBallFromGoingBelowGround)
 {
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, -0.5F}; // Below ground (shouldn't happen but test safety)
@@ -250,9 +259,10 @@ TEST_F(BouncePhaseTest, PreventsBallFromGoingBelowGround)
 TEST_F(BouncePhaseTest, NonZeroGroundHeight)
 {
 	ground.height = 5.0F; // Ground at 5 feet
+	terrain = std::make_shared<FlatTerrain>(ground);  // Recreate with updated ground
 
 	GolfBallPhysicsVariables physicsVars(ball, atmos);
-	BouncePhase bounce(physicsVars, ball, atmos, ground);
+	BouncePhase bounce(physicsVars, ball, atmos, terrain);
 
 	BallState state;
 	state.position = {0.0F, 0.0F, 5.0F}; // At ground level

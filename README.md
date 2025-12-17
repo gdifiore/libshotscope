@@ -33,7 +33,7 @@ chmod +x build.sh
 // Basic simulation with single ground type
 const golfBall ball{0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 0.0};
 const atmosphericData atmos{70.0, 0.0, 0.0, 0.0, 0.0, 50.0, 29.92};
-GroundSurface ground;  // Default fairway
+GroundSurface ground;  // Default fairway (or use constructor for custom values)
 
 GolfBallPhysicsVariables physVars(ball, atmos);
 FlightSimulator sim(physVars, ball, atmos, ground);

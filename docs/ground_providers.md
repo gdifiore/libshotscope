@@ -2,7 +2,27 @@
 
 ## Overview
 
-The `GroundProvider` interface lets you change ground properties based on position - model fairways, roughs, greens, elevation changes, etc.
+The `GroundProvider` interface lets you change ground properties based on position - model fairways, roughs, greens, and other surface variations on flat terrain.
+
+## Choosing Between GroundProvider and TerrainInterface
+
+### GroundProvider
+
+Use for flat terrain with varying materials:
+- Fairway, rough, and green with different properties
+- Simple API - return surface properties based on position
+- Good for upgrading existing code with minimal changes
+
+Limitation: Assumes flat terrain. The surface normal is always vertical.
+
+### TerrainInterface
+
+Use for 3D terrain with elevation:
+- Hills, slopes, or elevated greens
+- Slope-dependent bounce physics (varying surface normals)
+- Full control over terrain geometry
+
+See the [Terrain System Guide](terrain.md) for implementing 3D terrain.
 
 ```cpp
 class GroundProvider {
@@ -26,12 +46,13 @@ public:
         float yards = y / physics_constants::YARDS_TO_FEET;
 
         // Green at 250+ yards, elevated 3 feet
+        // (height, restitution, frictionStatic, frictionDynamic, firmness, spinRetention)
         if (yards >= 250.0f) {
             return GroundSurface{3.0f, 0.35f, 0.4f, 0.12f, 0.95f, 0.85f};
         }
 
-        // Fairway
-        return GroundSurface{};  // Default values
+        // Fairway with default values
+        return GroundSurface{};
     }
 };
 
@@ -276,9 +297,13 @@ float yards = feet / physics_constants::YARDS_TO_FEET;
 Old code still works:
 
 ```cpp
-// Single ground surface - still works
+// Single ground surface - still works (uses default fairway values)
 GroundSurface ground;
 FlightSimulator sim(physVars, ball, atmos, ground);
+
+// Or with custom values using constructor
+GroundSurface green{0.0f, 0.35f, 0.4f, 0.12f, 0.95f, 0.85f};
+FlightSimulator sim2(physVars, ball, atmos, green);
 ```
 
 Internally creates a `UniformGroundProvider` that returns the same surface everywhere.

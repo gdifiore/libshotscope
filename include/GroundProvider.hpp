@@ -15,6 +15,7 @@
 #define GROUND_PROVIDER_HPP
 
 #include "ground_surface.hpp"
+#include <memory>
 
 /**
  * @brief Interface for querying ground surface properties at any XY position.
@@ -73,6 +74,16 @@ public:
 	 * @return GroundSurface properties at the specified location
 	 */
 	virtual GroundSurface getGroundAt(float x, float y) const = 0;
+
+	/**
+	 * @brief Creates a copy of this ground provider.
+	 *
+	 * This method is used internally to ensure proper lifetime management when
+	 * the provider is wrapped in a TerrainInterface adapter.
+	 *
+	 * @return A unique pointer to a cloned copy of this provider
+	 */
+	virtual std::unique_ptr<GroundProvider> clone() const = 0;
 };
 
 /**
@@ -117,6 +128,16 @@ public:
 		(void)x; // Unused parameter
 		(void)y; // Unused parameter
 		return surface_;
+	}
+
+	/**
+	 * @brief Creates a copy of this uniform ground provider.
+	 *
+	 * @return A unique pointer to a cloned copy
+	 */
+	std::unique_ptr<GroundProvider> clone() const override
+	{
+		return std::make_unique<UniformGroundProvider>(surface_);
 	}
 
 private:

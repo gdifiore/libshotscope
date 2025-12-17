@@ -8,6 +8,8 @@
 #include "atmosphere.hpp"
 #include "golf_ball.hpp"
 #include "ground_surface.hpp"
+#include "terrain_interface.hpp"
+
 #include <memory>
 
 /**
@@ -41,18 +43,19 @@ public:
 	 * @param ball Golf ball parameters
 	 * @param atmos Atmospheric conditions
 	 * @param ground Ground surface properties
+	 * @param terrain Terrain interface for height/normal queries (optional, defaults to flat terrain)
 	 */
 	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
-					const struct golfBall &ball,
-					const struct atmosphericData &atmos,
-					const GroundSurface &ground);
+	                const struct golfBall &ball,
+	                const struct atmosphericData &atmos,
+	                const GroundSurface &ground,
+	                std::shared_ptr<TerrainInterface> terrain = nullptr);
 
 	/**
 	 * @brief Constructs a flight simulator with a custom ground provider.
 	 *
 	 * This constructor allows for dynamic ground type changes during the trajectory.
-	 * The ground provider will be queried at phase transitions to get ground properties
-	 * based on the ball's current XY position.
+	 * The ground provider is wrapped in a TerrainInterface adapter for compatibility.
 	 *
 	 * @param physicsVars Physics variables calculator
 	 * @param ball Golf ball parameters
@@ -60,9 +63,9 @@ public:
 	 * @param groundProvider Ground provider for position-dependent ground properties
 	 */
 	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
-					const struct golfBall &ball,
-					const struct atmosphericData &atmos,
-					const GroundProvider &groundProvider);
+	                const struct golfBall &ball,
+	                const struct atmosphericData &atmos,
+	                const GroundProvider &groundProvider);
 
 	/**
 	 * @brief Initializes the simulation with the given initial state.
@@ -126,31 +129,18 @@ private:
 	BallState state;
 	bool initialized;
 
+	// Terrain storage (for GroundProvider adapter lifetime management)
+	// Must be declared before phases since phases depend on it
+	std::shared_ptr<TerrainInterface> terrainStorage_;
+
 	AerialPhase aerialPhase;
 	BouncePhase bouncePhase;
 	RollPhase rollPhase;
-
-	// Ground provider support
-	const GroundProvider *groundProvider;
-	std::unique_ptr<UniformGroundProvider> uniformProvider;
-	GroundSurface currentGround;
-	int rollStepCounter;
 
 	/**
 	 * @brief Checks if the current phase is complete and transitions if needed.
 	 */
 	void checkPhaseTransition();
-
-	/**
-	 * @brief Updates the current ground surface based on ball position.
-	 *
-	 * Queries the ground provider at the specified XY position and updates
-	 * all flight phases with the new ground properties.
-	 *
-	 * @param x Lateral position in feet
-	 * @param y Forward/downrange position in feet
-	 */
-	void updateGroundAtPosition(float x, float y);
 };
 
 #endif // FLIGHT_SIMULATOR_HPP
