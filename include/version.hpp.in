@@ -6,7 +6,7 @@
 #define GOLF_VERSION_PATCH @GOLF_VERSION_PATCH@
 #define GOLF_VERSION_STRING "@GOLF_VERSION@"
 
-namespace shotscope {
+namespace golf {
     struct Version {
         static constexpr int MAJOR = GOLF_VERSION_MAJOR;
         static constexpr int MINOR = GOLF_VERSION_MINOR;

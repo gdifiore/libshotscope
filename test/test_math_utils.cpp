@@ -2,42 +2,42 @@
 
 #include <libgolf.hpp>
 
-TEST(ShotScopeTest, FtoC)
+TEST(GolfTest, FtoC)
 {
     float tempC = math_utils::convertFahrenheitToCelsius(32.0);
 
     EXPECT_NEAR(tempC, 0.0, 0.1);
 }
 
-TEST(ShotScopeTest, CtoK)
+TEST(GolfTest, CtoK)
 {
     float tempK = math_utils::convertCelsiusToKelvin(32.0);
 
     EXPECT_NEAR(tempK, 305.15, 0.1);
 }
 
-TEST(ShotScopeTest, FtoK)
+TEST(GolfTest, FtoK)
 {
     float tempK = math_utils::convertFahrenheitToKelvin(32.0);
 
     EXPECT_NEAR(tempK, 273.16, 0.1);
 }
 
-TEST(ShotScopeTest, FTtoM)
+TEST(GolfTest, FTtoM)
 {
     float tempK = math_utils::convertFeetToMeters(5.0);
 
     EXPECT_NEAR(tempK, 1.524, 0.1);
 }
 
-TEST(ShotScopeTest, MtoFT)
+TEST(GolfTest, MtoFT)
 {
     float lengthFT = math_utils::convertMetersToFeet(10.0);
 
     EXPECT_NEAR(lengthFT, 32.8084, 0.01);
 }
 
-TEST(ShotScopeTest, DistanceInYards)
+TEST(GolfTest, DistanceInYards)
 {
     Vector3D position{3.0, 4.0, 0.0};
     float distanceYards = math_utils::getDistanceInYards(position);
@@ -47,7 +47,7 @@ TEST(ShotScopeTest, DistanceInYards)
 
 // Vector Math Tests
 
-TEST(ShotScopeTest, DotProduct)
+TEST(GolfTest, DotProduct)
 {
     Vector3D a{1.0, 0.0, 0.0};
     Vector3D b{0.0, 1.0, 0.0};
@@ -62,7 +62,7 @@ TEST(ShotScopeTest, DotProduct)
     EXPECT_NEAR(result, 32.0, 0.001);  // 1*4 + 2*5 + 3*6 = 32
 }
 
-TEST(ShotScopeTest, CrossProduct)
+TEST(GolfTest, CrossProduct)
 {
     Vector3D x{1.0, 0.0, 0.0};
     Vector3D y{0.0, 1.0, 0.0};
@@ -81,7 +81,7 @@ TEST(ShotScopeTest, CrossProduct)
     EXPECT_NEAR(result[2], -3.0, 0.001);   // 1*5 - 2*4 = -3
 }
 
-TEST(ShotScopeTest, Magnitude)
+TEST(GolfTest, Magnitude)
 {
     Vector3D v{3.0, 4.0, 0.0};
     float mag = math_utils::magnitude(v);
@@ -94,7 +94,7 @@ TEST(ShotScopeTest, Magnitude)
     EXPECT_NEAR(mag, 1.732, 0.001);  // sqrt(3)
 }
 
-TEST(ShotScopeTest, Normalize)
+TEST(GolfTest, Normalize)
 {
     Vector3D v{3.0, 4.0, 0.0};
     Vector3D normalized = math_utils::normalize(v);
@@ -108,14 +108,14 @@ TEST(ShotScopeTest, Normalize)
     EXPECT_NEAR(mag, 1.0, 0.001);
 }
 
-TEST(ShotScopeTest, NormalizeZeroVector)
+TEST(GolfTest, NormalizeZeroVector)
 {
     Vector3D zero{0.0, 0.0, 0.0};
 
     EXPECT_THROW(math_utils::normalize(zero), std::invalid_argument);
 }
 
-TEST(ShotScopeTest, VectorProjection)
+TEST(GolfTest, VectorProjection)
 {
     // Project (3, 4, 0) onto (1, 0, 0)
     Vector3D v{3.0, 4.0, 0.0};
@@ -136,7 +136,7 @@ TEST(ShotScopeTest, VectorProjection)
     EXPECT_NEAR(projection[2], 0.0, 0.001);
 }
 
-TEST(ShotScopeTest, ProjectOntoZeroVector)
+TEST(GolfTest, ProjectOntoZeroVector)
 {
     Vector3D v{1.0, 2.0, 3.0};
     Vector3D zero{0.0, 0.0, 0.0};

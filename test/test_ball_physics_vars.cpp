@@ -4,7 +4,7 @@
 
 // Test default initial values from a spreadsheet created by Alan M. Nathan at
 // U. of Illinois
-TEST(ShotScopeTest, initVarsDefault)
+TEST(GolfTest, initVarsDefault)
 {
   const golfBall ball{0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 0.0};
   const atmosphericData atmos{70.0, 0.0, 0.0, 0.0, 0.0, 50.0, 29.92};
@@ -33,7 +33,7 @@ TEST(ShotScopeTest, initVarsDefault)
   EXPECT_NEAR(ballVars.getRe100(), 123600, 100);
 }
 
-TEST(ShotScopeTest, initVarsNotDefault)
+TEST(GolfTest, initVarsNotDefault)
 {
   const golfBall ball{0.0, 0.0, 0.0, 160.0, 11.0, 0.0, 3000.0, 500.0};
   const atmosphericData atmos{70.0, 90.0, 2.0, 30.0, 50.0, 50.0, 29.92};

@@ -54,7 +54,7 @@ jobs:
             artifact_name: libgolf.a
             asset_name: libgolf-macos-x86_64.a
           - os: windows-latest
-            artifact_name: shotscope.lib
+            artifact_name: golf.lib
             asset_name: libgolf-windows-x86_64.lib
 
     steps:

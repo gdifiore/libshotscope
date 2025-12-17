@@ -121,6 +121,6 @@ target_link_libraries(multi_ground_simulation ${PROJECT_NAME})
 include(GoogleTest)
 gtest_discover_tests(libgolf_tests)
 
-install(TARGETS shotscope DESTINATION lib)
+install(TARGETS golf DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 install(FILES "${PROJECT_BINARY_DIR}/include/version.hpp" DESTINATION include)
