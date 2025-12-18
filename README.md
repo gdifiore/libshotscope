@@ -18,12 +18,14 @@ chmod +x build.sh
 
 - Full trajectory simulation with automatic phase transitions (aerial → bounce → roll)
 - Dynamic ground surfaces - fairways, roughs, greens, elevation changes
+- 3D terrain system with slopes and varying surface normals
 - Efficient step-by-step numerical integration
 
 ## Documentation
 
-- [Getting Started](/docs/how.md) - Basic usage
+- [Getting Started](/docs/how.md) - Basic usage and examples
 - [Ground Providers](/docs/ground_providers.md) - Dynamic ground surfaces (fairways, roughs, greens)
+- [Terrain System](/docs/terrain.md) - 3D terrain with elevation and slopes
 
 ### Quick Example
 
