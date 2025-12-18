@@ -241,7 +241,9 @@ private:
 	mutable bool cacheValid_ = false;  // Explicit initialization flag
 
 	// Helper to update cache only when position changes
+	// cppcheck-suppress-begin unusedPrivateFunction
 	void updateCache(float x, float y) const;
+	// cppcheck-suppress-end unusedPrivateFunction
 };
 
 #endif // TERRAIN_INTERFACE_HPP
