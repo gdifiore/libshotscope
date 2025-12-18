@@ -66,6 +66,12 @@ class TerrainInterface
 public:
     virtual ~TerrainInterface() = default;
 
+    TerrainInterface(const TerrainInterface&) = delete;
+    TerrainInterface& operator=(const TerrainInterface&) = delete;
+
+    TerrainInterface(TerrainInterface&&) = delete;
+    TerrainInterface& operator=(TerrainInterface&&) = delete;
+
     /**
      * Gets the terrain height at the given horizontal position.
      *
@@ -98,6 +104,9 @@ public:
      * @return The ground surface properties (restitution, friction, etc.).
      */
     [[nodiscard]] virtual auto getSurfaceProperties(float x, float y) const -> const GroundSurface& = 0;
+
+protected:
+    TerrainInterface() = default;
 };
 
 /**
@@ -202,10 +211,9 @@ class GroundProvider;
  *
  * The adapter owns a copy of the provider to ensure proper lifetime management.
  *
- * @note Thread Safety: This class is NOT thread-safe for concurrent access.
- * The internal position cache uses mutable members without synchronization.
- * If concurrent access is required, external synchronization must be provided
- * by the caller (e.g., using a mutex).
+ * @warning This class is NOT thread-safe. It uses internal caching that will
+ *          cause data races if accessed concurrently from multiple threads.
+ *          Each thread should maintain its own instance.
  */
 class TerrainProviderAdapter : public TerrainInterface
 {

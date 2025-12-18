@@ -51,7 +51,7 @@ AerialPhase::AerialPhase(
 void AerialPhase::initialize(BallState &state)
 {
 	// Initialize spin from physicsVars if not already set
-	if (state.spinRate == 0.0F)
+	if (std::abs(state.spinRate) < physics_constants::MIN_VELOCITY_THRESHOLD)
 	{
 		state.spinRate = physicsVars.getROmega();
 	}
@@ -171,8 +171,17 @@ void AerialPhase::calculatePhi(BallState &state)
 
 void AerialPhase::calculateTau()
 {
-	tau = 1 / (physics_constants::TAU_COEFF * v /
-		(physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * physics_constants::PI * physics_constants::INCHES_PER_FOOT)));
+	const float ballRadius = physics_constants::STD_BALL_CIRCUMFERENCE_IN /
+	                        (2 * physics_constants::PI * physics_constants::INCHES_PER_FOOT);
+
+	// Prevent division by zero or near-zero velocity
+	if (v < physics_constants::MIN_VELOCITY_THRESHOLD)
+	{
+		tau = 1e6F;
+		return;
+	}
+
+	tau = 1.0F / (physics_constants::TAU_COEFF * v / ballRadius);
 }
 
 void AerialPhase::calculateRw(BallState &state)
