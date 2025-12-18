@@ -23,6 +23,9 @@
 class SimpleTestGroundProvider : public GroundProvider
 {
 public:
+	SimpleTestGroundProvider() = default;
+	SimpleTestGroundProvider(const SimpleTestGroundProvider&) : GroundProvider() {}
+
 	GroundSurface getGroundAt(float x, float y) const override
 	{
 		(void)x; // Not used in this simple test
@@ -65,6 +68,10 @@ public:
 class LateralTestGroundProvider : public GroundProvider
 {
 public:
+	LateralTestGroundProvider() = default;
+
+	LateralTestGroundProvider(const LateralTestGroundProvider&) : GroundProvider() {}
+
 	GroundSurface getGroundAt(float x, float y) const override
 	{
 		(void)y; // Not used in this test
@@ -396,6 +403,10 @@ TEST_F(GroundProviderTest, MultipleGroundTransitions)
 	class MultiZoneProvider : public GroundProvider
 	{
 	public:
+		MultiZoneProvider() = default;
+
+		MultiZoneProvider(const MultiZoneProvider&) : GroundProvider() {}
+
 		GroundSurface getGroundAt(float x, float y) const override
 		{
 			(void)x;

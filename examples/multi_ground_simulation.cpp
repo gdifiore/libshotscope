@@ -29,6 +29,9 @@
 class GolfHoleGroundProvider : public GroundProvider
 {
 public:
+	GolfHoleGroundProvider() = default;
+	GolfHoleGroundProvider(const GolfHoleGroundProvider&) : GroundProvider() {}
+
 	GroundSurface getGroundAt(float x, float y) const override
 	{
 		// Convert positions to yards for easier reasoning

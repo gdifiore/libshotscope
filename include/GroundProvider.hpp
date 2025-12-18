@@ -54,6 +54,12 @@ class GroundProvider
 public:
 	virtual ~GroundProvider() = default;
 
+	GroundProvider(const GroundProvider&) = delete;
+	GroundProvider& operator=(const GroundProvider&) = delete;
+
+	GroundProvider(GroundProvider&&) = delete;
+	GroundProvider& operator=(GroundProvider&&) = delete;
+
 	/**
 	 * @brief Query ground surface properties at a specific XY position.
 	 *
@@ -84,6 +90,9 @@ public:
 	 * @return A unique pointer to a cloned copy of this provider
 	 */
 	virtual std::unique_ptr<GroundProvider> clone() const = 0;
+
+protected:
+	GroundProvider() = default;
 };
 
 /**

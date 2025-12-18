@@ -22,6 +22,12 @@ class FlightPhase
 public:
 	virtual ~FlightPhase() = default;
 
+	FlightPhase(const FlightPhase&) = delete;
+	FlightPhase& operator=(const FlightPhase&) = delete;
+
+	FlightPhase(FlightPhase&&) = delete;
+	FlightPhase& operator=(FlightPhase&&) = delete;
+
 	/**
 	 * @brief Calculates a single time step for this phase.
 	 *
@@ -37,6 +43,9 @@ public:
 	 * @return true if the phase is complete and a transition should occur
 	 */
 	virtual bool isPhaseComplete(const BallState &state) const = 0;
+
+protected:
+	FlightPhase() = default;
 };
 
 /**
@@ -100,14 +109,14 @@ private:
 	// Private calculation methods
 	void calculatePosition(BallState &state, float dt);
 	void calculateV(BallState &state, float dt);
-	void calculateVelocityw(BallState &state);
-	void calculatePhi(BallState &state);
+	void calculateVelocityw(const BallState &state);
+	void calculatePhi(const BallState &state);
 	void calculateTau();
-	void calculateRw(BallState &state);
+	void calculateRw(const BallState &state);
 	void calculateRe_x_e5();
 	void calculateSpinFactor();
-	void calculateAccelD(BallState &state);
-	void calculateAccelM(BallState &state);
+	void calculateAccelD(const BallState &state);
+	void calculateAccelM(const BallState &state);
 	void calculateAccel(BallState &state);
 };
 

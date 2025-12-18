@@ -39,13 +39,13 @@ public:
 	 * This constructor uses a uniform ground surface (same properties everywhere).
 	 * For backward compatibility with existing code.
 	 *
-	 * @param physicsVars Physics variables calculator
+	 * @param physicsVars Physics variables calculator (will be copied)
 	 * @param ball Golf ball parameters
 	 * @param atmos Atmospheric conditions
 	 * @param ground Ground surface properties
 	 * @param terrain Terrain interface for height/normal queries (optional, defaults to flat terrain)
 	 */
-	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
+	FlightSimulator(const GolfBallPhysicsVariables &physicsVars,
 	                const struct golfBall &ball,
 	                const struct atmosphericData &atmos,
 	                const GroundSurface &ground,
@@ -57,12 +57,12 @@ public:
 	 * This constructor allows for dynamic ground type changes during the trajectory.
 	 * The ground provider is wrapped in a TerrainInterface adapter for compatibility.
 	 *
-	 * @param physicsVars Physics variables calculator
+	 * @param physicsVars Physics variables calculator (will be copied)
 	 * @param ball Golf ball parameters
 	 * @param atmos Atmospheric conditions
 	 * @param groundProvider Ground provider for position-dependent ground properties
 	 */
-	FlightSimulator(GolfBallPhysicsVariables &physicsVars,
+	FlightSimulator(const GolfBallPhysicsVariables &physicsVars,
 	                const struct golfBall &ball,
 	                const struct atmosphericData &atmos,
 	                const GroundProvider &groundProvider);
@@ -128,6 +128,10 @@ private:
 	Phase currentPhase;
 	BallState state;
 	bool initialized;
+
+	// Physics variables storage (owned by this simulator)
+	// Must be declared before phases since phases reference it
+	GolfBallPhysicsVariables physicsVars_;
 
 	// Terrain storage (for GroundProvider adapter lifetime management)
 	// Must be declared before phases since phases depend on it

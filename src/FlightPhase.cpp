@@ -51,7 +51,7 @@ AerialPhase::AerialPhase(
 void AerialPhase::initialize(BallState &state)
 {
 	// Initialize spin from physicsVars if not already set
-	if (state.spinRate == 0.0F)
+	if (std::abs(state.spinRate) < physics_constants::MIN_VELOCITY_THRESHOLD)
 	{
 		state.spinRate = physicsVars.getROmega();
 	}
@@ -145,7 +145,7 @@ void AerialPhase::calculateV(BallState &state, float dt)
 	vMph = v / physics_constants::MPH_TO_FT_PER_S;
 }
 
-void AerialPhase::calculateVelocityw(BallState &state)
+void AerialPhase::calculateVelocityw(const BallState &state)
 {
 	if (state.position[2] >= atmos.hWind)
 	{
@@ -164,18 +164,27 @@ void AerialPhase::calculateVelocityw(BallState &state)
 	vwMph = vw / physics_constants::MPH_TO_FT_PER_S;
 }
 
-void AerialPhase::calculatePhi(BallState &state)
+void AerialPhase::calculatePhi(const BallState &state)
 {
 	phi = atan2(state.position[1], state.position[2]) * 180 / physics_constants::PI;
 }
 
 void AerialPhase::calculateTau()
 {
-	tau = 1 / (physics_constants::TAU_COEFF * v /
-		(physics_constants::STD_BALL_CIRCUMFERENCE_IN / (2 * physics_constants::PI * physics_constants::INCHES_PER_FOOT)));
+	const float ballRadius = physics_constants::STD_BALL_CIRCUMFERENCE_IN /
+	                        (2 * physics_constants::PI * physics_constants::INCHES_PER_FOOT);
+
+	// Prevent division by zero or near-zero velocity
+	if (v < physics_constants::MIN_VELOCITY_THRESHOLD)
+	{
+		tau = 1e6F;
+		return;
+	}
+
+	tau = 1.0F / (physics_constants::TAU_COEFF * v / ballRadius);
 }
 
-void AerialPhase::calculateRw(BallState &state)
+void AerialPhase::calculateRw(const BallState &state)
 {
 	// Use current spin rate from state (which decays over time)
 	rw = state.spinRate;
@@ -231,7 +240,7 @@ void AerialPhase::calculateSpinFactor()
 	}
 }
 
-void AerialPhase::calculateAccelD(BallState &state)
+void AerialPhase::calculateAccelD(const BallState &state)
 {
 	accelerationDrag3D[0] = -physicsVars.getC0() * determineCoefficientOfDrag() *
 							vw * (state.velocity[0] - velocity3D_w[0]);
@@ -241,7 +250,7 @@ void AerialPhase::calculateAccelD(BallState &state)
 							vw * state.velocity[2];
 }
 
-void AerialPhase::calculateAccelM(BallState &state)
+void AerialPhase::calculateAccelM(const BallState &state)
 {
 	accelerationMagnitude3D[0] =
 		physicsVars.getC0() *
@@ -359,7 +368,6 @@ RollPhase::RollPhase(
 void RollPhase::calculateStep(BallState &state, float dt)
 {
 	// Get terrain data at ball position
-	float terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
 	Vector3D surfaceNormal = terrain->getNormal(state.position[0], state.position[1]);
 	const GroundSurface& surface = terrain->getSurfaceProperties(state.position[0], state.position[1]);
 
@@ -393,7 +401,7 @@ void RollPhase::calculateStep(BallState &state, float dt)
 	state.position[1] += state.velocity[1] * dt;
 
 	// Keep ball on terrain surface (recalculate height at new position)
-	terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
+	float terrainHeight = terrain->getHeight(state.position[0], state.position[1]);
 	state.position[2] = terrainHeight;
 	state.velocity[2] = 0.0F;
 
