@@ -74,12 +74,9 @@ namespace GroundPhysics
     Vector3D calculateRollAcceleration(
         const Vector3D& velocity,
         const Vector3D& surfaceNormal,
-        float spinRate,
+        [[maybe_unused]] float spinRate,
         const GroundSurface& surface)
     {
-        // Suppress unused parameter warning (may be used in future enhancements)
-        (void)spinRate;
-
         Vector3D acceleration = {0.0F, 0.0F, 0.0F};
 
         // Get horizontal velocity magnitude

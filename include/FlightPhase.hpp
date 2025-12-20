@@ -25,8 +25,8 @@ public:
 	FlightPhase(const FlightPhase&) = delete;
 	FlightPhase& operator=(const FlightPhase&) = delete;
 
-	FlightPhase(FlightPhase&&) = delete;
-	FlightPhase& operator=(FlightPhase&&) = delete;
+	FlightPhase(FlightPhase&&) = default;
+	FlightPhase& operator=(FlightPhase&&) = default;
 
 	/**
 	 * @brief Calculates a single time step for this phase.
@@ -61,8 +61,8 @@ class AerialPhase : public FlightPhase
 {
 public:
 	AerialPhase(GolfBallPhysicsVariables &physicsVars,
-	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos,
+	            const golfBall &ball,
+	            const atmosphericData &atmos,
 	            std::shared_ptr<TerrainInterface> terrain);
 
 	void initialize(BallState &state);
@@ -87,8 +87,8 @@ public:
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
-	struct golfBall ball;
-	struct atmosphericData atmos;
+	golfBall ball;
+	atmosphericData atmos;
 	std::shared_ptr<TerrainInterface> terrain;
 
 	// Calculated variables (derived from state)
@@ -132,8 +132,8 @@ class BouncePhase : public FlightPhase
 {
 public:
 	BouncePhase(GolfBallPhysicsVariables &physicsVars,
-	            const struct golfBall &ball,
-	            const struct atmosphericData &atmos,
+	            const golfBall &ball,
+	            const atmosphericData &atmos,
 	            std::shared_ptr<TerrainInterface> terrain);
 
 	void calculateStep(BallState &state, float dt) override;
@@ -141,8 +141,8 @@ public:
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
-	struct golfBall ball;
-	struct atmosphericData atmos;
+	golfBall ball;
+	atmosphericData atmos;
 	std::shared_ptr<TerrainInterface> terrain;
 	AerialPhase aerialPhase; // Used for aerodynamic calculations between bounces
 };
@@ -158,8 +158,8 @@ class RollPhase : public FlightPhase
 {
 public:
 	RollPhase(GolfBallPhysicsVariables &physicsVars,
-	          const struct golfBall &ball,
-	          const struct atmosphericData &atmos,
+	          const golfBall &ball,
+	          const atmosphericData &atmos,
 	          std::shared_ptr<TerrainInterface> terrain);
 
 	void calculateStep(BallState &state, float dt) override;
@@ -167,8 +167,8 @@ public:
 
 private:
 	GolfBallPhysicsVariables &physicsVars;
-	struct golfBall ball;
-	struct atmosphericData atmos;
+	golfBall ball;
+	atmosphericData atmos;
 	std::shared_ptr<TerrainInterface> terrain;
 };
 

@@ -35,7 +35,7 @@
  *       This class assumes that the input data is valid and within physically reasonable ranges.
  *       Passing invalid or out-of-range data may lead to unexpected behavior or incorrect calculations.
  */
-GolfBallPhysicsVariables::GolfBallPhysicsVariables(const struct golfBall &ball, const struct atmosphericData &atmos)
+GolfBallPhysicsVariables::GolfBallPhysicsVariables(const golfBall &ball, const atmosphericData &atmos)
     : ball(ball), atmos(atmos)
 {
     tempC = math_utils::convertFahrenheitToCelsius(atmos.temp);

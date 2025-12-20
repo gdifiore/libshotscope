@@ -92,7 +92,7 @@ float math_utils::getDistanceInYards(Vector3D position)
  * @param b The second vector.
  * @return The dot product (scalar).
  */
-float math_utils::dot(const Vector3D& a, const Vector3D& b)
+float math_utils::dot(const Vector3D& a, const Vector3D& b) noexcept
 {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
@@ -104,7 +104,7 @@ float math_utils::dot(const Vector3D& a, const Vector3D& b)
  * @param b The second vector.
  * @return The cross product vector (perpendicular to both a and b).
  */
-Vector3D math_utils::cross(const Vector3D& a, const Vector3D& b)
+Vector3D math_utils::cross(const Vector3D& a, const Vector3D& b) noexcept
 {
     return {
         a[1] * b[2] - a[2] * b[1],
@@ -119,7 +119,7 @@ Vector3D math_utils::cross(const Vector3D& a, const Vector3D& b)
  * @param v The vector.
  * @return The magnitude of the vector.
  */
-float math_utils::magnitude(const Vector3D& v)
+float math_utils::magnitude(const Vector3D& v) noexcept
 {
     return std::sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }
@@ -137,7 +137,7 @@ Vector3D math_utils::normalize(const Vector3D& v)
 
     if (mag < physics_constants::MIN_VELOCITY_THRESHOLD)
     {
-        throw std::invalid_argument("Cannot normalize zero-length vector");
+        throw std::invalid_argument(std::string(__func__) + ": Cannot normalize zero-length vector");
     }
 
     return {v[0] / mag, v[1] / mag, v[2] / mag};
@@ -157,7 +157,7 @@ Vector3D math_utils::project(const Vector3D& v, const Vector3D& onto)
 
     if (ontoMagSquared < physics_constants::MIN_VELOCITY_THRESHOLD * physics_constants::MIN_VELOCITY_THRESHOLD)
     {
-        throw std::invalid_argument("Cannot project onto zero-length vector");
+        throw std::invalid_argument(std::string(__func__) + ": Cannot project onto zero-length vector");
     }
 
     float scale = dot(v, onto) / ontoMagSquared;
