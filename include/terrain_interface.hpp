@@ -69,8 +69,8 @@ public:
     TerrainInterface(const TerrainInterface&) = delete;
     TerrainInterface& operator=(const TerrainInterface&) = delete;
 
-    TerrainInterface(TerrainInterface&&) = delete;
-    TerrainInterface& operator=(TerrainInterface&&) = delete;
+    TerrainInterface(TerrainInterface&&) = default;
+    TerrainInterface& operator=(TerrainInterface&&) = default;
 
     /**
      * Gets the terrain height at the given horizontal position.
@@ -130,23 +130,23 @@ public:
         // Validate surface properties are in physically meaningful ranges
         if (surface.restitution < 0.0F || surface.restitution > 1.0F)
         {
-            throw std::invalid_argument("Restitution must be in range [0.0, 1.0]");
+            throw std::invalid_argument(std::string(__func__) + ": Restitution must be in range [0.0, 1.0]");
         }
         if (surface.frictionStatic < 0.0F)
         {
-            throw std::invalid_argument("Static friction must be non-negative");
+            throw std::invalid_argument(std::string(__func__) + ": Static friction must be non-negative");
         }
         if (surface.frictionDynamic < 0.0F)
         {
-            throw std::invalid_argument("Dynamic friction must be non-negative");
+            throw std::invalid_argument(std::string(__func__) + ": Dynamic friction must be non-negative");
         }
         if (surface.firmness < 0.0F)
         {
-            throw std::invalid_argument("Firmness must be non-negative");
+            throw std::invalid_argument(std::string(__func__) + ": Firmness must be non-negative");
         }
         if (surface.spinRetention < 0.0F || surface.spinRetention > 1.0F)
         {
-            throw std::invalid_argument("Spin retention must be in range [0.0, 1.0]");
+            throw std::invalid_argument(std::string(__func__) + ": Spin retention must be in range [0.0, 1.0]");
         }
     }
 
@@ -157,11 +157,8 @@ public:
      * @param y The y-coordinate (unused for flat terrain).
      * @return The terrain height in feet.
      */
-    [[nodiscard]] auto getHeight(float x, float y) const noexcept -> float override
+    [[nodiscard]] auto getHeight([[maybe_unused]] float x, [[maybe_unused]] float y) const noexcept -> float override
     {
-        // Suppress unused parameter warnings
-        (void)x;
-        (void)y;
         return surface.height;
     }
 
@@ -172,11 +169,8 @@ public:
      * @param y The y-coordinate (unused for flat terrain).
      * @return The unit normal vector (0, 0, 1).
      */
-    [[nodiscard]] auto getNormal(float x, float y) const noexcept -> Vector3D override
+    [[nodiscard]] auto getNormal([[maybe_unused]] float x, [[maybe_unused]] float y) const noexcept -> Vector3D override
     {
-        // Suppress unused parameter warnings
-        (void)x;
-        (void)y;
         return {0.0F, 0.0F, 1.0F};
     }
 
@@ -187,11 +181,8 @@ public:
      * @param y The y-coordinate (unused for flat terrain).
      * @return The ground surface properties.
      */
-    [[nodiscard]] auto getSurfaceProperties(float x, float y) const noexcept -> const GroundSurface& override
+    [[nodiscard]] auto getSurfaceProperties([[maybe_unused]] float x, [[maybe_unused]] float y) const noexcept -> const GroundSurface& override
     {
-        // Suppress unused parameter warnings
-        (void)x;
-        (void)y;
         return surface;
     }
 
@@ -211,9 +202,9 @@ class GroundProvider;
  *
  * The adapter owns a copy of the provider to ensure proper lifetime management.
  *
- * @warning This class is NOT thread-safe. It uses internal caching that will
- *          cause data races if accessed concurrently from multiple threads.
- *          Each thread should maintain its own instance.
+ * @warning NOT thread-safe. Mutable cache members (cachedSurface_, cachedX_,
+ *          cachedY_, cacheValid_) will cause data races if shared across threads.
+ *          Use per-thread instances or mutex protection.
  */
 class TerrainProviderAdapter : public TerrainInterface
 {
@@ -225,9 +216,9 @@ public:
 	 * lifetime of this adapter.
 	 *
 	 * @param provider The ground provider to wrap (will be cloned)
-	 * @throws std::invalid_argument if provider is null
+	 * @throws std::invalid_argument if cloning fails
 	 */
-	explicit TerrainProviderAdapter(const GroundProvider* provider);
+	explicit TerrainProviderAdapter(const GroundProvider& provider);
 
 	[[nodiscard]] auto getHeight(float x, float y) const -> float override;
 	[[nodiscard]] auto getNormal(float x, float y) const noexcept -> Vector3D override;

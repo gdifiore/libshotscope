@@ -57,8 +57,8 @@ public:
 	GroundProvider(const GroundProvider&) = delete;
 	GroundProvider& operator=(const GroundProvider&) = delete;
 
-	GroundProvider(GroundProvider&&) = delete;
-	GroundProvider& operator=(GroundProvider&&) = delete;
+	GroundProvider(GroundProvider&&) = default;
+	GroundProvider& operator=(GroundProvider&&) = default;
 
 	/**
 	 * @brief Query ground surface properties at a specific XY position.
@@ -132,10 +132,8 @@ public:
 	 * @param y Forward position (ignored)
 	 * @return The ground surface specified at construction
 	 */
-	GroundSurface getGroundAt(float x, float y) const override
+	GroundSurface getGroundAt([[maybe_unused]] float x, [[maybe_unused]] float y) const override
 	{
-		(void)x; // Unused parameter
-		(void)y; // Unused parameter
 		return surface_;
 	}
 

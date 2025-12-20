@@ -9,8 +9,8 @@
 class GolfBallPhysicsVariables
 {
 public:
-	GolfBallPhysicsVariables(const struct golfBall &ball,
-							 const struct atmosphericData &atmos);
+	GolfBallPhysicsVariables(const golfBall &ball,
+							 const atmosphericData &atmos);
 
 	// Getters
 	[[nodiscard]] auto getRhoImperial() const -> float
@@ -37,8 +37,8 @@ public:
 	void calculateAllVariables();
 
 private:
-	struct golfBall ball;
-	struct atmosphericData atmos;
+	golfBall ball;
+	atmosphericData atmos;
 
 	// Member variables
 	float rhoImperial = 0.0F;
