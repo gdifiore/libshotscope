@@ -58,7 +58,7 @@ float getHeight(float x, float y) const override
 
 ### getNormal()
 
-Returns the surface normal vector at a given position. The normal must be unit length and point upward (away from solid terrain, into the air):
+Returns the surface normal vector at a given position. The normal should be unit length and point upward (away from solid terrain, into the air):
 
 ```c++
 Vector3D getNormal(float x, float y) const override
@@ -76,7 +76,7 @@ Vector3D getNormal(float x, float y) const override
 
 For flat surfaces, the normal is always `{0.0F, 0.0F, 1.0F}`. For sloped surfaces, the normal tilts accordingly while maintaining unit length.
 
-**Important:** The normal vector must have unit length (magnitude = 1.0). Functions will throw `std::invalid_argument` if this requirement is violated.
+**Important:** The normal vector should be unit length (magnitude = 1.0) for correct physics. Non-unit normals produce incorrect results but will not throw errors.
 
 ### getSurfaceProperties()
 
@@ -235,21 +235,13 @@ The simulation automatically transitions between phases:
 
 ## Validation and Error Handling
 
-### Surface Normal Validation
+### Parameter Validation
 
-All ground physics functions validate that surface normals are unit vectors:
+The library does not validate physics parameters:
 
-```c++
-float normalMag = math_utils::magnitude(surfaceNormal);
-if (std::abs(normalMag - 1.0F) > physics_constants::NORMAL_VECTOR_TOLERANCE)
-{
-    throw std::invalid_argument("Surface normal must be unit length");
-}
-```
-
-**Tolerance:** ±0.01 (1% deviation allowed for floating-point errors)
-
-This validation runs in both debug and production builds to catch implementation errors immediately.
+- Surface normals: should be unit vectors, not validated
+- Surface properties: any values accepted (allows experimental physics)
+- Caller's responsibility to ensure correct inputs
 
 ### Terrain Null Pointer
 
