@@ -46,8 +46,8 @@ public:
 	 * @param terrain Terrain interface for height/normal queries (optional, defaults to flat terrain)
 	 */
 	FlightSimulator(const GolfBallPhysicsVariables &physicsVars,
-	                const struct golfBall &ball,
-	                const struct atmosphericData &atmos,
+	                const golfBall &ball,
+	                const atmosphericData &atmos,
 	                const GroundSurface &ground,
 	                std::shared_ptr<TerrainInterface> terrain = nullptr);
 
@@ -63,8 +63,8 @@ public:
 	 * @param groundProvider Ground provider for position-dependent ground properties
 	 */
 	FlightSimulator(const GolfBallPhysicsVariables &physicsVars,
-	                const struct golfBall &ball,
-	                const struct atmosphericData &atmos,
+	                const golfBall &ball,
+	                const atmosphericData &atmos,
 	                const GroundProvider &groundProvider);
 
 	/**

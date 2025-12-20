@@ -10,8 +10,8 @@
 #include <stdexcept>
 
 FlightSimulator::FlightSimulator(
-	const GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, const GroundSurface &ground,
+	const GolfBallPhysicsVariables &physicsVars, const golfBall &ball,
+	const atmosphericData &atmos, const GroundSurface &ground,
 	std::shared_ptr<TerrainInterface> terrain)
 	: currentPhase(Phase::Aerial),
 	  // state is default-constructed
@@ -25,13 +25,13 @@ FlightSimulator::FlightSimulator(
 }
 
 FlightSimulator::FlightSimulator(
-	const GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, const GroundProvider &groundProvider)
+	const GolfBallPhysicsVariables &physicsVars, const golfBall &ball,
+	const atmosphericData &atmos, const GroundProvider &groundProvider)
 	: currentPhase(Phase::Aerial),
 	  // state is default-constructed
 	  initialized(false),
 	  physicsVars_(physicsVars),
-	  terrainStorage_(std::make_shared<TerrainProviderAdapter>(&groundProvider)),
+	  terrainStorage_(std::make_shared<TerrainProviderAdapter>(groundProvider)),
 	  aerialPhase(physicsVars_, ball, atmos, terrainStorage_),
 	  bouncePhase(physicsVars_, ball, atmos, terrainStorage_),
 	  rollPhase(physicsVars_, ball, atmos, terrainStorage_)

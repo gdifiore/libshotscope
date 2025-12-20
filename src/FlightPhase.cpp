@@ -24,13 +24,13 @@
 // ============================================================================
 
 AerialPhase::AerialPhase(
-	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
+	GolfBallPhysicsVariables &physicsVars, const golfBall &ball,
+	const atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain)
 {
 	if (!terrain)
 	{
-		throw std::invalid_argument("Terrain interface must not be null");
+		throw std::invalid_argument(std::string(__func__) + ": Terrain interface must not be null");
 	}
 
 	// Initialize calculated variables
@@ -285,14 +285,14 @@ void AerialPhase::calculateAccel(BallState &state)
 // ============================================================================
 
 BouncePhase::BouncePhase(
-	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
+	GolfBallPhysicsVariables &physicsVars, const golfBall &ball,
+	const atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain),
 	  aerialPhase(physicsVars, ball, atmos, terrain)
 {
 	if (!terrain)
 	{
-		throw std::invalid_argument("Terrain interface must not be null");
+		throw std::invalid_argument(std::string(__func__) + ": Terrain interface must not be null");
 	}
 }
 
@@ -355,13 +355,13 @@ bool BouncePhase::isPhaseComplete(const BallState &state) const
 // ============================================================================
 
 RollPhase::RollPhase(
-	GolfBallPhysicsVariables &physicsVars, const struct golfBall &ball,
-	const struct atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
+	GolfBallPhysicsVariables &physicsVars, const golfBall &ball,
+	const atmosphericData &atmos, std::shared_ptr<TerrainInterface> terrain)
 	: physicsVars(physicsVars), ball(ball), atmos(atmos), terrain(terrain)
 {
 	if (!terrain)
 	{
-		throw std::invalid_argument("Terrain interface must not be null");
+		throw std::invalid_argument(std::string(__func__) + ": Terrain interface must not be null");
 	}
 }
 

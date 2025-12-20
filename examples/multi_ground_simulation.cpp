@@ -30,7 +30,6 @@ class GolfHoleGroundProvider : public GroundProvider
 {
 public:
 	GolfHoleGroundProvider() = default;
-	GolfHoleGroundProvider(const GolfHoleGroundProvider&) : GroundProvider() {}
 
 	GroundSurface getGroundAt(float x, float y) const override
 	{
@@ -77,7 +76,7 @@ public:
 
 	std::unique_ptr<GroundProvider> clone() const override
 	{
-		return std::make_unique<GolfHoleGroundProvider>(*this);
+		return std::make_unique<GolfHoleGroundProvider>();
 	}
 };
 

@@ -12,12 +12,12 @@
 #include <stdexcept>
 #include <cmath>
 
-TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider* provider)
-	: provider_(provider ? provider->clone() : nullptr), cachedSurface_{}
+TerrainProviderAdapter::TerrainProviderAdapter(const GroundProvider& provider)
+	: provider_(provider.clone()), cachedSurface_{}
 {
-	if (!provider)
+	if (!provider_)
 	{
-		throw std::invalid_argument("GroundProvider pointer must not be null");
+		throw std::invalid_argument(std::string(__func__) + ": GroundProvider clone failed");
 	}
 }
 
@@ -41,10 +41,8 @@ float TerrainProviderAdapter::getHeight(float x, float y) const
 	return cachedSurface_.height;
 }
 
-Vector3D TerrainProviderAdapter::getNormal(float x, float y) const noexcept
+Vector3D TerrainProviderAdapter::getNormal([[maybe_unused]] float x, [[maybe_unused]] float y) const noexcept
 {
-	(void)x;
-	(void)y;
 	// GroundProvider assumes flat terrain, so normal is always vertical
 	return {0.0F, 0.0F, 1.0F};
 }
