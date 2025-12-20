@@ -85,14 +85,17 @@ public:
      * Gets the surface normal vector at the given horizontal position.
      *
      * The normal vector points upward from the surface (away from solid terrain,
-     * into the air) and has unit length. It is perpendicular to the tangent plane
-     * of the surface at the given position. For a horizontal flat surface, this is
-     * always (0, 0, 1). For sloped surfaces, the normal tilts accordingly while
-     * maintaining unit length.
+     * into the air) and should be unit length. It is perpendicular to the tangent
+     * plane of the surface at the given position.
+     *
+     * Expected values (not enforced):
+     *   Flat surface: (0, 0, 1)
+     *   Magnitude: 1.0 (unit vector for correct physics)
+     *   z-component: typically > 0.5 (slopes < ~60 degrees)
      *
      * @param x The x-coordinate (lateral position in feet).
      * @param y The y-coordinate (forward position in feet).
-     * @return The unit normal vector pointing upward from the surface.
+     * @return The surface normal vector (should be unit length).
      */
     [[nodiscard]] virtual auto getNormal(float x, float y) const -> Vector3D = 0;
 
@@ -123,32 +126,9 @@ public:
      * Constructs a flat terrain with the given surface properties.
      *
      * @param surface The ground surface properties to use everywhere.
-     * @throws std::invalid_argument if surface properties are out of valid ranges.
+     * @note No validation performed. Caller ensures valid inputs.
      */
-    explicit FlatTerrain(const GroundSurface& surface) : surface(surface)
-    {
-        // Validate surface properties are in physically meaningful ranges
-        if (surface.restitution < 0.0F || surface.restitution > 1.0F)
-        {
-            throw std::invalid_argument("Restitution must be in range [0.0, 1.0]");
-        }
-        if (surface.frictionStatic < 0.0F)
-        {
-            throw std::invalid_argument("Static friction must be non-negative");
-        }
-        if (surface.frictionDynamic < 0.0F)
-        {
-            throw std::invalid_argument("Dynamic friction must be non-negative");
-        }
-        if (surface.firmness < 0.0F)
-        {
-            throw std::invalid_argument("Firmness must be non-negative");
-        }
-        if (surface.spinRetention < 0.0F || surface.spinRetention > 1.0F)
-        {
-            throw std::invalid_argument("Spin retention must be in range [0.0, 1.0]");
-        }
-    }
+    explicit FlatTerrain(const GroundSurface& surface) : surface(surface) {}
 
     /**
      * Gets the terrain height (constant everywhere).

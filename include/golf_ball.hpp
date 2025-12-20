@@ -11,14 +11,74 @@
  */
 struct golfBall
 {
-    float x0;          // yards; initial lateral position (right of target line)
-    float y0;          // yards; initial forward position (downrange)
-    float z0;          // yards; initial height above ground
-    float exitSpeed;   // mph; ball speed at impact
-    float launchAngle; // deg; vertical angle above horizontal (0=flat, 90=straight up)
-    float direction;   // deg; horizontal angle (0=straight, >0=right, <0=left)
-    float backspin;    // rpm; backspin rate (positive = backspin)
-    float sidespin;    // rpm; sidespin rate (+ for hook, - for slice)
+	/**
+	 * @brief Initial lateral position (in yards).
+	 *
+	 * Positive values are right of target line.
+	 */
+	float x0;
+
+	/**
+	 * @brief Initial forward position (in yards).
+	 *
+	 * Distance downrange from origin.
+	 */
+	float y0;
+
+	/**
+	 * @brief Initial height above ground (in yards).
+	 *
+	 * Typically 0.0 for ground-level shots.
+	 */
+	float z0;
+
+	/**
+	 * @brief Ball speed at impact (in mph).
+	 *
+	 * Typical values:
+	 * - Driver: ~150-180 mph
+	 * - Mid iron: ~100-120 mph
+	 * - Wedge: ~70-90 mph
+	 */
+	float exitSpeed;
+
+	/**
+	 * @brief Vertical launch angle (in degrees).
+	 *
+	 * Angle above horizontal plane.
+	 * Typical values:
+	 * - Driver: ~10-15 deg
+	 * - Mid iron: ~20-30 deg
+	 * - Wedge: ~40-50 deg
+	 */
+	float launchAngle;
+
+	/**
+	 * @brief Horizontal launch direction (in degrees).
+	 *
+	 * Angle from target line (0 = straight, + = right, - = left).
+	 * Typical range: -45 to +45 deg
+	 */
+	float direction;
+
+	/**
+	 * @brief Backspin rate (in rpm).
+	 *
+	 * Positive values indicate backspin.
+	 * Typical values:
+	 * - Driver: ~2000-3000 rpm
+	 * - Mid iron: ~5000-7000 rpm
+	 * - Wedge: ~8000-10000 rpm
+	 */
+	float backspin;
+
+	/**
+	 * @brief Sidespin rate (in rpm).
+	 *
+	 * Positive values produce hook spin, negative values produce slice spin.
+	 * Typical range: -3000 to +3000 rpm
+	 */
+	float sidespin;
 };
 
 /**
@@ -26,12 +86,47 @@ struct golfBall
  */
 struct golfBallLanding
 {
-    float xF;           // yards; final lateral position (right of target line)
-    float yF;           // yards; final forward position (downrange)
-    float zF;           // yards; final height above ground
-    float timeOfFlight; // seconds; total time in air
-    float bearing;      // degrees; direction from start to landing
-    float distance;     // yards; total distance from start to landing
+	/**
+	 * @brief Final lateral position (in yards).
+	 *
+	 * Positive values are right of target line.
+	 */
+	float xF;
+
+	/**
+	 * @brief Final forward position (in yards).
+	 *
+	 * Distance downrange from origin at rest.
+	 */
+	float yF;
+
+	/**
+	 * @brief Final height above ground (in yards).
+	 *
+	 * Typically 0.0 when ball comes to rest on ground.
+	 */
+	float zF;
+
+	/**
+	 * @brief Total time of flight (in seconds).
+	 *
+	 * Duration from launch to final rest position.
+	 */
+	float timeOfFlight;
+
+	/**
+	 * @brief Direction from start to landing (in degrees).
+	 *
+	 * Bearing angle from initial position to final position.
+	 */
+	float bearing;
+
+	/**
+	 * @brief Total distance from start to landing (in yards).
+	 *
+	 * Straight-line distance between initial and final positions.
+	 */
+	float distance;
 };
 
 #endif // GOLF_BALL_HPP

@@ -23,13 +23,6 @@ namespace GroundPhysics
     {
         BounceResult result;
 
-        // Validate that surface normal is unit length
-        float normalMag = math_utils::magnitude(surfaceNormal);
-        if (std::abs(normalMag - 1.0F) > physics_constants::NORMAL_VECTOR_TOLERANCE)
-        {
-            throw std::invalid_argument("Surface normal must be unit length");
-        }
-
         // Decompose velocity into normal and tangent components
         // v_normal = (v · n) * n
         // v_tangent = v - v_normal
@@ -86,13 +79,6 @@ namespace GroundPhysics
     {
         // Suppress unused parameter warning (may be used in future enhancements)
         (void)spinRate;
-
-        // Validate that surface normal is unit length
-        float normalMag = math_utils::magnitude(surfaceNormal);
-        if (std::abs(normalMag - 1.0F) > physics_constants::NORMAL_VECTOR_TOLERANCE)
-        {
-            throw std::invalid_argument("Surface normal must be unit length");
-        }
 
         Vector3D acceleration = {0.0F, 0.0F, 0.0F};
 
@@ -159,13 +145,6 @@ namespace GroundPhysics
         const Vector3D& surfaceNormal,
         float heightAboveGround)
     {
-        // Validate that surface normal is unit length
-        float normalMag = math_utils::magnitude(surfaceNormal);
-        if (std::abs(normalMag - 1.0F) > physics_constants::NORMAL_VECTOR_TOLERANCE)
-        {
-            throw std::invalid_argument("Surface normal must be unit length");
-        }
-
         // Check if ball is close to the ground
         if (heightAboveGround > physics_constants::GROUND_CONTACT_THRESHOLD)
         {
